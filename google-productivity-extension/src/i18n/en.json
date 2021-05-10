@@ -1,0 +1,11 @@
+{
+    "messages": {
+        "drive.modifiedBy": "Modified: {date} by {name}",
+        "google.signIn": "Sign in to Google",
+        "google.signedOut": "Signed out of Google",
+        "google.launchMessage": "Open Google Drive",
+        "mail.unread": "You have {unread} unread email",
+        "mail.unreads": "You have {unread} unread emails",
+        "mail.launchMessage": "Open Google GMail"
+    }
+}
