@@ -3,9 +3,9 @@ import React, { useState, useEffect } from "react";
 import { withIntl } from "./ReactIntlProviderWrapper";
 import PropTypes from "prop-types";
 
-import { TextLink, Typography } from "@hedtech/react-design-system/core";
+import { Avatar, Divider, TextLink, Typography } from "@hedtech/react-design-system/core";
 import { withStyles } from "@hedtech/react-design-system/core/styles";
-import { spacing30, spacingSmall } from "@hedtech/react-design-system/core/styles/tokens";
+import { fontWeightBold, spacing30, spacingSmall } from "@hedtech/react-design-system/core/styles/tokens";
 
 import { ExtensionProvider, useExtensionControl } from '@ellucian/experience-extension-hooks';
 
@@ -62,29 +62,43 @@ const styles = () => ({
 	},
 	row: {
 		display: "flex",
-		paddingLeft: spacingSmall,
-		paddingRight: spacingSmall
-	},
-	fileBox: {
-		width: "90%",
-		display: "flex",
-		flexDirection: "column",
-		padding: "0 9px",
-		alignItems: "flex-start"
-	},
-	fileNameBox: {
-		display: "flex",
-		width: '100%',
-		alignItems: 'baseline',
-		marginBottom: spacing30
-	},
-	fileIcon: {
+		marginLeft: spacingSmall,
 		marginRight: spacingSmall
 	},
-	fileName: {
-		overflow: 'hidden',
-		wordWrap: 'break-word',
-		textOverflow: 'ellipsis'
+	messageBox: {
+		display: "flex",
+		alignItems: "center",
+		paddingLeft: spacingSmall,
+		paddingRight: spacingSmall,
+		width: '100%'
+	},
+	messageIcon: {
+		flex: '0 0 auto'
+	},
+	messageDetailsBox: {
+		paddingLeft: spacingSmall,
+		width: 'calc(100% - 40px)',
+		flex: '1 1 auto',
+		display: "flex",
+		flexDirection: 'column',
+		alignItems: 'stretch'
+	},
+	messageFrom: {
+		fontWeight: fontWeightBold
+	},
+	subjectBox: {
+		display: 'flex',
+		justifyContent: 'space-between'
+	},
+	subject: {
+		fontWeight: fontWeightBold,
+		marginRight: spacingSmall
+	},
+	body: {
+	},
+	divider: {
+		marginTop: spacing30,
+		marginBottom: spacing30
 	}
 });
 
@@ -111,24 +125,74 @@ function GMailCard({ classes }) {
 		setLoadingStatus(displayState !== 'loaded' && displayState !== 'loggedOut');
 	}, [displayState])
 
+	const loadedMessages = (messages || []).filter(message => message.data);
 	if (displayState === 'loaded') {
-		return (
-			<div className={classes.card}>
-				<img src={GoogleIcon}/>
-				<Typography>
-					{intl.formatMessage({id: (unread === 1 ? 'mail.unread' : 'mail.unreads')}, {unread})}
-				</Typography>
-				<Typography variant={"body1"} >
-					<TextLink
-						href='https://mail.google.com'
-						variant='inherit'
-						target='_blank'
-					>
-						{intl.formatMessage({id: 'mail.launchMessage'})}
-					</TextLink>
-				</Typography>
-			</div>
-		);
+		if (loadedMessages.length > 0) {
+			return (
+				<>
+					{loadedMessages.map((message) => {
+						const {
+							data: {
+								receivedDate,
+								fromName,
+								fromInitials,
+								subject,
+								body
+							}
+						} = message;
+						return (
+							<>
+								<div className={classes.messageBox}>
+									<Avatar>{fromInitials}</Avatar>
+									<div className={classes.messageDetailsBox}>
+										<Typography
+											className={classes.messageFrom}
+											noWrap
+											variant={"body1"}
+										>
+											{fromName}
+										</Typography>
+										<div className={classes.subjectBox}>
+											<Typography component='div' noWrap className={classes.subject}>
+												{subject}
+											</Typography>
+											<Typography component='div' className={classes.date}>
+												{receivedDate.toString()}
+											</Typography>
+										</div>
+										<Typography component='div' noWrap className={classes.body}>
+											{body}
+										</Typography>
+									</div>
+								</div>
+								<Divider classes={{ root: classes.divider }} variant={"middle"} />
+							</>
+						);
+					})}
+				</>
+			);
+		} else if (displayState === 'loggedOut') {
+			return (
+				<div className={classes.card}>
+					<img src={GoogleIcon}/>
+					<Typography>
+						{intl.formatMessage({id: (unread === 1 ? 'mail.unread' : 'mail.unreads')}, {unread})}
+					</Typography>
+					<Typography variant={"body1"} >
+						<TextLink
+							href='https://mail.google.com'
+							variant='inherit'
+							target='_blank'
+						>
+							{intl.formatMessage({id: 'mail.launchMessage'})}
+						</TextLink>
+					</Typography>
+				</div>
+			);
+		} else {
+			// happens for a skinny second
+			return null;
+		}
 	} else if (displayState === 'loggedOut') {
 		return (
 			<div className={classes.card}>

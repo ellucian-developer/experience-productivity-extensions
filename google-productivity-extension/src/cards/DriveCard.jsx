@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 
 import { TextLink, Typography, Divider } from "@hedtech/react-design-system/core";
 import { withStyles } from "@hedtech/react-design-system/core/styles";
-import { spacing30, spacingSmall } from "@hedtech/react-design-system/core/styles/tokens";
+import { fontWeightBold, spacing30, spacingSmall } from "@hedtech/react-design-system/core/styles/tokens";
 
 import { ExtensionProvider, useExtensionControl, useUserInfo } from '@ellucian/experience-extension-hooks';
 
@@ -80,9 +80,12 @@ const styles = () => ({
 		marginRight: spacingSmall
 	},
 	fileName: {
-		overflow: 'hidden',
-		wordWrap: 'break-word',
-		textOverflow: 'ellipsis'
+		width: '100%',
+		fontWeight: fontWeightBold
+	},
+	divider: {
+		marginTop: spacing30,
+		marginBottom: spacing30
 	}
 });
 
@@ -143,7 +146,7 @@ function DriveCard({ classes }) {
 										<div className={classes.fileNameBox}>
 											<Typography
 												className={classes.fileName}
-												style={{ fontWeight: "bold" }}
+												noWrap
 												variant={"body1"}
 											>
 												{file.name}
@@ -154,7 +157,7 @@ function DriveCard({ classes }) {
 										</div>
 									</div>
 								</div>
-								<Divider variant={"middle"} />
+								<Divider className={classes.divider} variant={"middle"} />
 							</a>
 						);
 					})}
