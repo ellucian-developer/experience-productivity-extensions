@@ -1,6 +1,6 @@
 {
   "name": "google-productivity-extension",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Description of google-productivity-extension",
   "main": "index.js",
   "license": "UNLICENSED",
@@ -17,13 +17,14 @@
     "@ellucian/experience-extension-hooks": "2.2.1",
     "@eui/ds-icons": "https://cdn.elluciancloud.com/assets/EDS2/4.5.0/umd/path_design_system_icons.tgz",
     "@hedtech/react-design-system": "https://cdn.elluciancloud.com/assets/EDS2/4.5.0/umd/path_design_system.tgz",
-    "classnames": "2.2.6",
+    "classnames": "2.3.1",
     "gapi-script": "1.2.0",
     "prop-types": "15.7.2",
     "react": "16.9.0",
     "react-dom": "16.9.0",
     "react-intl": "2.8.0",
-    "react-router-dom": "5.2.0"
+    "react-router-dom": "5.2.0",
+    "safe-html": "1.0.0"
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "7.12.1",

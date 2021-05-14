@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { withIntl } from "./ReactIntlProviderWrapper";
 import PropTypes from "prop-types";
+import safeHtml from 'safe-html';
+import classnames from 'classnames';
 
 import { Avatar, Divider, TextLink, Typography } from "@hedtech/react-design-system/core";
 import { withStyles } from "@hedtech/react-design-system/core/styles";
@@ -12,7 +14,6 @@ import { ExtensionProvider, useExtensionControl } from '@ellucian/experience-ext
 import { CardProvider, useIntl } from './card-context';
 
 import GoogleSignInImage from '../images/btn_google_signin_dark_normal_web.png';
-import GoogleIcon from '../images/btn_google_dark_focus_ios.svg';
 
 import { AuthProvider, useAuth } from "./auth-context";
 import { MailProvider, useMail } from "./mail-context";
@@ -84,15 +85,16 @@ const styles = () => ({
 		alignItems: 'stretch'
 	},
 	messageFrom: {
-		fontWeight: fontWeightBold
 	},
 	subjectBox: {
 		display: 'flex',
 		justifyContent: 'space-between'
 	},
 	subject: {
-		fontWeight: fontWeightBold,
 		marginRight: spacingSmall
+	},
+	bold: {
+		fontWeight: fontWeightBold
 	},
 	body: {
 	},
@@ -107,38 +109,37 @@ function GMailCard({ classes }) {
 	const { setLoadingStatus } = useExtensionControl();
 
 	const { login, loggedIn } = useAuth();
-	const { messages, unread } = useMail();
+	const { messages, state: mailState } = useMail();
 
 	const [displayState, setDisplayState] = useState('init');
 
 	useEffect(() => {
-		if (unread !== undefined) {
+		if (mailState === 'loaded') {
 			setDisplayState('loaded');
+		} else if (mailState && mailState.error) {
+			setDisplayState('error');
 		} else if (loggedIn === false) {
 			setDisplayState('loggedOut');
 		} else if (loggedIn) {
 			setDisplayState('loggedIn');
 		}
-	}, [ loggedIn, unread ])
+	}, [ loggedIn, mailState ])
 
 	useEffect(() => {
-		setLoadingStatus(displayState !== 'loaded' && displayState !== 'loggedOut');
+		setLoadingStatus(displayState === 'init' || !mailState || (displayState === 'loggedIn' && mailState === 'loading'));
 	}, [displayState])
 
-	const loadedMessages = (messages || []).filter(message => message.data);
 	if (displayState === 'loaded') {
-		if (loadedMessages.length > 0) {
+		if (messages.length > 0) {
 			return (
 				<>
-					{loadedMessages.map((message) => {
+					{messages.map((message) => {
 						const {
-							data: {
-								receivedDate,
-								fromName,
-								fromInitials,
-								subject,
-								body
-							}
+							receivedDate,
+							fromName,
+							fromInitials,
+							subject,
+							body
 						} = message;
 						return (
 							<>
@@ -146,14 +147,14 @@ function GMailCard({ classes }) {
 									<Avatar>{fromInitials}</Avatar>
 									<div className={classes.messageDetailsBox}>
 										<Typography
-											className={classes.messageFrom}
+											className={classnames(classes.messageFrom, { [classes.bold]: message.unread })}
 											noWrap
 											variant={"body1"}
 										>
 											{fromName}
 										</Typography>
 										<div className={classes.subjectBox}>
-											<Typography component='div' noWrap className={classes.subject}>
+											<Typography component='div' noWrap className={classnames(classes.subject, { [classes.bold]: message.unread })}>
 												{subject}
 											</Typography>
 											<Typography component='div' className={classes.date}>
@@ -161,7 +162,7 @@ function GMailCard({ classes }) {
 											</Typography>
 										</div>
 										<Typography component='div' noWrap className={classes.body}>
-											{body}
+											<div dangerouslySetInnerHTML={{__html: safeHtml(body)}}/>
 										</Typography>
 									</div>
 								</div>
@@ -171,27 +172,6 @@ function GMailCard({ classes }) {
 					})}
 				</>
 			);
-		} else if (displayState === 'loggedOut') {
-			return (
-				<div className={classes.card}>
-					<img src={GoogleIcon}/>
-					<Typography>
-						{intl.formatMessage({id: (unread === 1 ? 'mail.unread' : 'mail.unreads')}, {unread})}
-					</Typography>
-					<Typography variant={"body1"} >
-						<TextLink
-							href='https://mail.google.com'
-							variant='inherit'
-							target='_blank'
-						>
-							{intl.formatMessage({id: 'mail.launchMessage'})}
-						</TextLink>
-					</Typography>
-				</div>
-			);
-		} else {
-			// happens for a skinny second
-			return null;
 		}
 	} else if (displayState === 'loggedOut') {
 		return (
@@ -212,6 +192,8 @@ function GMailCard({ classes }) {
 			</div>
 		);
 	} else {
+		// eslint-disable-next-line no-warning-comments
+		// TODO add error case
 		return null;
 	}
 }

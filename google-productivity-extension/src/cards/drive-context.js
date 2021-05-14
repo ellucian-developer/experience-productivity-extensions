@@ -2,6 +2,8 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import PropTypes from 'prop-types';
 
 import { useAuth } from './auth-context';
+// eslint-disable-next-line camelcase
+import { unstable_batchedUpdates } from 'react-dom';
 
 const refreshInterval = 60000;
 
@@ -13,7 +15,7 @@ export function DriveProvider({children}) {
     const [state, setState] = useState('load');
     const [files, setFiles] = useState();
 
-    const refreshFiles = useCallback(async () => {
+    const refresh = useCallback(async () => {
 		if (gapi && loggedIn) {
             // if not force load and not curent visible, skip it
             if (state === 'refresh' && document.hidden) {
@@ -34,8 +36,10 @@ export function DriveProvider({children}) {
                 });
 
                 const data = JSON.parse(response.body);
-                setFiles(() => data.files);
-                setState('loaded');
+                unstable_batchedUpdates(() => {
+                    setFiles(() => data.files);
+                    setState('loaded');
+                })
             } catch (error) {
                 console.error('gapi failed', error);
                 setState('error');
@@ -45,9 +49,9 @@ export function DriveProvider({children}) {
 
     useEffect(() => {
 		if (gapi && loggedIn && (state === 'load' || state === 'refresh')) {
-            refreshFiles();
+            refresh();
         }
-    }, [gapi, loggedIn, refreshFiles, state])
+    }, [gapi, loggedIn, refresh, state])
 
     useEffect(() => {
         let timerId;
@@ -104,9 +108,9 @@ export function DriveProvider({children}) {
     const contextValue = useMemo(() => {
         return {
             files,
-            refresh: refreshFiles
+            refresh: refresh
         }
-    }, [ files, refreshFiles ]);
+    }, [ files, refresh ]);
 
     if (process.env.NODE_ENV === 'development') {
         useEffect(() => {
