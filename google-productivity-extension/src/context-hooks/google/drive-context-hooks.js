@@ -10,8 +10,9 @@ const refreshInterval = 60000;
 const Context = createContext()
 
 export function DriveProvider({children}) {
-    const { loggedIn } = useAuth();
+    const { loggedIn, setLoggedIn } = useAuth();
 
+    const [error, setError] = useState(false);
     const [state, setState] = useState('load');
     const [files, setFiles] = useState();
 
@@ -31,19 +32,38 @@ export function DriveProvider({children}) {
             try {
                 const { gapi } = window;
                 const response = await gapi.client.drive.files.list({
-                    pageSize: 10,
-                    fields: 'nextPageToken, files(id, iconLink, name, lastModifyingUser, modifiedTime, webViewLink)',
+                    pageSize: 20,
+                    fields: 'nextPageToken, files(id, iconLink, name, lastModifyingUser, modifiedTime, trashed, viewedByMe, webViewLink)',
+                    // fields: '*',
                     q: search
                 });
 
                 const data = JSON.parse(response.body);
+
+                // filter out trashed items and limit to 10
+                let filteredCount = 0;
+                const filteredFiles = data.files.filter(file => {
+                    if (!file.trashed) {
+                        filteredCount++;
+                        return filteredCount <= 10
+                    } else {
+                        return false;
+                    }
+                });
+
                 unstable_batchedUpdates(() => {
-                    setFiles(() => data.files);
+                    setFiles(() => filteredFiles);
                     setState('loaded');
                 })
             } catch (error) {
-                console.error('gapi failed', error);
-                setState('error');
+                // did we get logged out or credentials were revoked?
+                if (error && error.status === 401) {
+                    setLoggedIn(false);
+                } else {
+                    console.error('gapi failed', error);
+                    setState(() => ({ error: 'api'}));
+                    setError(error);
+                }
             }
         }
     }, [loggedIn, state])
@@ -108,10 +128,11 @@ export function DriveProvider({children}) {
 
     const contextValue = useMemo(() => {
         return {
+            error,
             files,
-            refresh: refresh
+            refresh: () => { setState('refresh') }
         }
-    }, [ files, refresh ]);
+    }, [ error, files, setState ]);
 
     if (process.env.NODE_ENV === 'development') {
         useEffect(() => {

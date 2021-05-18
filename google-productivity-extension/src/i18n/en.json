@@ -1,10 +1,13 @@
 {
     "messages": {
+        "error.contentNotAvailable": "Content Not Available",
+        "error.contactYourAdministrator": "Contact your Administrator",
         "drive.modifiedBy": "Modified: {date} by {name}",
-        "google.signIn": "Sign in to Google",
+        "google.signIn": "Sign in with Google",
         "google.signedOut": "Signed out of Google",
         "google.launchMessage": "Open Google Drive",
         "google.permissionsRequested": "Permissions Requested",
+        "mail.attachment": "Attachment",
         "mail.unread": "You have {unread} unread email",
         "mail.unreads": "You have {unread} unread emails",
         "mail.launchMessage": "Open Google GMail"

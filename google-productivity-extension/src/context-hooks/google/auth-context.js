@@ -29,7 +29,7 @@ function loadGapi(clientId, setApiState, setLoggedIn, setError) {
             'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest',
             'https://gmail.googleapis.com/$discovery/rest?version=v1'
         ];
-        const scope = 'https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/gmail.readonly';
+        const scope = 'https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/gmail.readonly';
 
         try {
             await gapi.client.init({
@@ -60,20 +60,45 @@ export function AuthProvider({ children }) {
     const { configuration: { googleOAuthClientId } } = useCardInfo();
 
     const [email, setEmail] = useState();
-    const [error, setError] = useState();
+    const [error, setError] = useState(false);
     // eslint-disable-next-line no-empty-function
-    const [login, setLogin] = useState(() => {});
+    // const [login, setLogin] = useState(() => {});
     const [loggedIn, setLoggedIn] = useState();
     const [state, setState] = useState('initializing');
 
     const [apiState, setApiState] = useState('init');
+
+    function login() {
+        const { gapi } = window;
+        if (gapi) {
+            gapi.auth2.getAuthInstance().signIn();
+        }
+    }
+
+    function logout() {
+        const { gapi } = window;
+        if (gapi) {
+            gapi.auth2.getAuthInstance().signOut();
+        }
+    }
+
+    function revokePermissions() {
+        const { gapi } = window;
+        if (gapi) {
+            gapi.auth2.getAuthInstance().currentUser.get().disconnect();
+            gapi.auth2.getAuthInstance().disconnect();
+        }
+    }
 
     const contextValue = useMemo(() => {
         return {
             email,
             error,
             login,
+            logout,
             loggedIn,
+            revokePermissions,
+            setLoggedIn,
             state
         }
     }, [email, error, loggedIn, login, state]);
@@ -101,15 +126,6 @@ export function AuthProvider({ children }) {
             setState('ready');
         }
     }, [apiState, setState]);
-
-    useEffect(() => {
-        setLogin(() => (() => {
-            const { gapi } = window;
-            if (gapi) {
-                gapi.auth2.getAuthInstance().signIn();
-            }
-        }))
-    }, [setLogin]);
 
     useEffect(() => {
         if (loggedIn) {

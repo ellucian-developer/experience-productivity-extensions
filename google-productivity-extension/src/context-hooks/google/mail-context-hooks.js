@@ -15,16 +15,28 @@ function getValueFromArray(data, name, defaultValue) {
 	return ((data || []).find(item => item.name === name) || {}).value || defaultValue;
 }
 
+function isToday(dateToCheck) {
+    const today = new Date();
+    return today.getFullYear() === dateToCheck.getFullYear() &&
+        today.getMonth() === dateToCheck.getMonth() &&
+        today.getDate() === dateToCheck.getDate()
+}
+
 export function MailProvider({children}) {
 	const { locale } = useUserInfo();
-    const { email, loggedIn } = useAuth();
+    const { email, loggedIn, setLoggedIn } = useAuth();
 
+    const [error, setError] = useState(false);
     const [state, setState] = useState('init');
     const [messages, setMessages] = useState();
     const [messagesById, setMessagesById] = useState({});
 
     const dateFormater = useMemo(() => {
 		return new Intl.DateTimeFormat(locale, { dateStyle: 'short'})
+	}, [locale]);
+
+    const timeFormater = useMemo(() => {
+		return new Intl.DateTimeFormat(locale, { timeStyle: 'short'})
 	}, [locale]);
 
     const loadMessageData = useCallback(async (email, message) => {
@@ -40,7 +52,8 @@ export function MailProvider({children}) {
             const {
                 labelIds,
                 payload: {
-                    headers
+                    headers,
+                    parts
                 },
                 snippet: summary,
                 threadId
@@ -55,11 +68,15 @@ export function MailProvider({children}) {
             const fromNameSplit = fromName.split(/[, ]/);
             const firstName = (fromNameSplit.length !== 3 ? fromNameSplit[0] : fromNameSplit[2]) || '';
             const lastName = (fromNameSplit.length !== 3 ? fromNameSplit[1] : fromNameSplit[0]) || '';
-            const fromInitials = `${firstName.slice(0, 1)}${lastName.slice(0, 1)}`;
+            const fromInitials = firstName ? firstName.slice(0, 1) : lastName.slice(0, 1);
 
             const subject = getValueFromArray(headers, 'Subject', 'No Subject');
 
-            const messageLink = `https://mail.google.com/mail/?authuser=${email}#inbox/${threadId}`;
+            const messageLink = `https://mail.google.com/mail/?authuser=${email}#all/${threadId}`;
+
+            const hasAttachment = parts.some(part => part.filename !== '');
+
+            const received = isToday(receivedDate) ? timeFormater.format(receivedDate) : dateFormater.format(receivedDate);
 
             Object.assign(message, {
                 body: summary,
@@ -67,17 +84,24 @@ export function MailProvider({children}) {
                 fromEmail,
                 fromInitials,
                 fromName,
+                hasAttachment,
                 messageLink,
-                receivedDate: dateFormater.format(receivedDate),
+                received,
                 subject,
                 threadId,
                 unread
             });
         } catch (error) {
-            console.error('gapi failed', error);
-            setState(() => ({ error: 'api'}));
+            // did we get logged out or credentials were revoked?
+            if (error && error.status === 401) {
+                setLoggedIn(false);
+            } else {
+                console.error('gapi failed', error);
+                setError(error);
+                setState(() => ({ error: 'api'}));
+            }
         }
-    }, [dateFormater, setState]);
+    }, [dateFormater, setState, timeFormater]);
 
     useEffect(() => {
         async function refresh() {
@@ -114,8 +138,14 @@ export function MailProvider({children}) {
                     setState('loaded');
                 })
             } catch (error) {
-                console.error('gapi failed', error);
-                setState(() => ({ error: 'api'}));
+                // did we get logged out or credentials were revoked?
+                if (error && error.status === 401) {
+                    setLoggedIn(false);
+                } else {
+                    setError(error);
+                    console.error('gapi failed', error);
+                    setState(() => ({ error: 'api'}));
+                }
             }
         }
 
@@ -186,7 +216,9 @@ export function MailProvider({children}) {
 
     const contextValue = useMemo(() => {
         return {
+            error,
             messages,
+            refresh: () => { setState('refresh') },
             state
         }
     }, [ messages, state ]);

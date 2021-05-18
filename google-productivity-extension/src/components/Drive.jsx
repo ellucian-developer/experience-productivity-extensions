@@ -1,10 +1,11 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React, { useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
+import classnames from 'classnames';
 
-import { Divider, Illustration, IMAGES, Typography } from "@hedtech/react-design-system/core";
+import { Button, Card, CardHeader, CardContent, Divider, Illustration, IMAGES, Typography } from "@hedtech/react-design-system/core";
 import { withStyles } from "@hedtech/react-design-system/core/styles";
-import { fontWeightBold, spacing30, spacingSmall } from "@hedtech/react-design-system/core/styles/tokens";
+import { fontWeightBold, fontWeightNormal, spacing30, spacing40 } from "@hedtech/react-design-system/core/styles/tokens";
 
 import { useExtensionControl, useUserInfo } from '@ellucian/experience-extension-hooks';
 
@@ -19,21 +20,25 @@ const styles = () => ({
 		width: "100%",
 		height: "100%",
 		display: "flex",
-		padding: spacingSmall,
+		padding: spacing40,
 		flexFlow: "column",
 		alignItems: "center",
 		justifyContent: "center",
 		'& > *': {
-			marginBottom: spacingSmall
+			marginBottom: spacing40
 		},
 		'& :last-child': {
 			marginBottom: '0px'
 		}
 	},
+	content: {
+		display: "flex",
+		flexFlow: "column"
+	},
 	row: {
 		display: "flex",
-		paddingLeft: spacingSmall,
-		paddingRight: spacingSmall
+		paddingLeft: spacing40,
+		paddingRight: spacing40
 	},
 	fileBox: {
 		width: "90%",
@@ -49,27 +54,53 @@ const styles = () => ({
 		marginBottom: spacing30
 	},
 	fileIcon: {
-		marginRight: spacingSmall
+		marginRight: spacing40
 	},
 	fileName: {
 		width: '100%',
+		'-webkit-line-clamp': '2',
+		'-webkit-box-orient': 'vertical',
+		overflow: 'hidden',
+		textOverflow: 'ellipsis',
+		wordBreak: 'break-all'
+	},
+	fileNameUnviewed: {
 		fontWeight: fontWeightBold
+	},
+	modified: {
+		width: '100%',
+		'-webkit-line-clamp': '2',
+		'-webkit-box-orient': 'vertical',
+		overflow: 'hidden',
+		textOverflow: 'ellipsis',
+		wordBreak: 'break-all'
 	},
 	divider: {
 		marginTop: spacing30,
+		marginBottom: spacing30
+	},
+	fontWeightNormal: {
+		fontWeight: fontWeightNormal
+	},
+	devCard: {
+		marginLeft: spacing40,
+		marginRight: spacing40,
+		marginBottom: spacing40
+	},
+	devButton: {
 		marginBottom: spacing30
 	}
 });
 
 function Drive({ classes }) {
-	const { setLoadingStatus } = useExtensionControl();
+	const { setErrorMessage, setLoadingStatus } = useExtensionControl();
 	const { locale } = useUserInfo();
 
 	const { intl } = useIntl();
 	const { LoginButton } = useComponents();
 
-	const { login, loggedIn } = useAuth();
-	const { files } = useDrive();
+	const { error: authError, login, loggedIn, logout, revokePermissions } = useAuth();
+	const { error: driveError, files, refresh } = useDrive();
 
 	const [displayState, setDisplayState] = useState('init');
 
@@ -82,10 +113,16 @@ function Drive({ classes }) {
 	}, [locale]);
 
 	useEffect(() => {
-		if (files !== undefined) {
-			setDisplayState('filesLoaded');
+		if (authError || driveError) {
+			setErrorMessage({
+				headerMessage: intl.formatMessage({id: 'error.contentNotAvailable'}),
+				textMessage: intl.formatMessage({id: 'error.contactYourAdministrator'}),
+				iconName: 'warning'
+			})
 		} else if (loggedIn === false) {
 			setDisplayState('loggedOut');
+		} else if (files !== undefined) {
+			setDisplayState('filesLoaded');
 		} else if (loggedIn) {
 			setDisplayState('loggedIn');
 		}
@@ -95,14 +132,23 @@ function Drive({ classes }) {
 		setLoadingStatus(displayState !== 'filesLoaded' && displayState !== 'loggedOut');
 	}, [displayState])
 
+	function onLogout() {
+		logout();
+	}
+
+	function onRevokePermissions() {
+		revokePermissions();
+		refresh();
+	}
+
 	if (displayState === 'filesLoaded') {
 		if (files.length > 0) {
 			return (
-				<div>
+				<div className={classes.content}>
 					{files.map((file) => {
 						const { modifiedTime: fileModifiedTime } = file;
 						const fileModified = new Date(fileModifiedTime);
-						const modified = new Date().getFullYear() ===  fileModified.getFullYear()
+						const modified = new Date().getFullYear() === fileModified.getFullYear()
 							? fileDateFormater.format(fileModified)
 							: fileDateFormaterWithYear.format(fileModified);
 						const modifiedBy = file.lastModifyingUser ? file.lastModifyingUser.displayName : 'unknown';
@@ -119,13 +165,13 @@ function Drive({ classes }) {
 										<img className={classes.fileIcon} src={file.iconLink}/>
 										<div className={classes.fileNameBox}>
 											<Typography
-												className={classes.fileName}
-												noWrap
+												className={classnames(classes.fileName, {[classes.fileNameUnviewed]: !file.viewedByMe})}
+												component='div'
 												variant={"body1"}
 											>
 												{file.name}
 											</Typography>
-											<Typography variant={"body3"}>
+											<Typography className={classes.modified} component='div' variant={"body3"}>
 												{intl.formatMessage({id: 'drive.modifiedBy'}, {date: modified, name: modifiedBy})}
 											</Typography>
 										</div>
@@ -135,6 +181,15 @@ function Drive({ classes }) {
 							</a>
 						);
 					})}
+					{ process.env.NODE_ENV === 'development' && (
+						<Card className={classes.devCard}>
+							<CardHeader title="Development Mode"/>
+							<CardContent>
+								<Button className={classes.devButton} onClick={onLogout}>Sign Out</Button>
+								<Button className={classes.devButton} onClick={onRevokePermissions}>Revoke Permissions</Button>
+							</CardContent>
+						</Card>
+					)}
 				</div>
 			);
 		}
