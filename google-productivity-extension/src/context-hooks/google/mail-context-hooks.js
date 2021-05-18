@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import { useUserInfo } from '@ellucian/experience-extension-hooks';
 
-import { useAuth } from './auth-context';
+import { useAuth } from '../auth-context-hooks';
 
 const refreshInterval = 60000;
 
@@ -17,9 +17,9 @@ function getValueFromArray(data, name, defaultValue) {
 
 export function MailProvider({children}) {
 	const { locale } = useUserInfo();
-    const { gapi, loggedIn } = useAuth();
+    const { email, loggedIn } = useAuth();
 
-    const [state, setState] = useState('loading');
+    const [state, setState] = useState('init');
     const [messages, setMessages] = useState();
     const [messagesById, setMessagesById] = useState({});
 
@@ -27,11 +27,9 @@ export function MailProvider({children}) {
 		return new Intl.DateTimeFormat(locale, { dateStyle: 'short'})
 	}, [locale]);
 
-    const loadMessageData = useCallback(async (message) => {
-        if (message.dataRead) {
-            return;
-        }
+    const loadMessageData = useCallback(async (email, message) => {
         try {
+            const { gapi } = window;
             const response = await gapi.client.gmail.users.messages.get({
                 userId: 'me',
                 id: message.id
@@ -44,7 +42,8 @@ export function MailProvider({children}) {
                 payload: {
                     headers
                 },
-                snippet: summary
+                snippet: summary,
+                threadId
             } = data;
             const receivedDate = new Date(getValueFromArray(headers, 'Date', undefined));
 
@@ -60,28 +59,33 @@ export function MailProvider({children}) {
 
             const subject = getValueFromArray(headers, 'Subject', 'No Subject');
 
+            const messageLink = `https://mail.google.com/mail/?authuser=${email}#inbox/${threadId}`;
+
             Object.assign(message, {
+                body: summary,
                 dataRead: true,
-                unread,
-                receivedDate: dateFormater.format(receivedDate),
-                fromName,
-                fromInitials,
                 fromEmail,
+                fromInitials,
+                fromName,
+                messageLink,
+                receivedDate: dateFormater.format(receivedDate),
                 subject,
-                body: summary
+                threadId,
+                unread
             });
         } catch (error) {
             console.error('gapi failed', error);
             setState(() => ({ error: 'api'}));
         }
-    }, [dateFormater, gapi, setState]);
+    }, [dateFormater, setState]);
 
     useEffect(() => {
         async function refresh() {
             if (process.env.NODE_ENV === 'development') {
-                console.log('refreshing gmail');
+                console.log(`${state}ing gmail`);
             }
             try {
+                const { gapi } = window;
                 const response = await gapi.client.gmail.users.messages.list({
                     userId: 'me',
                     maxResults: 10
@@ -96,7 +100,7 @@ export function MailProvider({children}) {
                     const { id } = message;
                     const newMessage = messagesById[id] || { id }
 
-                    loadPromises.push(loadMessageData(newMessage));
+                    loadPromises.push(loadMessageData(email, newMessage));
 
                     newMessages.push(newMessage);
                     newMessagesById[id] = newMessage;
@@ -115,10 +119,10 @@ export function MailProvider({children}) {
             }
         }
 
-        if (state === 'refresh') {
+        if (loggedIn && (state === 'load' || state === 'refresh')) {
             refresh();
         }
-    }, [messagesById, state, setMessages, setMessagesById, setState])
+    }, [loggedIn, state])
 
     useEffect(() => {
         let timerId;
@@ -159,6 +163,7 @@ export function MailProvider({children}) {
             }
         }
 
+        const { gapi } = window;
 		if (gapi && loggedIn) {
             document.addEventListener('visibilitychange', visibilitychangeListener);
             startInteval();
@@ -170,14 +175,14 @@ export function MailProvider({children}) {
                 clearInterval(timerId)
             }
         }
-    }, [gapi, loggedIn, setState]);
+    }, [loggedIn, setState]);
 
 	useEffect(() => {
-		if (gapi && loggedIn) {
-            setState('refresh');
+		if (loggedIn) {
+            setState(messages ? 'refresh' : 'load');
             // refreshMessageList();
 		}
-	}, [ gapi, loggedIn ])
+	}, [ loggedIn ])
 
     const contextValue = useMemo(() => {
         return {

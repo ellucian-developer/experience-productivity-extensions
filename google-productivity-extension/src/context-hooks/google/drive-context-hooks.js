@@ -1,22 +1,22 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-
-import { useAuth } from './auth-context';
 // eslint-disable-next-line camelcase
 import { unstable_batchedUpdates } from 'react-dom';
+
+import { useAuth } from '../auth-context-hooks';
 
 const refreshInterval = 60000;
 
 const Context = createContext()
 
 export function DriveProvider({children}) {
-    const { gapi, loggedIn } = useAuth();
+    const { loggedIn } = useAuth();
 
     const [state, setState] = useState('load');
     const [files, setFiles] = useState();
 
     const refresh = useCallback(async () => {
-		if (gapi && loggedIn) {
+		if (loggedIn) {
             // if not force load and not curent visible, skip it
             if (state === 'refresh' && document.hidden) {
                 if (process.env.NODE_ENV === 'development') {
@@ -29,6 +29,7 @@ export function DriveProvider({children}) {
             }
             const search = `mimeType != 'application/vnd.google-apps.folder'`;
             try {
+                const { gapi } = window;
                 const response = await gapi.client.drive.files.list({
                     pageSize: 10,
                     fields: 'nextPageToken, files(id, iconLink, name, lastModifyingUser, modifiedTime, webViewLink)',
@@ -45,13 +46,13 @@ export function DriveProvider({children}) {
                 setState('error');
             }
         }
-    }, [gapi, loggedIn, state])
+    }, [loggedIn, state])
 
     useEffect(() => {
-		if (gapi && loggedIn && (state === 'load' || state === 'refresh')) {
+		if (loggedIn && (state === 'load' || state === 'refresh')) {
             refresh();
         }
-    }, [gapi, loggedIn, refresh, state])
+    }, [loggedIn, refresh, state])
 
     useEffect(() => {
         let timerId;
@@ -92,7 +93,7 @@ export function DriveProvider({children}) {
             }
         }
 
-		if (gapi && loggedIn) {
+		if (loggedIn) {
             document.addEventListener('visibilitychange', visibilitychangeListener);
             startInteval();
         }
@@ -103,7 +104,7 @@ export function DriveProvider({children}) {
                 clearInterval(timerId)
             }
         }
-    }, [gapi, loggedIn, setState]);
+    }, [loggedIn, setState]);
 
     const contextValue = useMemo(() => {
         return {

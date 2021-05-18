@@ -1,48 +1,20 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React, { useState, useEffect, useMemo } from "react";
-import { withIntl } from "./ReactIntlProviderWrapper";
 import PropTypes from "prop-types";
 
-import { TextLink, Typography, Divider } from "@hedtech/react-design-system/core";
+import { Divider, Illustration, IMAGES, Typography } from "@hedtech/react-design-system/core";
 import { withStyles } from "@hedtech/react-design-system/core/styles";
 import { fontWeightBold, spacing30, spacingSmall } from "@hedtech/react-design-system/core/styles/tokens";
 
-import { ExtensionProvider, useExtensionControl, useUserInfo } from '@ellucian/experience-extension-hooks';
+import { useExtensionControl, useUserInfo } from '@ellucian/experience-extension-hooks';
 
-import { CardProvider, useIntl } from './card-context';
+import { useComponents, useIntl } from '../context-hooks/card-context-hooks';
 
-import GoogleSignInImage from '../images/btn_google_signin_dark_normal_web.png';
-import { AuthProvider, useAuth } from "./auth-context";
-import { DriveProvider, useDrive } from "./drive-context";
-
-const googleSignOnButtonStyles = () => ({
-	root: {
-	},
-	button: {
-		border: 'none',
-		padding: '0px',
-		cursor: 'pointer'
-	}
-});
-
-function GoogleSignOnButtonSansStyles({classes, onClick}) {
-	return (
-		<div className={classes.root}>
-			<button className={classes.button} onClick={onClick}>
-				<img src={GoogleSignInImage}/>
-			</button>
-		</div>
-	)
-}
-GoogleSignOnButtonSansStyles.propTypes = {
-	classes: PropTypes.object.isRequired,
-	onClick: PropTypes.func
-};
-
-const GoogleSignOnButton = withStyles(googleSignOnButtonStyles)(GoogleSignOnButtonSansStyles);
+import { useAuth } from "../context-hooks/auth-context-hooks";
+import { useDrive } from "../context-hooks/google/drive-context-hooks";
 
 const styles = () => ({
-	cardLoggedOut: {
+	card: {
 		flex: "1 0 auto",
 		width: "100%",
 		height: "100%",
@@ -89,10 +61,12 @@ const styles = () => ({
 	}
 });
 
-function DriveCard({ classes }) {
-	const { intl } = useIntl();
+function Drive({ classes }) {
 	const { setLoadingStatus } = useExtensionControl();
 	const { locale } = useUserInfo();
+
+	const { intl } = useIntl();
+	const { LoginButton } = useComponents();
 
 	const { login, loggedIn } = useAuth();
 	const { files } = useDrive();
@@ -166,20 +140,12 @@ function DriveCard({ classes }) {
 		}
 	} else if (displayState === 'loggedOut') {
 		return (
-			<div className={classes.cardLoggedOut}>
-				<GoogleSignOnButton onClick={login}/>
-				<Typography variant={"h3"}>
-					{intl.formatMessage({id: 'google.signedOut'})}
+			<div className={classes.card}>
+				<Illustration name={IMAGES.ID_BADGE} />
+				<Typography className={classes.fontWeightNormal} variant={"h3"} component='div'>
+					{intl.formatMessage({id: 'google.permissionsRequested'})}
 				</Typography>
-				<Typography variant={"body1"} >
-					<TextLink
-						href='https://drive.google.com'
-						variant='inherit'
-						target='_blank'
-					>
-						{intl.formatMessage({id: 'google.launchMessage'})}
-					</TextLink>
-				</Typography>
+				<LoginButton login={login}/>
 			</div>
 		);
 	} else {
@@ -187,24 +153,8 @@ function DriveCard({ classes }) {
 	}
 }
 
-DriveCard.propTypes = {
+Drive.propTypes = {
 	classes: PropTypes.object.isRequired
 };
 
-const DriveCardWithStyles = withStyles(styles)(DriveCard);
-
-function CardWithProviders(props) {
-    return (
-        <ExtensionProvider {...props}>
-			<CardProvider {...props}>
-				<AuthProvider type='google'>
-					<DriveProvider>
-						<DriveCardWithStyles/>
-					</DriveProvider>
-				</AuthProvider>
-			</CardProvider>
-        </ExtensionProvider>
-    )
-}
-
-export default withIntl(CardWithProviders);
+export default withStyles(styles)(Drive);

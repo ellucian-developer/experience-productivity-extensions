@@ -4,6 +4,7 @@
         "google.signIn": "Sign in to Google",
         "google.signedOut": "Signed out of Google",
         "google.launchMessage": "Open Google Drive",
+        "google.permissionsRequested": "Permissions Requested",
         "mail.unread": "You have {unread} unread email",
         "mail.unreads": "You have {unread} unread emails",
         "mail.launchMessage": "Open Google GMail"

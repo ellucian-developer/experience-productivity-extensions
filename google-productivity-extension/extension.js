@@ -11,7 +11,7 @@ module.exports = {
 	},
     'cards': [{
         'type': 'DriveCard',
-        'source': './src/cards/DriveCard',
+        'source': './src/cards/GoogleDriveCard',
         'title': 'Google Drive',
         'displayCardType': 'Google Drive',
         'description': 'Google Drive card'
