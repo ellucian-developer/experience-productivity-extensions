@@ -19,8 +19,8 @@ module.exports = {
     {
         'type': 'MailCard',
         'source': './src/cards/GMailCard',
-        'title': 'GMail',
-        'displayCardType': 'GMail',
-        'description': 'Google GMail card'
+        'title': 'Gmail',
+        'displayCardType': 'Gmail',
+        'description': 'Google Gmail card'
     }]
 }

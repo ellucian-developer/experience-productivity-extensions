@@ -121,19 +121,17 @@ function Mail({ classes }) {
 				textMessage: intl.formatMessage({id: 'error.contactYourAdministrator'}),
 				iconName: 'warning'
 			})
-		} else if (loggedIn === false) {
+		} else if (loggedIn === false && authState === 'ready') {
 			setDisplayState('loggedOut');
 		} else if (mailState === 'loaded' || mailState === 'refresh') {
 			setDisplayState('loaded');
 		} else if (mailState && mailState.error) {
 			setDisplayState('error');
-		} else if (loggedIn) {
-			setDisplayState('loggedIn');
 		}
 	}, [ loggedIn, mailState ])
 
 	useEffect(() => {
-		setLoadingStatus(displayState === 'init' || !mailState || authState !== 'ready');
+		setLoadingStatus(displayState === 'init');
 	}, [authState, displayState, mailState])
 
 	function onLogout() {
@@ -153,23 +151,24 @@ function Mail({ classes }) {
 						const {
 							body,
 							id,
-							fromInitials,
+							fromInitial,
 							fromName,
 							hasAttachment,
-							messageLink,
+							messageUrl,
 							received,
-							subject
+							subject,
+							unread
 						} = message;
 						const first = index === 0;
 						const last = index === messages.length - 1;
 						return (
 							<Fragment key={id}>
 								<div className={classnames(classes.messageBox, {[classes.messagePaddingTop]: !first})}>
-									<Avatar>{fromInitials}</Avatar>
+									<Avatar>{fromInitial}</Avatar>
 									<div className={classes.messageDetailsBox}>
 										<div className={classes.fromBox}>
 											<Typography
-												className={classnames(classes.messageFrom, { [classes.bold]: message.unread })}
+												className={classnames(classes.messageFrom, { [classes.bold]: unread })}
 												noWrap
 												variant={"body1"}
 											>
@@ -180,9 +179,9 @@ function Mail({ classes }) {
 											</Typography>
 										</div>
 										<div className={classes.subjectBox}>
-											<Typography component='div' noWrap className={classnames(classes.subject, { [classes.bold]: message.unread })}>
+											<Typography component='div' noWrap className={classnames(classes.subject, { [classes.bold]: unread })}>
 												<a
-													href={messageLink}
+													href={messageUrl}
 													target='_blank'
 													rel="noreferrer"
 												>

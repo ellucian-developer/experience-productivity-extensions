@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import { useUserInfo } from '@ellucian/experience-extension-hooks';
 
 import { useAuth } from '../auth-context-hooks';
+import { getMessagesFromThreads } from '../../util/gmail';
 
 const refreshInterval = 60000;
 
@@ -29,7 +30,6 @@ export function MailProvider({children}) {
     const [error, setError] = useState(false);
     const [state, setState] = useState('init');
     const [messages, setMessages] = useState();
-    const [messagesById, setMessagesById] = useState({});
 
     const dateFormater = useMemo(() => {
 		return new Intl.DateTimeFormat(locale, { dateStyle: 'short'})
@@ -39,102 +39,63 @@ export function MailProvider({children}) {
 		return new Intl.DateTimeFormat(locale, { timeStyle: 'short'})
 	}, [locale]);
 
-    const loadMessageData = useCallback(async (email, message) => {
-        try {
-            const { gapi } = window;
-            const response = await gapi.client.gmail.users.messages.get({
-                userId: 'me',
-                id: message.id
-            });
-
-            const data = JSON.parse(response.body);
-
-            const {
-                labelIds,
-                payload: {
-                    headers,
-                    parts
-                },
-                snippet: summary,
-                threadId
-            } = data;
-            const receivedDate = new Date(getValueFromArray(headers, 'Date', undefined));
-
-            const unread = labelIds.includes('UNREAD');
-            const from = getValueFromArray(headers, 'From', 'Unknown');
-            const fromMatches = from.match(/"?([^<>"]*)"?\s*<(.*)>/);
-            const fromName = fromMatches[1].trim();
-            const fromEmail = fromMatches[2].trim();
-            const fromNameSplit = fromName.split(/[, ]/);
-            const firstName = (fromNameSplit.length !== 3 ? fromNameSplit[0] : fromNameSplit[2]) || '';
-            const lastName = (fromNameSplit.length !== 3 ? fromNameSplit[1] : fromNameSplit[0]) || '';
-            const fromInitials = firstName ? firstName.slice(0, 1) : lastName.slice(0, 1);
-
-            const subject = getValueFromArray(headers, 'Subject', 'No Subject');
-
-            const messageLink = `https://mail.google.com/mail/?authuser=${email}#all/${threadId}`;
-
-            const hasAttachment = parts.some(part => part.filename !== '');
-
-            const received = isToday(receivedDate) ? timeFormater.format(receivedDate) : dateFormater.format(receivedDate);
-
-            Object.assign(message, {
-                body: summary,
-                dataRead: true,
-                fromEmail,
-                fromInitials,
-                fromName,
-                hasAttachment,
-                messageLink,
-                received,
-                subject,
-                threadId,
-                unread
-            });
-        } catch (error) {
-            // did we get logged out or credentials were revoked?
-            if (error && error.status === 401) {
-                setLoggedIn(false);
-            } else {
-                console.error('gapi failed', error);
-                setError(error);
-                setState(() => ({ error: 'api'}));
-            }
-        }
-    }, [dateFormater, setState, timeFormater]);
-
     useEffect(() => {
         async function refresh() {
             if (process.env.NODE_ENV === 'development') {
                 console.log(`${state}ing gmail`);
             }
             try {
-                const { gapi } = window;
-                const response = await gapi.client.gmail.users.messages.list({
-                    userId: 'me',
-                    maxResults: 10
+                const newMessages = await getMessagesFromThreads();
+
+                // transform to what UI needs
+                const transformedMessages = newMessages.map( message => {
+                    const {
+                        id,
+                        labelIds,
+                        payload: {
+                            headers,
+                            parts
+                        },
+                        snippet: body
+                    } = message;
+
+                    const receivedDate = new Date(getValueFromArray(headers, 'Date', undefined));
+
+                    const unread = labelIds.includes('UNREAD');
+                    const from = getValueFromArray(headers, 'From', 'Unknown');
+                    const fromMatches = from.match(/"?([^<>"]*)"?\s*<(.*)>/);
+                    const fromName = fromMatches[1].trim();
+                    const fromNameSplit = fromName.split(/[, ]/);
+                    const firstName = (fromNameSplit.length !== 3 ? fromNameSplit[0] : fromNameSplit[2]) || '';
+                    const fromInitial = firstName.slice(0, 1);
+
+                    const subject = getValueFromArray(headers, 'Subject', 'No Subject');
+
+                    const messageUrl = `https://mail.google.com/mail/?authuser=${email}#all/${id}`;
+
+                    const hasAttachment = parts.some(part => part.filename !== '');
+
+                    const received = isToday(receivedDate) ? timeFormater.format(receivedDate) : dateFormater.format(receivedDate);
+
+                    return {
+                        body,
+                        id,
+                        fromInitial,
+                        fromName,
+                        hasAttachment,
+                        messageUrl,
+                        received,
+                        receivedDate,
+                        subject,
+                        unread
+                    }
                 });
 
-                const data = JSON.parse(response.body);
-
-                const newMessages = [];
-                const newMessagesById = {};
-                const loadPromises = [];
-                for (const message of data.messages) {
-                    const { id } = message;
-                    const newMessage = messagesById[id] || { id }
-
-                    loadPromises.push(loadMessageData(email, newMessage));
-
-                    newMessages.push(newMessage);
-                    newMessagesById[id] = newMessage;
-                }
-
-                await Promise.all(loadPromises);
+                // ensure sorted by recieved date
+                transformedMessages.sort((left, right) => right.receivedDate.getTime() - left.receivedDate.getTime());
 
                 unstable_batchedUpdates(() => {
-                    setMessagesById(() => newMessagesById);
-                    setMessages(() => newMessages);
+                    setMessages(() => transformedMessages);
                     setState('loaded');
                 })
             } catch (error) {
@@ -152,7 +113,7 @@ export function MailProvider({children}) {
         if (loggedIn && (state === 'load' || state === 'refresh')) {
             refresh();
         }
-    }, [loggedIn, state])
+    }, [dateFormater, loggedIn, state, setState, timeFormater])
 
     useEffect(() => {
         let timerId;
