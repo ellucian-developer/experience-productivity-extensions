@@ -10,14 +10,14 @@ const refreshInterval = 60000;
 const Context = createContext()
 
 export function DriveProvider({children}) {
-    const { loggedIn, setLoggedIn } = useAuth();
+    const { email, loggedIn, setLoggedIn } = useAuth();
 
     const [error, setError] = useState(false);
     const [state, setState] = useState('load');
     const [files, setFiles] = useState();
 
     const refresh = useCallback(async () => {
-		if (loggedIn) {
+        if (loggedIn) {
             // if not force load and not curent visible, skip it
             if (state === 'refresh' && document.hidden) {
                 if (process.env.NODE_ENV === 'development') {
@@ -69,7 +69,7 @@ export function DriveProvider({children}) {
     }, [loggedIn, state])
 
     useEffect(() => {
-		if (loggedIn && (state === 'load' || state === 'refresh')) {
+        if (loggedIn && (state === 'load' || state === 'refresh')) {
             refresh();
         }
     }, [loggedIn, refresh, state])
@@ -113,7 +113,7 @@ export function DriveProvider({children}) {
             }
         }
 
-		if (loggedIn) {
+        if (loggedIn) {
             document.addEventListener('visibilitychange', visibilitychangeListener);
             startInteval();
         }
@@ -130,9 +130,12 @@ export function DriveProvider({children}) {
         return {
             error,
             files,
+            openDrive: () => {
+                window.open(`https://drive.google.com?authuser=${email}`, '_blank');
+            },
             refresh: () => { setState('refresh') }
         }
-    }, [ error, files, setState ]);
+    }, [ email, error, files, setState ]);
 
     if (process.env.NODE_ENV === 'development') {
         useEffect(() => {

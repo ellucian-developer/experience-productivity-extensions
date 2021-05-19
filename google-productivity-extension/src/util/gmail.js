@@ -12,7 +12,7 @@ export async function getMessagesFromThreads({ max = 10 } = {}) {
     const response = await gapi.client.gmail.users.threads.list(listOptions);
     const threadsData = JSON.parse(response.body);
 
-    const {threads} = threadsData;
+    const {threads = []} = threadsData;
 
     // load the thread data
     const threadPromises = [];

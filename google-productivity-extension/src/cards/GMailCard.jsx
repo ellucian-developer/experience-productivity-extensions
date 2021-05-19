@@ -13,13 +13,13 @@ import Mail from '../components/Mail';
 function GmailCard(props) {
     return (
         <ExtensionProvider {...props}>
-			<CardProvider {...props}>
-				<AuthProvider type='google'>
-					<MailProvider>
-						<Mail/>
-					</MailProvider>
-				</AuthProvider>
-			</CardProvider>
+            <CardProvider {...props}>
+                <AuthProvider>
+                    <MailProvider>
+                        <Mail/>
+                    </MailProvider>
+                </AuthProvider>
+            </CardProvider>
         </ExtensionProvider>
     )
 }

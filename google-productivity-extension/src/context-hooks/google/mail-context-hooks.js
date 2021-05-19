@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 // eslint-disable-next-line camelcase
 import { unstable_batchedUpdates } from 'react-dom';
 import PropTypes from 'prop-types';
@@ -13,7 +13,7 @@ const refreshInterval = 60000;
 const Context = createContext()
 
 function getValueFromArray(data, name, defaultValue) {
-	return ((data || []).find(item => item.name === name) || {}).value || defaultValue;
+    return ((data || []).find(item => item.name === name) || {}).value || defaultValue;
 }
 
 function isToday(dateToCheck) {
@@ -24,7 +24,7 @@ function isToday(dateToCheck) {
 }
 
 export function MailProvider({children}) {
-	const { locale } = useUserInfo();
+    const { locale } = useUserInfo();
     const { email, loggedIn, setLoggedIn } = useAuth();
 
     const [error, setError] = useState(false);
@@ -32,12 +32,12 @@ export function MailProvider({children}) {
     const [messages, setMessages] = useState();
 
     const dateFormater = useMemo(() => {
-		return new Intl.DateTimeFormat(locale, { dateStyle: 'short'})
-	}, [locale]);
+        return new Intl.DateTimeFormat(locale, { dateStyle: 'short'})
+    }, [locale]);
 
     const timeFormater = useMemo(() => {
-		return new Intl.DateTimeFormat(locale, { timeStyle: 'short'})
-	}, [locale]);
+        return new Intl.DateTimeFormat(locale, { timeStyle: 'short'})
+    }, [locale]);
 
     useEffect(() => {
         async function refresh() {
@@ -65,6 +65,7 @@ export function MailProvider({children}) {
                     const from = getValueFromArray(headers, 'From', 'Unknown');
                     const fromMatches = from.match(/"?([^<>"]*)"?\s*<(.*)>/);
                     const fromName = fromMatches[1].trim();
+                    const fromEmail = fromMatches[2].trim().toLocaleLowerCase();
                     const fromNameSplit = fromName.split(/[, ]/);
                     const firstName = (fromNameSplit.length !== 3 ? fromNameSplit[0] : fromNameSplit[2]) || '';
                     const fromInitial = firstName.slice(0, 1);
@@ -80,6 +81,7 @@ export function MailProvider({children}) {
                     return {
                         body,
                         id,
+                        fromEmail,
                         fromInitial,
                         fromName,
                         hasAttachment,
@@ -155,7 +157,7 @@ export function MailProvider({children}) {
         }
 
         const { gapi } = window;
-		if (gapi && loggedIn) {
+        if (gapi && loggedIn) {
             document.addEventListener('visibilitychange', visibilitychangeListener);
             startInteval();
         }
@@ -168,17 +170,20 @@ export function MailProvider({children}) {
         }
     }, [loggedIn, setState]);
 
-	useEffect(() => {
-		if (loggedIn) {
+    useEffect(() => {
+        if (loggedIn) {
             setState(messages ? 'refresh' : 'load');
             // refreshMessageList();
-		}
-	}, [ loggedIn ])
+        }
+    }, [ loggedIn ])
 
     const contextValue = useMemo(() => {
         return {
             error,
             messages,
+            openMail: () => {
+                window.open(`https://mail.google.com?authuser=${email}`, '_blank');
+            },
             refresh: () => { setState('refresh') },
             state
         }

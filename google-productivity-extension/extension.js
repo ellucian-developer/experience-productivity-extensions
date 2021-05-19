@@ -1,14 +1,14 @@
 module.exports = {
-    'name': 'Google Productivity Extension',
-    'publisher': 'Sample',
+    'name': 'Google Productivity',
+    'publisher': 'Ellucian',
     "configuration": {
-		"client": [{
-				"key": "googleOAuthClientId",
-				"label": "Google OAuth Client ID",
-				"type": "string",
-				"required": true
+        "client": [{
+                "key": "googleOAuthClientId",
+                "label": "Google OAuth Client ID",
+                "type": "string",
+                "required": true
             }]
-	},
+    },
     'cards': [{
         'type': 'DriveCard',
         'source': './src/cards/GoogleDriveCard',

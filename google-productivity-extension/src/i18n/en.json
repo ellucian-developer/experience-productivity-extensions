@@ -3,13 +3,17 @@
         "error.contentNotAvailable": "Content Not Available",
         "error.contactYourAdministrator": "Contact your Administrator",
         "drive.modifiedBy": "Modified: {date} by {name}",
+        "drive.noFiles": "You have no files yet",
         "google.signIn": "Sign in with Google",
+        "google.openDrive": "Open Drive",
+        "google.openGmail": "Open Gmail",
         "google.signedOut": "Signed out of Google",
         "google.launchMessage": "Open Google Drive",
         "google.permissionsRequested": "Permissions Requested",
         "mail.attachment": "Attachment",
         "mail.unread": "You have {unread} unread email",
         "mail.unreads": "You have {unread} unread emails",
+        "mail.noMessages": "You have no email yet",
         "mail.launchMessage": "Open Google GMail"
     }
 }

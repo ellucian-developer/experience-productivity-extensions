@@ -19,20 +19,20 @@ const styles = () => ({
     }
 });
 
-function GoogleLoginButton({ classes, onClick }) {
+function GoogleDriveOpenButton({ classes, onClick }) {
     const { intl } = useIntl();
 
     return (
         <Button className={classes.button} onClick={onClick}>
             <img className={classes.image} src={GoogleImage}/>
-            {intl.formatMessage({id: 'google.signIn'})}
+            {intl.formatMessage({id: 'google.openDrive'})}
         </Button>
     );
 }
 
-GoogleLoginButton.propTypes = {
+GoogleDriveOpenButton.propTypes = {
     classes: PropTypes.object.isRequired,
     onClick: PropTypes.func.isRequired
 };
 
-export default withStyles(styles)(GoogleLoginButton);
+export default withStyles(styles)(GoogleDriveOpenButton);

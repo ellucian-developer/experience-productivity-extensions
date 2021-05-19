@@ -13,13 +13,13 @@ import Drive from '../components/Drive';
 function GoogleDriveCard(props) {
     return (
         <ExtensionProvider {...props}>
-			<CardProvider {...props}>
-				<AuthProvider type='google'>
-					<DriveProvider>
-						<Drive/>
-					</DriveProvider>
-				</AuthProvider>
-			</CardProvider>
+            <CardProvider {...props}>
+                <AuthProvider>
+                    <DriveProvider>
+                        <Drive/>
+                    </DriveProvider>
+                </AuthProvider>
+            </CardProvider>
         </ExtensionProvider>
     )
 }
