@@ -22,5 +22,14 @@ module.exports = {
         'title': 'Gmail',
         'displayCardType': 'Gmail',
         'description': 'Google Gmail card'
-    }]
+    }],
+    "licensing": {
+        "options": [
+            {
+                "requirements": [
+                    { "licenseCode": "01t1M00000LbI6QQAV" }
+                ]
+            }
+        ]
+    }
 }
