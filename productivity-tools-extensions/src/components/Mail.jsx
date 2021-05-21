@@ -172,7 +172,7 @@ function Mail({ classes }) {
 
     useEffect(() => {
         setLoadingStatus(displayState === 'init');
-    }, [authState, displayState, mailState])
+    }, [displayState, mailState])
 
     if (displayState === 'loaded') {
         if (messages && messages.length > 0) {

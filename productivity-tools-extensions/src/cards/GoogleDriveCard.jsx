@@ -5,7 +5,7 @@ import { ExtensionProvider } from '@ellucian/experience-extension-hooks';
 
 import { withIntl } from "../components/ReactIntlProviderWrapper";
 
-import { CardProvider } from '../context-hooks/card-context-hooks';
+import { CardProvider } from '../context-providers/google-card-context-provider';
 import { AuthProvider } from "../context-providers/google-auth-context-provider";
 import { DriveProvider } from "../context-providers/google-drive-context-provider";
 
