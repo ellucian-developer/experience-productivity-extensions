@@ -60,8 +60,10 @@ export function DriveProvider({children}) {
                     setLoggedIn(false);
                 } else {
                     console.error('gapi failed', error);
-                    setState(() => ({ error: 'api'}));
-                    setError(error);
+                    unstable_batchedUpdates(() => {
+                        setState(() => ({ error: 'api'}));
+                        setError(error);
+                    })
                 }
             }
         }
