@@ -1,16 +1,17 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 // eslint-disable-next-line camelcase
 import { unstable_batchedUpdates } from 'react-dom';
 import PropTypes from 'prop-types';
 
 import { useUserInfo } from '@ellucian/experience-extension-hooks';
 
-import { useAuth } from '../auth-context-hooks';
+// eslint-disable-next-line import/no-unresolved
+import { useAuth } from 'common/context-hooks/auth-context-hooks';
+// eslint-disable-next-line import/no-unresolved
+import { Context } from 'common/context-hooks/mail-context-hooks';
 import { getMessagesFromThreads } from '../../util/gmail';
 
 const refreshInterval = 60000;
-
-const Context = createContext()
 
 function getValueFromArray(data, name, defaultValue) {
     return ((data || []).find(item => item.name === name) || {}).value || defaultValue;

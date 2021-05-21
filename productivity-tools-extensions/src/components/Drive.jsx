@@ -11,8 +11,8 @@ import { useExtensionControl, useUserInfo } from '@ellucian/experience-extension
 
 import { useComponents, useIntl } from '../context-hooks/card-context-hooks';
 
-import { useAuth } from "../context-hooks/auth-context-hooks";
-import { useDrive } from "../context-hooks/google/drive-context-hooks";
+import { useAuth } from '../context-hooks/auth-context-hooks';
+import { useDrive } from "../context-hooks/drive-context-hooks";
 
 const styles = () => ({
     card: {

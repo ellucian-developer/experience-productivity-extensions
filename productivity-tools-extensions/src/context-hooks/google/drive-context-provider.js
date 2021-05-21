@@ -1,13 +1,12 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 // eslint-disable-next-line camelcase
 import { unstable_batchedUpdates } from 'react-dom';
 
 import { useAuth } from '../auth-context-hooks';
+import { Context } from '../drive-context-hooks';
 
 const refreshInterval = 60000;
-
-const Context = createContext()
 
 export function DriveProvider({children}) {
     const { email, loggedIn, setLoggedIn } = useAuth();

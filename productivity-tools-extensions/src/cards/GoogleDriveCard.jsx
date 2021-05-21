@@ -3,14 +3,13 @@ import React from "react";
 
 import { ExtensionProvider } from '@ellucian/experience-extension-hooks';
 
-import { withIntl } from "./ReactIntlProviderWrapper";
-// eslint-disable-next-line import/no-unresolved
-import { CardProvider } from 'common/context-hooks/card-context-hooks';
+import { withIntl } from "../components/ReactIntlProviderWrapper";
+
+import { CardProvider } from '../context-hooks/card-context-hooks';
 import { AuthProvider } from "../context-hooks/google/auth-context-provider";
 import { DriveProvider } from "../context-hooks/google/drive-context-provider";
 
-// eslint-disable-next-line import/no-unresolved
-import Drive from 'common/components/Drive';
+import Drive from '../components/Drive';
 
 function GoogleDriveCard(props) {
     return (

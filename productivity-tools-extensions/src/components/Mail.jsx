@@ -26,8 +26,8 @@ import {
 import { useExtensionControl } from '@ellucian/experience-extension-hooks';
 
 import { useComponents, useIntl } from '../context-hooks/card-context-hooks.js';
-import { useAuth } from "../context-hooks/auth-context-hooks";
-import { useMail } from "../context-hooks/google/mail-context-hooks";
+import { useAuth } from '../context-hooks/auth-context-hooks';
+import { useMail } from "../context-hooks/mail-context-hooks";
 
 const colors = [ fountain400, iris400, kiwi400, meadow400, purple400, saffron400, tangerine400 ];
 function pickAvatarColor(email, colorsContext) {

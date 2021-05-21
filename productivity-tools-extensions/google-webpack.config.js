@@ -1,8 +1,8 @@
 const dotenv = require('dotenv');
 const packageJson = require('./package.json');
-const extensionConfig = require('./extension.js');
+const extensionConfig = require('./google-extension.js');
 const Dotenv = require('dotenv-webpack');
-const path = require('path');
+// const path = require('path');
 
 dotenv.config();
 
@@ -27,15 +27,19 @@ module.exports = async (env, options) => {
 
     // For advanced scenarios, dynamically modify webpackConfig here.
 
+    /*
     webpackConfig.resolve.alias = {
-        common: path.resolve(__dirname, '../common/src')
+        common: path.resolve(__dirname, '../../src')
     };
+    */
 
     // const src = path.resolve(__dirname, 'src');
     // webpackConfig.resolve.roots = [__dirname, src];
 
+    /*
     const nodeModules = path.resolve(__dirname, 'node_modules');
     webpackConfig.resolve.modules = [ nodeModules ];
+    */
 
     webpackConfig.plugins.push(new Dotenv());
 
