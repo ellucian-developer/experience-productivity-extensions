@@ -9,6 +9,8 @@
         "google.openGmail": "Open Gmail",
         "google.permissionsRequested": "Permissions Requested",
         "mail.attachment": "Attachment",
-        "mail.noMessages": "You have no email yet"
+        "mail.noMessages": "You have no email yet",
+        "development.signOut": "Sign out",
+        "development.revokePermissions": "Revoke permissions"
     }
 }

@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import safeHtml from 'safe-html';
 import classnames from 'classnames';
 
-import { Avatar, Button, Card, CardContent, CardHeader, Divider, Illustration, IMAGES, Tooltip, Typography } from "@hedtech/react-design-system/core";
+import { Avatar, Divider, Illustration, IMAGES, Tooltip, Typography } from "@hedtech/react-design-system/core";
 import { Icon } from '@eui/ds-icons/lib/';
 import { withStyles } from "@hedtech/react-design-system/core/styles";
 import {
@@ -27,7 +27,9 @@ import { useExtensionControl } from '@ellucian/experience-extension-hooks';
 
 import { useComponents, useIntl } from '../context-hooks/card-context-hooks.js';
 import { useAuth } from '../context-hooks/auth-context-hooks';
-import { useMail } from "../context-hooks/mail-context-hooks";
+import { useMail } from '../context-hooks/mail-context-hooks';
+
+import DevelopmentBox from './DevelopmentBox';
 
 const colors = [ fountain400, iris400, kiwi400, meadow400, purple400, saffron400, tangerine400 ];
 function pickAvatarColor(email, colorsContext) {
@@ -123,14 +125,6 @@ const styles = () => ({
     fontWeightNormal: {
         fontWeight: fontWeightNormal
     },
-    devCard: {
-        marginLeft: spacing40,
-        marginRight: spacing40,
-        marginBottom: spacing40
-    },
-    devButton: {
-        marginBottom: spacing30
-    },
     divider: {
         marginTop: '0px',
         marginBottom: '0px'
@@ -153,8 +147,8 @@ function Mail({ classes }) {
 
     const { intl } = useIntl();
     const { LoginButton, OpenMailButton } = useComponents();
-    const { error: authError, login, loggedIn, logout, revokePermissions, state: authState } = useAuth();
-    const { error: mailError, messages, refresh, openMail, state: mailState } = useMail();
+    const { error: authError, login, loggedIn, state: authState } = useAuth();
+    const { error: mailError, messages, openMail, state: mailState } = useMail();
 
     const [colorsContext] = useState({ colorsUsed: [], colorsByUser: {}});
 
@@ -179,15 +173,6 @@ function Mail({ classes }) {
     useEffect(() => {
         setLoadingStatus(displayState === 'init');
     }, [authState, displayState, mailState])
-
-    function onLogout() {
-        logout();
-    }
-
-    function onRevokePermissions() {
-        revokePermissions();
-        refresh();
-    }
 
     if (displayState === 'loaded') {
         if (messages && messages.length > 0) {
@@ -256,15 +241,7 @@ function Mail({ classes }) {
                     <div className={classes.openEmailBox}>
                         <OpenMailButton className={classes.openEmail} onClick={openMail}/>
                     </div>
-                    { process.env.NODE_ENV === 'development' && (
-                        <Card className={classes.devCard}>
-                            <CardHeader title="Development Mode"/>
-                            <CardContent>
-                                <Button className={classes.devButton} onClick={onLogout}>Sign Out</Button>
-                                <Button className={classes.devButton} onClick={onRevokePermissions}>Revoke Permissions</Button>
-                            </CardContent>
-                        </Card>
-                    )}
+                    <DevelopmentBox/>
                 </div>
             );
         } else if (messages) {

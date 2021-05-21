@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
 import classnames from 'classnames';
 
-import { Button, Card, CardHeader, CardContent, Divider, Illustration, IMAGES, Typography } from "@hedtech/react-design-system/core";
+import { Divider, Illustration, IMAGES, Typography } from "@hedtech/react-design-system/core";
 import { withStyles } from "@hedtech/react-design-system/core/styles";
 import { fontWeightBold, fontWeightNormal, spacing30, spacing40 } from "@hedtech/react-design-system/core/styles/tokens";
 
@@ -13,6 +13,8 @@ import { useComponents, useIntl } from '../context-hooks/card-context-hooks';
 
 import { useAuth } from '../context-hooks/auth-context-hooks';
 import { useDrive } from "../context-hooks/drive-context-hooks";
+
+import DevelopmentBox from './DevelopmentBox';
 
 const styles = () => ({
     card: {
@@ -107,8 +109,8 @@ function Drive({ classes }) {
     const { intl } = useIntl();
     const { OpenDriveButton, LoginButton } = useComponents();
 
-    const { error: authError, login, loggedIn, logout, revokePermissions } = useAuth();
-    const { error: driveError, files, openDrive, refresh } = useDrive();
+    const { error: authError, login, loggedIn } = useAuth();
+    const { error: driveError, files, openDrive } = useDrive();
 
     const [displayState, setDisplayState] = useState('init');
 
@@ -139,15 +141,6 @@ function Drive({ classes }) {
     useEffect(() => {
         setLoadingStatus(displayState !== 'filesLoaded' && displayState !== 'loggedOut');
     }, [displayState])
-
-    function onLogout() {
-        logout();
-    }
-
-    function onRevokePermissions() {
-        revokePermissions();
-        refresh();
-    }
 
     if (displayState === 'filesLoaded') {
         if (files && files.length > 0) {
@@ -192,15 +185,7 @@ function Drive({ classes }) {
                     <div className={classes.openDriveBox}>
                         <OpenDriveButton onClick={openDrive}/>
                     </div>
-                    { process.env.NODE_ENV === 'development' && (
-                        <Card className={classes.devCard}>
-                            <CardHeader title="Development Mode"/>
-                            <CardContent>
-                                <Button className={classes.devButton} onClick={onLogout}>Sign Out</Button>
-                                <Button className={classes.devButton} onClick={onRevokePermissions}>Revoke Permissions</Button>
-                            </CardContent>
-                        </Card>
-                    )}
+                    <DevelopmentBox/>
                 </div>
             );
         } else if (files) {
