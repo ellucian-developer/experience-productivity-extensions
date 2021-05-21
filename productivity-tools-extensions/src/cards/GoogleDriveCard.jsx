@@ -6,8 +6,8 @@ import { ExtensionProvider } from '@ellucian/experience-extension-hooks';
 import { withIntl } from "../components/ReactIntlProviderWrapper";
 
 import { CardProvider } from '../context-hooks/card-context-hooks';
-import { AuthProvider } from "../context-hooks/google/auth-context-provider";
-import { DriveProvider } from "../context-hooks/google/drive-context-provider";
+import { AuthProvider } from "../context-providers/google/auth-context-provider";
+import { DriveProvider } from "../context-providers/google/drive-context-provider";
 
 import Drive from '../components/Drive';
 

@@ -5,8 +5,8 @@ import PropTypes from 'prop-types';
 
 import { useUserInfo } from '@ellucian/experience-extension-hooks';
 
-import { useAuth } from '../auth-context-hooks';
-import { Context } from '../mail-context-hooks';
+import { useAuth } from '../../context-hooks/auth-context-hooks';
+import { Context } from '../../context-hooks/mail-context-hooks';
 import { getMessagesFromThreads } from '../../util/gmail';
 
 const refreshInterval = 60000;

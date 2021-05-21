@@ -5,7 +5,7 @@ import { unstable_batchedUpdates } from 'react-dom';
 
 import { useCardInfo } from '@ellucian/experience-extension-hooks';
 
-import { Context } from '../auth-context-hooks';
+import { Context } from '../../context-hooks/auth-context-hooks';
 
 function loadGapiScript() {
     return new Promise(resolve => {
