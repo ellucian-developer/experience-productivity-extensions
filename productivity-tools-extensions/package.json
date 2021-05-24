@@ -15,7 +15,7 @@
     "google-deploy-prod": "webpack --config google-webpack.config.js --progress --mode production --env verbose --env upload",
     "microsoft-deploy-prod": "webpack --progress --mode production --env verbose --env upload",
     "google-start": "webpack --config google-webpack.config.js --hot --watch --mode development --env verbose --env upload --env forceUpload",
-    "microsoft-start": "webpack --hot --watch --mode development --env verbose --env upload --env forceUpload",
+    "microsoft-start": "webpack --config microsoft-webpack.config.js --hot --watch --mode development --env verbose --env upload --env forceUpload",
     "test": "cross-env BABEL_ENV=test JEST_JUNIT_OUTPUT=./report.xml jest --coverage"
   },
   "dependencies": {
@@ -29,7 +29,8 @@
     "react-dom": "16.9.0",
     "react-intl": "2.8.0",
     "react-router-dom": "5.2.0",
-    "safe-html": "1.0.0"
+    "safe-html": "1.0.0",
+    "msal": "^1.4.4"
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "7.12.1",
@@ -37,6 +38,7 @@
     "@babel/preset-react": "7.12.1",
     "@calm/eslint-plugin-react-intl": "1.4.1",
     "@ellucian/experience-extension": "2.2.1",
+    "@microsoft/microsoft-graph-client": "^2.0.0",
     "babel-eslint": "10.1.0",
     "babel-plugin-rewire": "1.2.0",
     "cross-env": "7.0.2",
@@ -55,6 +57,7 @@
     "jest": "26.5.3",
     "jest-fetch-mock": "3.0.3",
     "jest-junit": "12.0.0",
+    "jsonpath": "1.0.2",
     "react-test-renderer": "16.13.1",
     "rewiremock": "3.14.3",
     "svg-url-loader": "7.1.1",
