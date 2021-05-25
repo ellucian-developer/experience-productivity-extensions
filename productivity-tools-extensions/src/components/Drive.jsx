@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React, { useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
-import classnames from 'classnames';
 
 import { Divider, Illustration, IMAGES, Typography } from "@hedtech/react-design-system/core";
 import { withStyles } from "@hedtech/react-design-system/core/styles";
@@ -13,8 +12,6 @@ import { useComponents, useIntl } from '../context-hooks/card-context-hooks';
 
 import { useAuth } from '../context-hooks/auth-context-hooks';
 import { useDrive } from "../context-hooks/drive-context-hooks";
-
-import DevelopmentBox from './DevelopmentBox';
 
 const styles = () => ({
     card: {
@@ -56,26 +53,24 @@ const styles = () => ({
         marginBottom: spacing30
     },
     fileIcon: {
+        alignSelf: 'flex-start',
+        marginTop: spacing30,
         marginRight: spacing40
     },
     fileName: {
         width: '100%',
+        display: '-webkit-box',
         '-webkit-line-clamp': '2',
         '-webkit-box-orient': 'vertical',
         overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        wordBreak: 'break-all'
-    },
-    fileNameUnviewed: {
         fontWeight: fontWeightBold
     },
     modified: {
         width: '100%',
+        display: '-webkit-box',
         '-webkit-line-clamp': '2',
         '-webkit-box-orient': 'vertical',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        wordBreak: 'break-all'
+        overflow: 'hidden'
     },
     divider: {
         marginTop: spacing30,
@@ -92,7 +87,7 @@ const styles = () => ({
     devButton: {
         marginBottom: spacing30
     },
-    openDriveBox: {
+    logoutBox: {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -107,10 +102,10 @@ function Drive({ classes }) {
     const { locale } = useUserInfo();
 
     const { intl } = useIntl();
-    const { OpenDriveButton, LoginButton } = useComponents();
+    const { LogoutButton, LoginButton } = useComponents();
 
-    const { error: authError, login, loggedIn } = useAuth();
-    const { error: driveError, files, openDrive } = useDrive();
+    const { error: authError, login, loggedIn, logout } = useAuth();
+    const { error: driveError, files } = useDrive();
 
     const [displayState, setDisplayState] = useState('init');
 
@@ -166,9 +161,9 @@ function Drive({ classes }) {
                                         <img className={classes.fileIcon} src={file.iconLink}/>
                                         <div className={classes.fileNameBox}>
                                             <Typography
-                                                className={classnames(classes.fileName, {[classes.fileNameUnviewed]: !file.viewedByMe})}
+                                                className={classes.fileName}
                                                 component='div'
-                                                variant={"body1"}
+                                                variant={"body2"}
                                             >
                                                 {file.name}
                                             </Typography>
@@ -182,10 +177,9 @@ function Drive({ classes }) {
                             </a>
                         );
                     })}
-                    <div className={classes.openDriveBox}>
-                        <OpenDriveButton onClick={openDrive}/>
+                    <div className={classes.logoutBox}>
+                        <LogoutButton onClick={logout}/>
                     </div>
-                    <DevelopmentBox/>
                 </div>
             );
         } else if (files) {
@@ -194,7 +188,9 @@ function Drive({ classes }) {
                     <Typography className={classes.noFiles} component='div' variant={'h3'}>
                         {intl.formatMessage({id: 'drive.noFiles'})}
                     </Typography>
-                    <OpenDriveButton onClick={openDrive}/>
+                    <div className={classes.logoutBox}>
+                        <LogoutButton onClick={logout}/>
+                    </div>
                 </div>
             )
         }

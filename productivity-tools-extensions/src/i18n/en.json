@@ -5,12 +5,11 @@
         "drive.modifiedBy": "Modified: {date} by {name}",
         "drive.noFiles": "You have no files yet",
         "google.signIn": "Sign in with Google",
+        "google.signOut": "Sign out",
         "google.openDrive": "Open Drive",
         "google.openGmail": "Open Gmail",
         "google.permissionsRequested": "Permissions Requested",
         "mail.attachment": "Attachment",
-        "mail.noMessages": "You have no email yet",
-        "development.signOut": "Sign out",
-        "development.revokePermissions": "Revoke permissions"
+        "mail.noMessages": "You have no email yet"
     }
 }

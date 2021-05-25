@@ -1,10 +1,10 @@
 /* eslint-disable jsx-a11y/alt-text */
-import React, { useState, useEffect, Fragment } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import safeHtml from 'safe-html';
 import classnames from 'classnames';
 
-import { Avatar, Divider, Illustration, IMAGES, Tooltip, Typography } from "@hedtech/react-design-system/core";
+import { Avatar, Divider, Illustration, IMAGES, TextLink, Tooltip, Typography } from "@hedtech/react-design-system/core";
 import { Icon } from '@eui/ds-icons/lib/';
 import { withStyles } from "@hedtech/react-design-system/core/styles";
 import {
@@ -28,8 +28,6 @@ import { useExtensionControl } from '@ellucian/experience-extension-hooks';
 import { useComponents, useIntl } from '../context-hooks/card-context-hooks.js';
 import { useAuth } from '../context-hooks/auth-context-hooks';
 import { useMail } from '../context-hooks/mail-context-hooks';
-
-import DevelopmentBox from './DevelopmentBox';
 
 const colors = [ fountain400, iris400, kiwi400, meadow400, purple400, saffron400, tangerine400 ];
 function pickAvatarColor(email, colorsContext) {
@@ -107,12 +105,14 @@ const styles = () => ({
         display: 'flex',
         alignItems: 'center'
     },
-    subject: {
-        marginRight: spacing40
+    subjectLink: {
+        maxWidth: '100%'
     },
+    subject: { },
     attachment: {
         flex: '1 0 auto',
-        maxWidth: spacing40
+        maxWidth: spacing40,
+        marginLeft: spacing30
     },
     bold: {
         fontWeight: fontWeightBold
@@ -132,13 +132,16 @@ const styles = () => ({
     avatar: {
         color: colorTextNeutral600
     },
-    openEmailBox: {
+    logoutBox: {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: spacing40,
         marginBottom: spacing40
+    },
+    settings: {
+        marginTop: spacing40
     }
 });
 
@@ -146,16 +149,36 @@ function Mail({ classes }) {
     const { setErrorMessage, setLoadingStatus } = useExtensionControl();
 
     const { intl } = useIntl();
-    const { LoginButton, OpenMailButton } = useComponents();
-    const { error: authError, login, loggedIn, state: authState } = useAuth();
-    const { error: mailError, messages, openMail, state: mailState } = useMail();
+    const { LoginButton, LogoutButton } = useComponents();
+    const { error: authError, login, loggedIn, logout, state: authState } = useAuth();
+    const { error: mailError, messages, state: mailState } = useMail();
 
     const [colorsContext] = useState({ colorsUsed: [], colorsByUser: {}});
 
     const [displayState, setDisplayState] = useState('init');
 
+    const [contentNode, setContentNode] = useState();
+
+    const contentRef = (contentNode) => {
+        setContentNode(contentNode);
+    }
+
     useEffect(() => {
-        if (authError || mailError) {
+        if (contentNode) {
+            // find the parent with a title, to remove it so it doesn't interfere with the tool tip
+            const nodesWithTitle = document.querySelectorAll('div[title]');
+            for (const node of nodesWithTitle) {
+                if (node.contains(contentNode))  {
+                    node.removeAttribute('title');
+                }
+            }
+        }
+    }, [contentNode]);
+
+    useEffect(() => {
+        if (displayState === 'settings') {
+            // do nothing
+        } else if (authError || mailError) {
             setErrorMessage({
                 headerMessage: intl.formatMessage({id: 'error.contentNotAvailable'}),
                 textMessage: intl.formatMessage({id: 'error.contactYourAdministrator'}),
@@ -177,7 +200,7 @@ function Mail({ classes }) {
     if (displayState === 'loaded') {
         if (messages && messages.length > 0) {
             return (
-                <div className={classes.content}>
+                <div className={classes.content} ref={contentRef}>
                     {messages.map((message, index) => {
                         const {
                             body,
@@ -202,32 +225,38 @@ function Mail({ classes }) {
                                         <div className={classes.fromBox}>
                                             <Typography
                                                 className={classnames(classes.messageFrom, { [classes.bold]: unread })}
+                                                component='div'
                                                 noWrap
-                                                variant={"body1"}
+                                                variant={"body2"}
                                             >
                                                 {fromName}
                                             </Typography>
-                                            <Typography component='div' className={classes.date}>
+                                            <Typography
+                                                className={classes.date}
+                                                component='div'
+                                                variant={"body3"}
+                                            >
                                                 {received}
                                             </Typography>
                                         </div>
                                         <div className={classes.subjectBox}>
-                                            <Typography component='div' noWrap className={classnames(classes.subject, { [classes.bold]: unread })}>
-                                                <a
-                                                    href={messageUrl}
-                                                    target='_blank'
-                                                    rel="noreferrer"
+                                            <TextLink className={classes.subjectLink} onClick={() => window.open(messageUrl, '_blank')}>
+                                                <Typography
+                                                    className={classnames(classes.subject, { [classes.bold]: unread })}
+                                                    component='div'
+                                                    noWrap
+                                                    variant={"body2"}
                                                 >
                                                     {subject}
-                                                </a>
-                                            </Typography>
+                                                </Typography>
+                                            </TextLink>
                                             { hasAttachment && (
                                                 <Tooltip title={intl.formatMessage({id: 'mail.attachment'})}>
                                                     <Icon className={classes.attachment} name='file-text' />
                                                 </Tooltip>
                                             )}
                                         </div>
-                                        <Typography component='div' noWrap>
+                                        <Typography component='div' noWrap variant='body3'>
                                             <div className={classes.noWrap} dangerouslySetInnerHTML={{__html: safeHtml(body)}}/>
                                         </Typography>
                                     </div>
@@ -238,10 +267,9 @@ function Mail({ classes }) {
                             </Fragment>
                         );
                     })}
-                    <div className={classes.openEmailBox}>
-                        <OpenMailButton className={classes.openEmail} onClick={openMail}/>
+                    <div className={classes.logoutBox}>
+                        <LogoutButton className={classes.logout} onClick={logout}/>
                     </div>
-                    <DevelopmentBox/>
                 </div>
             );
         } else if (messages) {
@@ -250,7 +278,9 @@ function Mail({ classes }) {
                     <Typography className={classes.noMessages} component='div' variant={'h3'}>
                         {intl.formatMessage({id: 'mail.noMessages'})}
                     </Typography>
-                    <OpenMailButton onClick={openMail}/>
+                    <div className={classes.logoutBox}>
+                        <LogoutButton className={classes.logout} onClick={logout}/>
+                    </div>
                 </div>
             )
         }
