@@ -104,9 +104,11 @@ export function MailProvider({children}) {
                 if (error && error.status === 401) {
                     setLoggedIn(false);
                 } else {
-                    setError(error);
                     console.error('gapi failed', error);
-                    setState(() => ({ error: 'api'}));
+                    unstable_batchedUpdates(() => {
+                        setError(error);
+                        setState(() => ({ error: 'api'}));
+                    })
                 }
             }
         }

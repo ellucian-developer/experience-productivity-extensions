@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 // eslint-disable-next-line camelcase
 import { unstable_batchedUpdates } from 'react-dom';
@@ -60,8 +60,10 @@ export function DriveProvider({children}) {
                     setLoggedIn(false);
                 } else {
                     console.error('gapi failed', error);
-                    setState(() => ({ error: 'api'}));
-                    setError(error);
+                    unstable_batchedUpdates(() => {
+                        setState(() => ({ error: 'api'}));
+                        setError(error);
+                    })
                 }
             }
         }
@@ -155,8 +157,4 @@ export function DriveProvider({children}) {
 
 DriveProvider.propTypes = {
     children: PropTypes.object.isRequired
-}
-
-export function useDrive() {
-    return useContext(Context);
 }
