@@ -2,6 +2,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 
+import classnames from 'classnames';
+
 import { Button } from "@hedtech/react-design-system/core";
 import { withStyles } from "@hedtech/react-design-system/core/styles";
 import { spacing30 } from "@hedtech/react-design-system/core/styles/tokens";
@@ -19,20 +21,21 @@ const styles = () => ({
     }
 });
 
-function GoogleLoginButton({ classes, onClick }) {
+function SignOutButton({classes, className = '', onClick}) {
     const { intl } = useIntl();
 
     return (
-        <Button className={classes.button} color='secondary' onClick={onClick}>
+        <Button className={classnames(className, classes.button)} color='secondary' onClick={onClick}>
             <img className={classes.image} src={GoogleImage}/>
-            {intl.formatMessage({id: 'google.signIn'})}
+            {intl.formatMessage({id: 'google.signOut'})}
         </Button>
     );
 }
 
-GoogleLoginButton.propTypes = {
+SignOutButton.propTypes = {
     classes: PropTypes.object.isRequired,
+    className: PropTypes.string,
     onClick: PropTypes.func.isRequired
 };
 
-export default withStyles(styles)(GoogleLoginButton);
+export default withStyles(styles)(SignOutButton);

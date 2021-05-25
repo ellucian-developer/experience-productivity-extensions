@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Context } from '../context-hooks/card-context-hooks';
 import { default as OpenDriveButton } from '../components/GoogleDriveOpenButton';
 import { default as LoginButton } from '../components/GoogleLoginButton';
-import { default as OpenMailButton } from '../components/GmailOpenButton';
+import { default as LogoutButton } from '../components/GoogleLogoutButton';
 
 
 export function CardProvider({children, intl}) {
@@ -13,7 +13,7 @@ export function CardProvider({children, intl}) {
             intl,
             components: {
                 OpenDriveButton,
-                OpenMailButton,
+                LogoutButton,
                 LoginButton
             }
         }
