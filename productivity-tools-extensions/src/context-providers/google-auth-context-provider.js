@@ -68,10 +68,18 @@ export function AuthProvider({ children }) {
 
     const [apiState, setApiState] = useState('init');
 
-    function login() {
+    function login(scope) {
         const { gapi } = window;
         if (gapi) {
-            gapi.auth2.getAuthInstance().signIn();
+            // gapi.auth2.getAuthInstance().signIn();
+            const options = {
+                prompt: 'select_account',
+                'ux_mode': 'popup'
+            };
+            if (typeof scope === 'string') {
+                options.scope = scope;
+            }
+            gapi.auth2.getAuthInstance().signIn(options);
         }
     }
 

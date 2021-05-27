@@ -67,11 +67,18 @@ const styles = () => ({
     },
     content: {
         display: "flex",
-        flexFlow: "column"
+        flexFlow: "column",
+        '& :first-child': {
+            paddingTop: '0px'
+        },
+        '& hr:last-of-type': {
+            display: 'none'
+        }
     },
-    messageBox: {
+    row: {
         display: "flex",
         alignItems: "center",
+        paddingTop: spacing30,
         paddingLeft: spacing40,
         paddingRight: spacing40,
         paddingBottom: spacing30,
@@ -155,7 +162,7 @@ function Mail({ classes }) {
 
     const [colorsContext] = useState({ colorsUsed: [], colorsByUser: {}});
 
-    const [displayState, setDisplayState] = useState('init');
+    const [displayState, setDisplayState] = useState('loading');
 
     const [contentNode, setContentNode] = useState();
 
@@ -176,9 +183,7 @@ function Mail({ classes }) {
     }, [contentNode]);
 
     useEffect(() => {
-        if (displayState === 'settings') {
-            // do nothing
-        } else if (authError || mailError) {
+        if (authError || mailError) {
             setErrorMessage({
                 headerMessage: intl.formatMessage({id: 'error.contentNotAvailable'}),
                 textMessage: intl.formatMessage({id: 'error.contactYourAdministrator'}),
@@ -186,6 +191,8 @@ function Mail({ classes }) {
             })
         } else if (loggedIn === false && authState === 'ready') {
             setDisplayState('loggedOut');
+        } else if (mailState === 'load') {
+            setDisplayState('loading');
         } else if (mailState === 'loaded' || mailState === 'refresh') {
             setDisplayState('loaded');
         } else if (mailState && mailState.error) {
@@ -194,14 +201,14 @@ function Mail({ classes }) {
     }, [ authError, authState, loggedIn, mailError, mailState ])
 
     useEffect(() => {
-        setLoadingStatus(displayState === 'init');
+        setLoadingStatus(displayState === 'loading');
     }, [displayState, mailState])
 
     if (displayState === 'loaded') {
         if (messages && messages.length > 0) {
             return (
                 <div className={classes.content} ref={contentRef}>
-                    {messages.map((message, index) => {
+                    {messages.map((message) => {
                         const {
                             body,
                             id,
@@ -214,12 +221,10 @@ function Mail({ classes }) {
                             subject,
                             unread
                         } = message;
-                        const first = index === 0;
-                        const last = index === messages.length - 1;
                         const avatarColor = pickAvatarColor(fromEmail, colorsContext);
                         return (
                             <Fragment key={id}>
-                                <div className={classnames(classes.messageBox, {[classes.messagePaddingTop]: !first})}>
+                                <div className={classes.row}>
                                     <Avatar className={classes.avatar} style={{backgroundColor: avatarColor}}>{fromInitial}</Avatar>
                                     <div className={classes.messageDetailsBox}>
                                         <div className={classes.fromBox}>
@@ -261,9 +266,7 @@ function Mail({ classes }) {
                                         </Typography>
                                     </div>
                                 </div>
-                                { !last && (
-                                    <Divider classes={{ root: classes.divider }} variant={"middle"} />
-                                )}
+                                <Divider classes={{ root: classes.divider }} variant={"middle"} />
                             </Fragment>
                         );
                     })}

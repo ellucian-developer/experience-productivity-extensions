@@ -72,6 +72,10 @@ export function DriveProvider({children}) {
     useEffect(() => {
         if (loggedIn && (state === 'load' || state === 'refresh')) {
             refresh();
+        } else if (!loggedIn && state === 'loaded') {
+            // force refresh when logged back in
+            setFiles(undefined);
+            setState('load');
         }
     }, [loggedIn, refresh, state])
 
