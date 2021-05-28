@@ -11,7 +11,6 @@ import { MailProvider } from '../context-providers/google-mail-context-provider'
 
 import Mail from '../../components/Mail';
 
-
 function GmailCard(props) {
     return (
         <ExtensionProvider {...props}>
