@@ -3,13 +3,13 @@ import React from "react";
 
 import { ExtensionProvider } from '@ellucian/experience-extension-hooks';
 
-import { withIntl } from "../components/ReactIntlProviderWrapper";
+import { withIntl } from "../../components/ReactIntlProviderWrapper";
 
 import { CardProvider } from '../context-providers/google-card-context-provider';
 import { AuthProvider } from "../context-providers/google-auth-context-provider";
 import { DriveProvider } from "../context-providers/google-drive-context-provider";
 
-import Drive from '../components/Drive';
+import Drive from '../../components/Drive';
 
 function GoogleDriveCard(props) {
     return (

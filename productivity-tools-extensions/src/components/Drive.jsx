@@ -1,10 +1,11 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React, { useState, useEffect, useMemo, Fragment } from "react";
 import PropTypes from "prop-types";
+import classnames from 'classnames';
 
-import { Divider, Illustration, IMAGES, Tooltip, Typography } from "@hedtech/react-design-system/core";
+import { Divider, Illustration, IMAGES, Popper, Typography } from "@hedtech/react-design-system/core";
 import { withStyles } from "@hedtech/react-design-system/core/styles";
-import { colorBrandNeutral250, fontWeightBold, fontWeightNormal, spacing30, spacing40 } from "@hedtech/react-design-system/core/styles/tokens";
+import { colorBrandNeutral250, colorBrandNeutral300, fontWeightBold, fontWeightNormal, spacing30, spacing40 } from "@hedtech/react-design-system/core/styles/tokens";
 
 import { useExtensionControl, useUserInfo } from '@ellucian/experience-extension-hooks';
 
@@ -33,18 +34,18 @@ const styles = () => ({
     content: {
         display: "flex",
         flexFlow: "column",
-        '& :first-child': {
-            paddingTop: '0px'
-        },
+        marginLeft: spacing40,
+        marginRight: spacing40,
         '& hr:last-of-type': {
             display: 'none'
         }
     },
+    'row0': {
+        paddingTop: '0px !important'
+    },
     row: {
         paddingTop: spacing30,
         paddingBottom: spacing30,
-        paddingLeft: spacing40,
-        paddingRight: spacing40,
         '&:hover': {
             backgroundColor: colorBrandNeutral250
         }
@@ -81,7 +82,8 @@ const styles = () => ({
     },
     divider: {
         marginTop: '0px',
-        marginBottom: '0px'
+        marginBottom: '0px',
+        backgroundColor: colorBrandNeutral300
     },
     fontWeightNormal: {
         fontWeight: fontWeightNormal
@@ -109,12 +111,14 @@ function Drive({ classes }) {
     const { locale } = useUserInfo();
 
     const { intl } = useIntl();
-    const { LogoutButton, LoginButton } = useComponents();
+    const { LogoutButton, LoginButton, NoFiles } = useComponents();
 
     const { error: authError, login, loggedIn, logout } = useAuth();
     const { error: driveError, files } = useDrive();
 
     const [displayState, setDisplayState] = useState('init');
+
+    const [popperContext, setPopperContext] = useState({ overflowedFileIds: []});
 
     const fileDateFormater = useMemo(() => {
         return new Intl.DateTimeFormat(locale, { month: 'short', day: '2-digit' })
@@ -126,8 +130,28 @@ function Drive({ classes }) {
 
     const [contentNode, setContentNode] = useState();
 
-    const contentRef = (contentNode) => {
-        setContentNode(contentNode);
+    const contentRef = (node) => {
+        setContentNode(node);
+    }
+
+    const fileNameRef = (node, id) => {
+        if (node) {
+            const { clientHeight, scrollHeight } = node;
+            const { overflowedFileIds } = popperContext;
+            if (clientHeight < scrollHeight) {
+                // it is overflowing
+                const index = overflowedFileIds.indexOf(id);
+                if (index === -1) {
+                    overflowedFileIds.push(id);
+                }
+            } else {
+                // it is not overflowing, hide tool tip
+                const index = overflowedFileIds.indexOf(id);
+                if (index >= 0) {
+                    overflowedFileIds.splice(index, 1);
+                }
+            }
+        }
     }
 
     useEffect(() => {
@@ -156,17 +180,32 @@ function Drive({ classes }) {
             const nodesWithTitle = document.querySelectorAll('div[title]');
             for (const node of nodesWithTitle) {
                 if (node.contains(contentNode))  {
-                    node.removeAttribute('title');
+                    // nodIe.removeAttribute('title');
                 }
             }
         }
     }, [contentNode]);
 
+    function openPopper(event, id) {
+        const { currentTarget } = event;
+        setPopperContext(() => ({
+            id,
+            anchor: currentTarget,
+            overflowedFileIds: popperContext.overflowedFileIds
+        }));
+    }
+
+    function closePopper() {
+        setPopperContext(() => ({
+            overflowedFileIds: popperContext.overflowedFileIds
+        }));
+    }
+
     if (displayState === 'filesLoaded') {
         if (files && files.length > 0) {
             return (
                 <div className={classes.content} ref={contentRef}>
-                    {files.map((file) => {
+                    {files.map((file, index) => {
                         const { component: FileComponent, iconLink, id, lastModifyingUser, modifiedTime: fileModifiedTime, name, webViewLink } = file;
                         const fileModified = new Date(fileModifiedTime);
                         const modified = new Date().getFullYear() === fileModified.getFullYear()
@@ -175,7 +214,7 @@ function Drive({ classes }) {
                         const modifiedBy = lastModifyingUser ? lastModifyingUser.displayName : 'unknown';
                         return (
                             <Fragment key={id}>
-                                <div className={classes.row}>
+                                <div className={classnames(classes.row, classes[`row${index}`])}>
                                     <a
                                         style={{ textDecoration: "none", color: "initial" }}
                                         href={webViewLink}
@@ -189,15 +228,31 @@ function Drive({ classes }) {
                                                 <div className={classes.fileBox}>
                                                     <img className={classes.fileIcon} src={iconLink}/>
                                                     <div className={classes.fileNameBox}>
-                                                        <Tooltip title={name}>
-                                                            <Typography
-                                                                className={classes.fileName}
-                                                                component='div'
-                                                                variant={"body2"}
-                                                            >
-                                                                {name}
-                                                            </Typography>
-                                                        </Tooltip>
+                                                        <Typography
+                                                            className={classes.fileName}
+                                                            component='div'
+                                                            variant={"body2"}
+                                                            ref={node => fileNameRef(node, id)}
+                                                            onFocus={event => openPopper(event, id)}
+                                                            onMouseOver={event => openPopper(event, id)}
+                                                            onBlur={() => closePopper()}
+                                                            onMouseLeave={() => closePopper()}
+                                                        >
+                                                            {name}
+                                                        </Typography>
+                                                        <Popper
+                                                            anchorEl={popperContext.anchor}
+                                                            container={contentNode}
+                                                            open={popperContext.id === id && popperContext.overflowedFileIds.includes(id)}
+                                                            modifiers={{
+                                                                preventOverflow: {
+                                                                    enabled: true,
+                                                                    padding: spacing40
+                                                                }
+                                                            }}
+                                                        >
+                                                            <Typography>{name}</Typography>
+                                                        </Popper>
                                                         <Typography className={classes.modified} component='div' variant={"body3"}>
                                                             {intl.formatMessage({id: 'drive.modifiedBy'}, {date: modified, name: modifiedBy})}
                                                         </Typography>
@@ -216,16 +271,7 @@ function Drive({ classes }) {
                 </div>
             );
         } else if (files) {
-            return (
-                <div className={classes.card}>
-                    <Typography className={classes.noFiles} component='div' variant={'h3'}>
-                        {intl.formatMessage({id: 'drive.noFiles'})}
-                    </Typography>
-                    <div className={classes.logoutBox}>
-                        <LogoutButton onClick={logout}/>
-                    </div>
-                </div>
-            )
+            return <NoFiles/>;
         }
     } else if (displayState === 'loggedOut') {
         return (

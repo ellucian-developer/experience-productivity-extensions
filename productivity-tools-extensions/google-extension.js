@@ -11,14 +11,14 @@ module.exports = {
     },
     'cards': [{
         'type': 'DriveCard',
-        'source': './src/cards/GoogleDriveCard',
+        'source': './src/google/cards/GoogleDriveCard',
         'title': 'Google Drive',
         'displayCardType': 'Google Drive',
         'description': 'Google Drive card'
     },
     {
         'type': 'MailCard',
-        'source': './src/cards/GMailCard',
+        'source': './src/google/cards/GMailCard',
         'title': 'Gmail',
         'displayCardType': 'Gmail',
         'description': 'Google Gmail card'
