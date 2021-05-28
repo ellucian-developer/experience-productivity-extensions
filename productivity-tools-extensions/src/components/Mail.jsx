@@ -9,6 +9,7 @@ import { Icon } from '@eui/ds-icons/lib/';
 import { withStyles } from "@hedtech/react-design-system/core/styles";
 import {
     colorBrandNeutral250,
+    colorBrandNeutral300,
     colorTextNeutral600,
     fontWeightBold,
     fontWeightNormal,
@@ -67,27 +68,32 @@ const styles = () => ({
     },
     content: {
         display: "flex",
-        flexFlow: "column"
+        flexDirection: "column",
+        marginLeft: spacing40,
+        marginRight: spacing40,
+        '& :first-child': {
+            paddingTop: '0px'
+        },
+        '& hr:last-of-type': {
+            display: 'none'
+        }
     },
-    messageBox: {
+    row: {
         display: "flex",
         alignItems: "center",
-        paddingLeft: spacing40,
-        paddingRight: spacing40,
+        paddingTop: spacing30,
         paddingBottom: spacing30,
-        width: '100%',
+        paddingLeft: spacing30,
+        paddingRight: spacing30,
         '&:hover': {
             backgroundColor: colorBrandNeutral250
         }
     },
-    messagePaddingTop: {
-        paddingTop: spacing30
-    },
-    messageIcon: {
-        flex: '0 0 auto'
+    avatar: {
+        color: colorTextNeutral600
     },
     messageDetailsBox: {
-        paddingLeft: spacing40,
+        paddingLeft: spacing30,
         width: 'calc(100% - 40px)',
         flex: '1 1 auto',
         display: "flex",
@@ -114,8 +120,9 @@ const styles = () => ({
         maxWidth: spacing40,
         marginLeft: spacing30
     },
-    bold: {
-        fontWeight: fontWeightBold
+    unread: {
+        fontWeight: fontWeightBold,
+        color: colorTextNeutral600
     },
     noWrap: {
         overflow: 'hidden',
@@ -127,10 +134,8 @@ const styles = () => ({
     },
     divider: {
         marginTop: '0px',
-        marginBottom: '0px'
-    },
-    avatar: {
-        color: colorTextNeutral600
+        marginBottom: '0px',
+        backgroundColor: colorBrandNeutral300
     },
     logoutBox: {
         display: 'flex',
@@ -149,13 +154,13 @@ function Mail({ classes }) {
     const { setErrorMessage, setLoadingStatus } = useExtensionControl();
 
     const { intl } = useIntl();
-    const { LoginButton, LogoutButton } = useComponents();
+    const { LoginButton, LogoutButton, NoEmail } = useComponents();
     const { error: authError, login, loggedIn, logout, state: authState } = useAuth();
     const { error: mailError, messages, state: mailState } = useMail();
 
     const [colorsContext] = useState({ colorsUsed: [], colorsByUser: {}});
 
-    const [displayState, setDisplayState] = useState('init');
+    const [displayState, setDisplayState] = useState('loading');
 
     const [contentNode, setContentNode] = useState();
 
@@ -176,9 +181,7 @@ function Mail({ classes }) {
     }, [contentNode]);
 
     useEffect(() => {
-        if (displayState === 'settings') {
-            // do nothing
-        } else if (authError || mailError) {
+        if (authError || mailError) {
             setErrorMessage({
                 headerMessage: intl.formatMessage({id: 'error.contentNotAvailable'}),
                 textMessage: intl.formatMessage({id: 'error.contactYourAdministrator'}),
@@ -186,6 +189,8 @@ function Mail({ classes }) {
             })
         } else if (loggedIn === false && authState === 'ready') {
             setDisplayState('loggedOut');
+        } else if (mailState === 'load') {
+            setDisplayState('loading');
         } else if (mailState === 'loaded' || mailState === 'refresh') {
             setDisplayState('loaded');
         } else if (mailState && mailState.error) {
@@ -194,14 +199,14 @@ function Mail({ classes }) {
     }, [ authError, authState, loggedIn, mailError, mailState ])
 
     useEffect(() => {
-        setLoadingStatus(displayState === 'init');
+        setLoadingStatus(displayState === 'loading');
     }, [displayState, mailState])
 
     if (displayState === 'loaded') {
         if (messages && messages.length > 0) {
             return (
                 <div className={classes.content} ref={contentRef}>
-                    {messages.map((message, index) => {
+                    {messages.map((message) => {
                         const {
                             body,
                             id,
@@ -214,17 +219,15 @@ function Mail({ classes }) {
                             subject,
                             unread
                         } = message;
-                        const first = index === 0;
-                        const last = index === messages.length - 1;
                         const avatarColor = pickAvatarColor(fromEmail, colorsContext);
                         return (
                             <Fragment key={id}>
-                                <div className={classnames(classes.messageBox, {[classes.messagePaddingTop]: !first})}>
+                                <div className={classes.row}>
                                     <Avatar className={classes.avatar} style={{backgroundColor: avatarColor}}>{fromInitial}</Avatar>
                                     <div className={classes.messageDetailsBox}>
                                         <div className={classes.fromBox}>
                                             <Typography
-                                                className={classnames(classes.messageFrom, { [classes.bold]: unread })}
+                                                className={classnames(classes.messageFrom, { [classes.unread]: unread })}
                                                 component='div'
                                                 noWrap
                                                 variant={"body2"}
@@ -240,7 +243,7 @@ function Mail({ classes }) {
                                             </Typography>
                                         </div>
                                         <div className={classes.subjectBox}>
-                                            <TextLink className={classes.subjectLink} onClick={() => window.open(messageUrl, '_blank')}>
+                                            <TextLink className={classes.subjectLink} href={messageUrl} target='_blank'>
                                                 <Typography
                                                     className={classnames(classes.subject, { [classes.bold]: unread })}
                                                     component='div'
@@ -261,9 +264,7 @@ function Mail({ classes }) {
                                         </Typography>
                                     </div>
                                 </div>
-                                { !last && (
-                                    <Divider classes={{ root: classes.divider }} variant={"middle"} />
-                                )}
+                                <Divider classes={{ root: classes.divider }} variant={"middle"} />
                             </Fragment>
                         );
                     })}
@@ -273,16 +274,7 @@ function Mail({ classes }) {
                 </div>
             );
         } else if (messages) {
-            return (
-                <div className={classes.card}>
-                    <Typography className={classes.noMessages} component='div' variant={'h3'}>
-                        {intl.formatMessage({id: 'mail.noMessages'})}
-                    </Typography>
-                    <div className={classes.logoutBox}>
-                        <LogoutButton className={classes.logout} onClick={logout}/>
-                    </div>
-                </div>
-            )
+            return <NoEmail/>;
         }
     } else if (displayState === 'loggedOut') {
         return (

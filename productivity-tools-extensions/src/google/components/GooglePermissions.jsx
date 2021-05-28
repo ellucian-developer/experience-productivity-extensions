@@ -6,7 +6,7 @@ import { Button, Illustration, IMAGES, Typography } from "@hedtech/react-design-
 import { withStyles } from "@hedtech/react-design-system/core/styles";
 import { fontWeightNormal, spacing30, spacingSmall } from "@hedtech/react-design-system/core/styles/tokens";
 
-import { useIntl } from '../context-hooks/card-context-hooks';
+import { useIntl } from '../../context-hooks/card-context-hooks';
 
 import GoogleSignInImage from '../images/btn_google_light_normal_ios.svg';
 

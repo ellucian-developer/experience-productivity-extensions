@@ -3,12 +3,15 @@
         "error.contentNotAvailable": "Content Not Available",
         "error.contactYourAdministrator": "Contact your Administrator",
         "drive.modifiedBy": "Modified: {date} by {name}",
-        "drive.noFiles": "You have no files yet",
         "google.signIn": "Sign in with Google",
         "google.signOut": "Sign out",
         "google.openDrive": "Open Drive",
         "google.openGmail": "Open Gmail",
         "google.permissionsRequested": "Permissions Requested",
+        "google.noFilesTitle": "No Files in Google Drive",
+        "google.noFilesMessage": "Go to Google Drive to start adding files",
+        "google.noEmailTitle": "No Emails in Gmail",
+        "google.noEmailMessage": "Your inbox is empty, go to Gmail to start sending and receiving email",
         "mail.attachment": "Attachment",
         "mail.noMessages": "You have no email yet"
     }

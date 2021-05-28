@@ -1,11 +1,14 @@
 import React, { useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
-import { Context } from '../context-hooks/card-context-hooks';
+import { Context } from '../../context-hooks/card-context-hooks';
 import { default as OpenDriveButton } from '../components/GoogleDriveOpenButton';
 import { default as LoginButton } from '../components/GoogleLoginButton';
 import { default as LogoutButton } from '../components/GoogleLogoutButton';
+import { default as NoFiles } from '../components/GoogleNoDriveFiles';
+import { default as NoEmail } from '../components/GmailNoEmail';
 
+const googleRenderedLoginButton = false;
 
 export function CardProvider({children, intl}) {
     const contextValue = useMemo(() => {
@@ -14,7 +17,10 @@ export function CardProvider({children, intl}) {
             components: {
                 OpenDriveButton,
                 LogoutButton,
-                LoginButton
+                // eslint-disable-next-line react/display-name
+                LoginButton: (props) => (<LoginButton googleRender={googleRenderedLoginButton} {...props}/>),
+                NoFiles,
+                NoEmail
             }
         }
     }, [ intl ]);

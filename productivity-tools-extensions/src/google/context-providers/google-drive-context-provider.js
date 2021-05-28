@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 // eslint-disable-next-line camelcase
 import { unstable_batchedUpdates } from 'react-dom';
 
-import { useAuth } from '../context-hooks/auth-context-hooks';
-import { Context } from '../context-hooks/drive-context-hooks';
+import { useAuth } from '../../context-hooks/auth-context-hooks';
+import { Context } from '../../context-hooks/drive-context-hooks';
 
 const refreshInterval = 60000;
 
@@ -72,6 +72,10 @@ export function DriveProvider({children}) {
     useEffect(() => {
         if (loggedIn && (state === 'load' || state === 'refresh')) {
             refresh();
+        } else if (!loggedIn && state === 'loaded') {
+            // force refresh when logged back in
+            setFiles(undefined);
+            setState('load');
         }
     }, [loggedIn, refresh, state])
 

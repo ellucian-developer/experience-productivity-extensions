@@ -3,13 +3,14 @@ import React from 'react';
 
 import { ExtensionProvider } from '@ellucian/experience-extension-hooks';
 
-import { withIntl } from '../components/ReactIntlProviderWrapper';
+import { withIntl } from '../../components/ReactIntlProviderWrapper';
 
 import { CardProvider } from '../context-providers/google-card-context-provider';
 import { AuthProvider } from '../context-providers/google-auth-context-provider';
 import { MailProvider } from '../context-providers/google-mail-context-provider';
 
-import Mail from '../components/Mail';
+import Mail from '../../components/Mail';
+
 
 function GmailCard(props) {
     return (
