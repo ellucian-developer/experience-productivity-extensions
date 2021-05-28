@@ -5,7 +5,7 @@ import classnames from 'classnames';
 
 import { Divider, Illustration, IMAGES, Popper, Typography } from "@hedtech/react-design-system/core";
 import { withStyles } from "@hedtech/react-design-system/core/styles";
-import { colorBrandNeutral250, colorBrandNeutral300, fontWeightBold, fontWeightNormal, spacing30, spacing40 } from "@hedtech/react-design-system/core/styles/tokens";
+import { colorBrandNeutral250, colorBrandNeutral300, fontWeightBold, fontWeightNormal, spacing30, spacing40, spacing50 } from "@hedtech/react-design-system/core/styles/tokens";
 
 import { useExtensionControl, useUserInfo } from '@ellucian/experience-extension-hooks';
 
@@ -72,6 +72,10 @@ const styles = () => ({
         '-webkit-box-orient': 'vertical',
         overflow: 'hidden',
         fontWeight: fontWeightBold
+    },
+    fileNamePopper: {
+        paddingLeft: spacing50,
+        paddingRight: spacing50
     },
     modified: {
         width: '100%',
@@ -241,6 +245,7 @@ function Drive({ classes }) {
                                                             {name}
                                                         </Typography>
                                                         <Popper
+                                                            className={classes.fileNamePopper}
                                                             anchorEl={popperContext.anchor}
                                                             container={contentNode}
                                                             open={popperContext.id === id && popperContext.overflowedFileIds.includes(id)}
