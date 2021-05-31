@@ -8,7 +8,7 @@ import { Button } from "@hedtech/react-design-system/core";
 import { withStyles } from "@hedtech/react-design-system/core/styles";
 import { spacing30 } from "@hedtech/react-design-system/core/styles/tokens";
 
-import { useIntl } from '../context-hooks/card-context-hooks';
+import { useIntl } from '../../context-hooks/card-context-hooks';
 
 import GoogleImage from '../images/btn_google_light_normal_ios.svg';
 

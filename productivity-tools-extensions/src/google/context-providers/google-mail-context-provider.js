@@ -5,8 +5,8 @@ import PropTypes from 'prop-types';
 
 import { useUserInfo } from '@ellucian/experience-extension-hooks';
 
-import { useAuth } from '../context-hooks/auth-context-hooks';
-import { Context } from '../context-hooks/mail-context-hooks';
+import { useAuth } from '../../context-hooks/auth-context-hooks';
+import { Context } from '../../context-hooks/mail-context-hooks';
 import { getMessagesFromThreads } from '../util/gmail';
 
 const refreshInterval = 60000;
@@ -66,14 +66,14 @@ export function MailProvider({children}) {
                     const fromName = fromMatches[1].trim();
                     const fromEmail = fromMatches[2].trim().toLocaleLowerCase();
                     const fromNameSplit = fromName.split(/[, ]/);
-                    const firstName = (fromNameSplit.length !== 3 ? fromNameSplit[0] : fromNameSplit[2]) || '';
+                    const firstName = fromName.includes(',') ? fromNameSplit[2] : (fromNameSplit[0] || '');
                     const fromInitial = firstName.slice(0, 1);
 
                     const subject = getValueFromArray(headers, 'Subject', 'No Subject');
 
                     const messageUrl = `https://mail.google.com/mail/?authuser=${email}#all/${id}`;
 
-                    const hasAttachment = parts.some(part => part.filename !== '');
+                    const hasAttachment = parts && parts.some(part => part.filename !== '');
 
                     const received = isToday(receivedDate) ? timeFormater.format(receivedDate) : dateFormater.format(receivedDate);
 
@@ -104,9 +104,11 @@ export function MailProvider({children}) {
                 if (error && error.status === 401) {
                     setLoggedIn(false);
                 } else {
-                    setError(error);
                     console.error('gapi failed', error);
-                    setState(() => ({ error: 'api'}));
+                    unstable_batchedUpdates(() => {
+                        setError(error);
+                        setState(() => ({ error: 'api'}));
+                    })
                 }
             }
         }
@@ -173,6 +175,9 @@ export function MailProvider({children}) {
         if (loggedIn) {
             setState(messages ? 'refresh' : 'load');
             // refreshMessageList();
+        } else if (state === 'loaded') {
+            setMessages(undefined);
+            setState('load');
         }
     }, [ loggedIn ])
 
