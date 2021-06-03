@@ -46,7 +46,9 @@ const styles = () => ({
     row: {
         paddingTop: spacing30,
         paddingBottom: spacing30,
-        '&:hover': {
+        textDecoration: 'none',
+        color: 'initial',
+        '&:hover, &:focus': {
             backgroundColor: colorBrandNeutral250
         }
     },
@@ -218,54 +220,52 @@ function Drive({ classes }) {
                         const modifiedBy = lastModifyingUser ? lastModifyingUser.displayName : 'unknown';
                         return (
                             <Fragment key={id}>
-                                <div className={classnames(classes.row, classes[`row${index}`])}>
-                                    <a
-                                        style={{ textDecoration: "none", color: "initial" }}
-                                        href={webViewLink}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                    >
-                                        {FileComponent && (
-                                            <FileComponent/>
-                                        )}
-                                        {!FileComponent && (
-                                                <div className={classes.fileBox}>
-                                                    <img className={classes.fileIcon} src={iconLink}/>
-                                                    <div className={classes.fileNameBox}>
-                                                        <Typography
-                                                            className={classes.fileName}
-                                                            component='div'
-                                                            variant={"body2"}
-                                                            ref={node => fileNameRef(node, id)}
-                                                            onFocus={event => openPopper(event, id)}
-                                                            onMouseOver={event => openPopper(event, id)}
-                                                            onBlur={() => closePopper()}
-                                                            onMouseLeave={() => closePopper()}
-                                                        >
-                                                            {name}
-                                                        </Typography>
-                                                        <Popper
-                                                            className={classes.fileNamePopper}
-                                                            anchorEl={popperContext.anchor}
-                                                            container={contentNode}
-                                                            open={popperContext.id === id && popperContext.overflowedFileIds.includes(id)}
-                                                            modifiers={{
-                                                                preventOverflow: {
-                                                                    enabled: true,
-                                                                    padding: spacing40
-                                                                }
-                                                            }}
-                                                        >
-                                                            <Typography>{name}</Typography>
-                                                        </Popper>
-                                                        <Typography className={classes.modified} component='div' variant={"body3"}>
-                                                            {intl.formatMessage({id: 'drive.modifiedBy'}, {date: modified, name: modifiedBy})}
-                                                        </Typography>
-                                                    </div>
+                                <a
+                                    className={classnames(classes.row, classes[`row${index}`])}
+                                    href={webViewLink}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                >
+                                    {FileComponent && (
+                                        <FileComponent/>
+                                    )}
+                                    {!FileComponent && (
+                                            <div className={classes.fileBox}>
+                                                <img className={classes.fileIcon} src={iconLink}/>
+                                                <div className={classes.fileNameBox}>
+                                                    <Typography
+                                                        className={classes.fileName}
+                                                        component='div'
+                                                        variant={"body2"}
+                                                        ref={node => fileNameRef(node, id)}
+                                                        onFocus={event => openPopper(event, id)}
+                                                        onMouseOver={event => openPopper(event, id)}
+                                                        onBlur={() => closePopper()}
+                                                        onMouseLeave={() => closePopper()}
+                                                    >
+                                                        {name}
+                                                    </Typography>
+                                                    <Popper
+                                                        className={classes.fileNamePopper}
+                                                        anchorEl={popperContext.anchor}
+                                                        container={contentNode}
+                                                        open={popperContext.id === id && popperContext.overflowedFileIds.includes(id)}
+                                                        modifiers={{
+                                                            preventOverflow: {
+                                                                enabled: true,
+                                                                padding: spacing40
+                                                            }
+                                                        }}
+                                                    >
+                                                        <Typography>{name}</Typography>
+                                                    </Popper>
+                                                    <Typography className={classes.modified} component='div' variant={"body3"}>
+                                                        {intl.formatMessage({id: 'drive.modifiedBy'}, {date: modified, name: modifiedBy})}
+                                                    </Typography>
                                                 </div>
-                                        )}
-                                    </a>
-                                </div>
+                                            </div>
+                                    )}
+                                </a>
                                 <Divider className={classes.divider} variant={"middle"} />
                             </Fragment>
                         );
