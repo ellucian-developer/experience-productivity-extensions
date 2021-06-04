@@ -1,7 +1,7 @@
 {
-  "name": "productivity-tools-extensions",
-  "version": "1.0.8",
-  "description": "Productivity Tools extensions",
+  "name": "ms-exp-extn-productivity-tools-extensions",
+  "version": "1.0.6",
+  "description": "MS EXP EXTN Productivity Tools extensions",
   "main": "index.js",
   "license": "UNLICENSED",
   "scripts": {
@@ -11,15 +11,18 @@
     "google-deploy-dev": "webpack --config google-webpack.config.js --progress --mode development --env verbose --env upload",
     "google-deploy-prod": "webpack --config google-webpack.config.js --progress --mode production --env verbose --env upload",
     "google-start": "webpack --config google-webpack.config.js --hot --watch --mode development --env verbose --env upload --env forceUpload",
-    "microsoft-build-dev": "webpack --progress --mode development --env verbose",
-    "microsoft-build-prod": "webpack --progress --mode production --env verbose",
-    "microsoft-deploy-dev": "webpack --progress --mode development --env verbose --env upload",
-    "microsoft-deploy-prod": "webpack --progress --mode production --env verbose --env upload",
+    "microsoft-build-dev": "webpack --config microsoft-webpack.config.js --progress --mode development --env verbose",
+    "microsoft-build-prod": "webpack --config microsoft-webpack.config.js --progress --mode production --env verbose",
+    "microsoft-deploy-dev": "webpack --config microsoft-webpack.config.js --progress --mode development --env verbose --env upload",
+    "microsoft-deploy-prod": "webpack --config microsoft-webpack.config.js --progress --mode production --env verbose --env upload",
     "microsoft-start": "webpack --config microsoft-webpack.config.js --hot --watch --mode development --env verbose --env upload --env forceUpload",
     "test": "cross-env BABEL_ENV=test JEST_JUNIT_OUTPUT=./report.xml jest --coverage"
   },
   "dependencies": {
     "@ellucian/experience-extension-hooks": "2.2.1",
+    "@microsoft/mgt-element": "^2.2.0",
+    "@microsoft/mgt-msal2-provider": "^2.2.0",
+    "@microsoft/mgt-react": "^2.2.0",
     "classnames": "2.3.1",
     "gapi-script": "1.2.0",
     "prop-types": "15.7.2",
@@ -27,8 +30,7 @@
     "react-dom": "16.9.0",
     "react-intl": "2.8.0",
     "react-router-dom": "5.2.0",
-    "safe-html": "1.0.0",
-    "msal": "^1.4.4"
+    "safe-html": "1.0.0"
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "7.12.1",

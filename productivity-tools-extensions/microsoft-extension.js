@@ -1,5 +1,5 @@
 module.exports = {
-    "name": "Microsoft Productivity Tools",
+    "name": "MSEXPEXTN Microsoft Productivity Tools",
     "publisher": "Ellucian",
     "configuration": {
 		"client": [{
@@ -17,19 +17,14 @@ module.exports = {
 				"label": "Azure AD Tenant ID",
 				"type": "text",
 				"required": true,
-            }, {
-                "key": "userId",
-                "label": "user Id",
-                "type": "text",
-                "required": true,
             }]
 	},
     "cards": [{       
-        "type": "OneDriveCard",
-        "source": "./src/cards/OneDriveCard",
-        "title": "OneDrive",
-        "displayCardType": "MsOneDrive",
-        "description": "This card displays MS OneDrive" 
+        "type": "MSEXPEXTN OneDriveCard",
+        "source": "./src/microsoft/cards/OneDriveCard",
+        "title": "MSEXPEXTN OneDrive",
+        "displayCardType": "MSEXPEXTN MsOneDrive",
+        "description": "This card displays MSEXPEXTN OneDrive" 
     }],
     "licensing": {
         "options": [

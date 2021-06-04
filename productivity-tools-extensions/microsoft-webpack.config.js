@@ -27,20 +27,6 @@ module.exports = async (env, options) => {
 
     // For advanced scenarios, dynamically modify webpackConfig here.
 
-    /*
-    webpackConfig.resolve.alias = {
-        common: path.resolve(__dirname, '../../src')
-    };
-    */
-
-    // const src = path.resolve(__dirname, 'src');
-    // webpackConfig.resolve.roots = [__dirname, src];
-
-    /*
-    const nodeModules = path.resolve(__dirname, 'node_modules');
-    webpackConfig.resolve.modules = [ nodeModules ];
-    */
-
     webpackConfig.plugins.push(new Dotenv());
 
     const {module: {rules} } = webpackConfig;
@@ -69,6 +55,7 @@ module.exports = async (env, options) => {
         ]
     })
 
+    // this is needed for @ellucian/experience-extension-hooks
     webpackConfig.module.rules.forEach( rule => {
         if (rule.loader === 'babel-loader' || rule.loader === 'eslit-loader') {
             rule.exclude = /node_modules\/(?!(@ellucian)\/)/

@@ -3,7 +3,7 @@
         "error.contentNotAvailable": "Content Not Available",
         "error.contactYourAdministrator": "Contact your Administrator",
         "drive.modifiedBy": "Modified: {date} by {name}",
-        "google.signIn": "Sign in",
+        "google.signIn": "Sign in with Google",
         "google.signOut": "Sign out",
         "google.openDrive": "Open Drive",
         "google.openGmail": "Open Gmail",
@@ -13,6 +13,10 @@
         "google.noEmailTitle": "No Emails in Gmail",
         "google.noEmailMessage": "Your inbox is empty, go to Gmail to start sending and receiving email",
         "mail.attachment": "Attachment",
-        "mail.noMessages": "You have no email yet"
+        "mail.noMessages": "You have no email yet",
+        "microsoft.noFilesTitle": "No Files in One Drive",
+        "microsoft.noFilesMessage": "Go to One Drive to start adding files",
+        "microsoft.noEmailTitle": "No Emails",
+        "microsoft.noEmailMessage": "Your inbox is empty."
     }
 }

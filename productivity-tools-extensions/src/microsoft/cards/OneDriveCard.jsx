@@ -3,24 +3,24 @@ import React from "react";
 
 import { ExtensionProvider } from '@ellucian/experience-extension-hooks';
 
-import { withIntl } from "../components/ReactIntlProviderWrapper";
+import { withIntl } from "../../components/ReactIntlProviderWrapper";
 
-import { CardProvider } from '../context-hooks/card-context-hooks';
+import { MicrosoftCardProvider } from '../context-providers/microsoft-card-context-provider';
 import { MicrosoftAuthProvider } from "../context-providers/microsoft-auth-context-provider";
 import { MicrosoftDriveProvider } from "../context-providers/microsoft-drive-context-provider";
 
-import OneDrive from '../components/OneDrive';
+import OneDrive from '../../components/OneDrive';
 
 function OneDriveCard(props) {
     return (
         <ExtensionProvider {...props}>
-            <CardProvider {...props}>
+            <MicrosoftCardProvider {...props}>
                 <MicrosoftAuthProvider>
                     <MicrosoftDriveProvider>
                         <OneDrive/>
                     </MicrosoftDriveProvider>
                 </MicrosoftAuthProvider>
-            </CardProvider>
+            </MicrosoftCardProvider>
         </ExtensionProvider>
     )
 }
