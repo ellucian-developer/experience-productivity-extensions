@@ -107,7 +107,7 @@ export function MicrosoftAuthProvider({ children }) {
         if (loggedIn) {
             // TODO: Set the Email. Remove testEmailNeedToBeChanged
             console.log('Email set to: testEmailNeedToBeChanged');
-            const userId = "testEmailNeedToBeChanged";
+            const userId = "Krishna.Kant@ellucian.com";
             setEmail(userId);
         }
     }, [loggedIn]);

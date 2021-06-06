@@ -25,6 +25,12 @@ module.exports = {
         "title": "MSEXPEXTN OneDrive",
         "displayCardType": "MSEXPEXTN MsOneDrive",
         "description": "This card displays MSEXPEXTN OneDrive" 
+    }, {
+        "type": "Outlook Mail WIP",
+        "source": "./src/microsoft/cards/OutlookMailCard",
+        "title": "Outlook Mail WIP",
+        "displayCardType": "MsOutlookMail WIP",
+        "description": "This card displays Office 365 Mail"
     }],
     "licensing": {
         "options": [
