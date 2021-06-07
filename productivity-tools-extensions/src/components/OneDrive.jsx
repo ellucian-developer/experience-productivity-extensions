@@ -132,7 +132,7 @@ function OneDrive({ classes }) {
     const { locale } = useUserInfo();
 
     const { intl } = useIntl();
-    const { MsLoginButton, MsLogoutButton, MsNoFiles } = useComponents();
+    const { LoginButton, LogoutButton, NoFiles } = useComponents();
 
     const { error: authError, login, loggedIn, logout } = useAuth();
     const { error: driveError, files } = useDrive();
@@ -287,13 +287,13 @@ function OneDrive({ classes }) {
                         }
                     })}
                     <div className={classes.logoutBox}>
-                        <MsLogoutButton onClick={logout}/>
+                        <LogoutButton onClick={logout}/>
                     </div>
                 </div>
             );
         }
         else if (files) {
-            return <MsNoFiles/>;
+            return <NoFiles/>;
         }
     } else if (displayState === 'loggedOut') {
         return (
@@ -302,7 +302,7 @@ function OneDrive({ classes }) {
                 <Typography className={classes.fontWeightNormal} variant={"h3"} component='div'>
                     {intl.formatMessage({id: 'google.permissionsRequested'})}
                 </Typography>
-                <MsLoginButton onClick={login}/>
+                <LoginButton onClick={login}/>
             </div>
         );
     } else {

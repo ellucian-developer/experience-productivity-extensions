@@ -2,10 +2,10 @@ import React, { useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import { Context } from '../../context-hooks/card-context-hooks';
-import { default as MsNoFiles } from '../components/MicrosoftNoDriveFiles';
-import { default as MsNoEmail } from '../components/MicrosoftNoEmail';
+import { default as NoFiles } from '../components/MicrosoftNoDriveFiles';
+import { default as NoEmail } from '../components/MicrosoftNoEmail';
 import { default as LoginButton } from '../components/MicrosoftSignInButton';
-import { default as MsLogoutButton } from '../components/MicrosoftSignOutButton';
+import { default as LogoutButton } from '../components/MicrosoftSignOutButton';
 
 const renderedLoginButton = false;
 
@@ -15,11 +15,11 @@ export function MicrosoftCardProvider({children, intl}) {
             intl,
             components: {
             //     OpenDriveButton,
-                MsLogoutButton,
+                LogoutButton,
             // eslint-disable-next-line react/display-name
-                MsLoginButton: (props) => (<LoginButton microsoftRender={renderedLoginButton} {...props}/>),
-                MsNoFiles,
-                MsNoEmail
+                LoginButton: (props) => (<LoginButton microsoftRender={renderedLoginButton} {...props}/>),
+                NoFiles,
+                NoEmail
             }
         }
     }, [ intl ]);
