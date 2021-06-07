@@ -6,16 +6,13 @@ import classnames from 'classnames';
 import { Divider, Illustration, IMAGES, Popper, Typography } from "@hedtech/react-design-system/core";
 import { withStyles } from "@hedtech/react-design-system/core/styles";
 import { colorBrandNeutral250, colorCtaIrisActive, colorBrandNeutral300, fontWeightBold, fontWeightNormal, spacing30, spacing40, spacing50 } from "@hedtech/react-design-system/core/styles/tokens";
-
 import { useExtensionControl, useUserInfo } from '@ellucian/experience-extension-hooks';
 
 import { useComponents, useIntl } from '../context-hooks/card-context-hooks';
-
 import { useAuth } from '../context-hooks/auth-context-hooks';
 import { useDrive } from "../context-hooks/drive-context-hooks";
 
-import { Person,  PeoplePicker, People, FileList, MgtTemplateProps, File, Login } from '@microsoft/mgt-react';
-import { Button } from "@hedtech/react-design-system/core";
+import { File } from '@microsoft/mgt-react';
 
 const styles = () => ({
     card: {
@@ -48,15 +45,16 @@ const styles = () => ({
     },
     row: {
         paddingTop: spacing30,
-        paddingBottom: spacing30
-        // '&:hover': {
-        //     backgroundColor: colorBrandNeutral250
-        // }
+        paddingBottom: spacing30,
+        textDecoration: 'none',
+        color: 'initial',
+        '&:hover, &:focus': {
+            backgroundColor: colorBrandNeutral250
+        }
     },
     fileBox: {
-        width: "90%",
         display: "flex",
-        // padding: "0 9px",
+        padding: "0 9px",
         alignItems: "center"
     },
     fileNameBox: {
@@ -118,82 +116,25 @@ const styles = () => ({
             backgroundColor: colorCtaIrisActive,
             color: colorBrandNeutral250
         }
+    },
+    fileImage: {
+        '& .item__file-type-icon': {
+            padding: '0px',
+            paddingLeft: spacing30,
+            paddingRight: spacing30
+        }
     }
 });
 
 
-
-function MyFile (MgtTemplateProps, classes) {
-
-    const fileDateFormater = useMemo(() => {
-        return new Intl.DateTimeFormat(locale, { month: 'short', day: '2-digit' })
-    }, [locale]);
-
-    const fileDateFormaterWithYear = useMemo(() => {
-        return new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'short', day: '2-digit' })
-    }, [locale]);
-
-    const { locale } = useUserInfo();
-
-    const { file } = MgtTemplateProps.dataContext;
-    // return <div>
-    //             <img height="28px" width="28px" src="https://spoprod-a.akamaihd.net/files/fabric-cdn-prod_20201008.001/assets/item-types/48/xlsx.svg"/>
-    //         {file.name}
-    //         </div>;
-    const fileModified = new Date(file.lastModifiedDateTime);
-                        const modified = new Date().getFullYear() === fileModified.getFullYear()
-                            ? fileDateFormater.format(fileModified)
-                            : fileDateFormaterWithYear.format(fileModified);
-                        const modifiedBy = file.lastModifiedBy.user ? file.lastModifiedBy.user.displayName : 'unknown';
-    return <Fragment key={file.id}>
-                <a
-                    style={{ textDecoration: "none", color: "initial" }}
-                    href={file.webUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                >
-                    {/* <mgt-file file-details ={file} view="twolines" line2Property="lastModifiedDateTime"> </mgt-file> */}
-                    <File fileDetails={file} view="twolines"/>
-                    {/* <Typography className={classes.modified} component='div' variant={"body3"}>
-                        {intl.formatMessage({id: 'drive.modifiedBy'}, {date: modified, name: modifiedBy})}
-                    </Typography> */}
-                </a>
-                {/* <Divider className={classes.divider} variant={"middle"} /> */}
-            </Fragment>;
-}
-
-function MicrosoftLogin(MgtTemplateProps) {
-    return <div style={{cursor: 'pointer',
-                        height: '40px',
-                        width: '100px',
-                        borderRadius: '5px',
-                        border: '2px solid #026BC8',
-                        textAlign: 'center',
-                        verticalAlign:'center',
-                        fontFamily:'Roboto Condensed',
-                        fontWeight: '700',
-                        color: '#026BC8',
-                        fontSize: '1rem',
-                        letterSpacing: '.0625rem',
-                        lineHeight:'2.5',
-                        '&:hover': {
-                            backgroundColor: colorCtaIrisActive,
-                            color: colorBrandNeutral250
-                        }}} >
-                SIGN IN
-            </div>
-}
-
 function OneDrive({ classes }) {
-    const [people, setPeople] = useState([]);
-
     const { setErrorMessage, setLoadingStatus } = useExtensionControl();
     const { locale } = useUserInfo();
 
     const { intl } = useIntl();
-    // const { NoFiles } = useComponents();
+    const { MsLoginButton, MsLogoutButton, MsNoFiles } = useComponents();
 
-    const { error: authError, login, loginInit, loginFailed, loggedIn, logout, logoutCompleted } = useAuth();
+    const { error: authError, login, loggedIn, logout } = useAuth();
     const { error: driveError, files } = useDrive();
 
     const [displayState, setDisplayState] = useState('init');
@@ -281,25 +222,16 @@ function OneDrive({ classes }) {
         }));
     }
 
-    // const handleSelectionChanged = (e) => {
-    //     setPeople(e.target.selectedPeople);
-    // };
-
     if (displayState === 'filesLoaded') {
         if (files && files.length > 0) {
             return (
                 <div className={classes.content} ref={contentRef}>
-                    {/* <FileList fileListQuery="/me/drive/search(q='')?$orderby=lastModifiedDateTime%20desc" pageSize="10">
-                        <MyFile template="file"/>
-                    </FileList> */}
-                     {/* <File fileQuery="/me/drive/items/01MYB5TYUHERZ3VTRNDNAI223BLC7PFJHI" > </File> */}
                      {files.map((file, index) => {
                         const fileModified = new Date(file.lastModifiedDateTime);
                         const modified = new Date().getFullYear() === fileModified.getFullYear()
                             ? fileDateFormater.format(fileModified)
                             : fileDateFormaterWithYear.format(fileModified);
                         const modifiedBy = file.lastModifiedBy.user ? file.lastModifiedBy.user.displayName : 'unknown';
-                        var filequery = "/me/drive/items/"+ file.id;
                         if (file.file === undefined) {
                             return "";
                         }
@@ -313,13 +245,8 @@ function OneDrive({ classes }) {
                                         target="_blank"
                                         rel="noreferrer"
                                     >
-                                        {/* <mgt-file file-query ={filequery} view="twolines"> </mgt-file> */}
-                                        {/* <mgt-file file-details ={file} view="oneline"> </mgt-file> */}
                                         <div className={classes.fileBox}>
-                                            <File fileDetails={file} view="image"/>
-                                            {/* <Typography className={classes.fileName} component='div' variant={"body2"} >
-                                                {file.name}
-                                            </Typography> */}
+                                            <File className={classes.fileImage} fileDetails={file} view="image"/>
                                             <div className={classes.fileNameBox}>
                                                 <Typography
                                                     className={classes.fileName}
@@ -359,20 +286,14 @@ function OneDrive({ classes }) {
                             );
                         }
                     })}
-                    {/* <Person personQuery="me" /> */}
-                    {/* <div>
-                        <PeoplePicker selectionChanged={handleSelectionChanged} />
-                        Selected People: <People people={people} />
-                    </div> */}
                     <div className={classes.logoutBox}>
-                        <Login logoutInitiated={logout} logoutCompleted={logoutCompleted} />
+                        <MsLogoutButton onClick={logout}/>
                     </div>
                 </div>
             );
         }
         else if (files) {
-            // return <NoFiles/>;
-            return <div> No Files found </div>;
+            return <MsNoFiles/>;
         }
     } else if (displayState === 'loggedOut') {
         return (
@@ -381,14 +302,7 @@ function OneDrive({ classes }) {
                 <Typography className={classes.fontWeightNormal} variant={"h3"} component='div'>
                     {intl.formatMessage({id: 'google.permissionsRequested'})}
                 </Typography>
-                {/* <LoginButton onClick={login}/> */}
-                <Login loginCompleted={login} loginInitiated={loginInit} loginFailed={loginFailed} />
-                <Login loginCompleted={login} loginInitiated={loginInit} loginFailed={loginFailed} data-type="signed-out-button-content">
-                    {/* <template data-type="signed-out-button-content">
-                        <div> SIGN IN </div>
-                    </template> */}
-                    <MicrosoftLogin template="signed-out-button-content" />
-                </Login>
+                <MsLoginButton onClick={login}/>
             </div>
         );
     } else {

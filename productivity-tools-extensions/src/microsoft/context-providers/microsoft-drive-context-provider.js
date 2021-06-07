@@ -10,7 +10,6 @@ const refreshInterval = 60000;
 
 export function MicrosoftDriveProvider({children}) {
     const { client, loggedIn, setLoggedIn } = useAuth();
-
     const [error, setError] = useState(false);
     const [state, setState] = useState('load');
     const [files, setFiles] = useState();
