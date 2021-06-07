@@ -6,13 +6,11 @@ import classnames from 'classnames';
 
 import { Avatar, Divider, Illustration, IMAGES, TextLink, Tooltip, Typography } from "@hedtech/react-design-system/core";
 import { Icon } from '@eui/ds-icons/lib/';
-import { Login } from '@microsoft/mgt-react';
 import { withStyles } from "@hedtech/react-design-system/core/styles";
 import {
     colorBrandNeutral250,
     colorBrandNeutral300,
     colorTextNeutral600,
-    colorCtaIrisActive,
     fontWeightBold,
     fontWeightNormal,
     spacing30,
@@ -28,7 +26,7 @@ import {
 
 import { useExtensionControl, useUserInfo } from '@ellucian/experience-extension-hooks';
 
-import { useIntl } from '../context-hooks/card-context-hooks.js';
+import { useComponents, useIntl } from '../context-hooks/card-context-hooks';
 import { useAuth } from '../context-hooks/auth-context-hooks';
 import { useMail } from '../context-hooks/mail-context-hooks';
 
@@ -113,7 +111,10 @@ const styles = () => ({
         display: 'flex',
         alignItems: 'center'
     },
-    subjectLink: {
+    subjectLink90: {
+        maxWidth: '90%'
+    },
+    subjectLink100: {
         maxWidth: '100%'
     },
     subject: { },
@@ -152,35 +153,14 @@ const styles = () => ({
     }
 });
 
-function MicrosoftLogin(MgtTemplateProps) {
-    return <div style={{cursor: 'pointer',
-                        height: '40px',
-                        width: '100px',
-                        borderRadius: '5px',
-                        border: '2px solid #026BC8',
-                        textAlign: 'center',
-                        verticalAlign:'center',
-                        fontFamily:'Roboto Condensed',
-                        fontWeight: '700',
-                        color: '#026BC8',
-                        fontSize: '1rem',
-                        letterSpacing: '.0625rem',
-                        lineHeight:'2.5',
-                        '&:hover': {
-                            backgroundColor: colorCtaIrisActive,
-                            color: colorBrandNeutral250
-                        }}} >
-                SIGN IN
-            </div>
-}
-
 function OutlookMail({ classes }) {
     const { setErrorMessage, setLoadingStatus } = useExtensionControl();
     const { locale } = useUserInfo();
 
     const { intl } = useIntl();
+    const { LoginButton, LogoutButton } = useComponents();
 
-    const { error: authError, login, loginInit, loginFailed, loggedIn, logout, logoutCompleted } = useAuth();
+    const { error: authError, login, loggedIn, logout } = useAuth();
     const { error: mailError, mails, userPhotos } = useMail();
     let userPhotoUrl;
 
@@ -226,7 +206,7 @@ function OutlookMail({ classes }) {
         if (mails && mails.length > 0) {
             return (
                 <div className={classes.content}>
-                    {mails.map((mail, index) => {
+                    {mails.map((mail) => {
                         const {
                             bodyPreview,
                             id,
@@ -246,8 +226,6 @@ function OutlookMail({ classes }) {
                         const localReceivedDateTime = new Date(receivedDateTime);
                         const diaplayReceivedDateTime = isToday(localReceivedDateTime) ? timeFormater.format(localReceivedDateTime) : dateFormater.format(localReceivedDateTime);
 
-                        // const first = index === 0;
-                        // const last = index === mails.length - 1;
                         const avatarColor = pickAvatarColor(address, colorsContext);
 
                         // console.debug('10:provider.userPhotos:-', userPhotos);
@@ -283,14 +261,14 @@ function OutlookMail({ classes }) {
                                             </Typography>
                                         </div>
                                         <div className={classes.subjectBox}>
-                                            <TextLink className={classes.subjectLink} href={webLink} target='_blank'>
+                                            <TextLink className={{ [classes.subjectLink90]: hasAttachments, [classes.subjectLink100]: !hasAttachments}} href={webLink} target='_blank'>
                                                 <Typography component='div' noWrap className={classnames(classes.subject, { [classes.unread]: !isRead })} variant="body2">
                                                     {subject}
                                                 </Typography>
                                             </TextLink>
                                             { hasAttachments && (
                                                 <Tooltip title={intl.formatMessage({id: 'mail.attachment'})}>
-                                                    <Icon className={classes.attachment} name='file-text' />
+                                                    <Icon className={classes.attachment} name='file-text' align='right' />
                                                 </Tooltip>
                                             )}
                                         </div>
@@ -310,7 +288,7 @@ function OutlookMail({ classes }) {
                     </div>
                     <DevelopmentBox/> */}
                     <div className={classes.logoutBox}>
-                        <Login logoutInitiated={logout} logoutCompleted={logoutCompleted} />
+                        <LogoutButton onClick={logout}/>
                     </div>
                 </div>
             );
@@ -334,14 +312,7 @@ function OutlookMail({ classes }) {
                 <Typography className={classes.fontWeightNormal} variant={"h3"} component='div'>
                     {intl.formatMessage({id: 'google.permissionsRequested'})}
                 </Typography>
-                {/* <LoginButton onClick={login}/> */}
-                <Login loginCompleted={login} loginInitiated={loginInit} loginFailed={loginFailed} />
-                <Login loginCompleted={login} loginInitiated={loginInit} loginFailed={loginFailed} data-type="signed-out-button-content">
-                    {/* <template data-type="signed-out-button-content">
-                        <div> SIGN IN </div>
-                    </template> */}
-                    <MicrosoftLogin template="signed-out-button-content" />
-                </Login>
+                <LoginButton onClick={login}/>
             </div>
         );
     } else {

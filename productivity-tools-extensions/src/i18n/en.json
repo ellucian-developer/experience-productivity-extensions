@@ -17,6 +17,8 @@
         "microsoft.noFilesTitle": "No Files in One Drive",
         "microsoft.noFilesMessage": "Go to One Drive to start adding files",
         "microsoft.noEmailTitle": "No Emails",
-        "microsoft.noEmailMessage": "Your inbox is empty."
+        "microsoft.noEmailMessage": "Your inbox is empty.",
+        "signIn": "Sign in",
+        "signOut": "Sign out"
     }
 }

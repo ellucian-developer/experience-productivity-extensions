@@ -18,28 +18,50 @@ export function MicrosoftAuthProvider({ children }) {
 
     const [apiState, setApiState] = useState('init');
 
+    const updateState = () => {
+        const provider = Providers.globalProvider;
+        if (provider && provider.state === ProviderState.SignedIn) {
+            const authProvider = provider;
+            const clientOptions = {
+                authProvider
+            };
+            const client = Client.initWithMiddleware(clientOptions);
+            setClient(client);
+            setLoggedIn(true);
+            setApiState('ready');
+        } else {
+            setLoggedIn(false);
+            setApiState('init');
+        }
+    };
+
     function login() {
         console.log("MS Auth login");
-        setLoggedIn(true);
-        setApiState('ready');
-    }
-
-    function loginInit() {
-        console.log("MS Auth login Init");
-    }
-
-    function loginFailed() {
-        console.log("MS Auth login Failed");
-        setLoggedIn(false);
+        Providers.globalProvider = new Msal2Provider({
+            clientId: aadClientId,
+            loginType: LoginType.Popup,
+            authority: `https://login.microsoftonline.com/${aadTenantId}/`,
+            redirectUri: aadRedirectUrl,
+            scopes: ['user.read', 'people.read', 'calendars.read', 'files.read', 'files.read.all']
+        });
+        Providers.onProviderUpdated(updateState);
+        console.log(Providers.globalProvider);
+        Providers.globalProvider.login().then((response) => {
+            console.log(response);
+            updateState();
+        }).catch((e) => {
+            console.log("Login error...");
+        });
     }
 
     function logout() {
         console.log("MS Auth logout Initiated");
-    }
-
-    function logoutCompleted() {
-        console.log("MS Auth logout Completed");
-        setLoggedIn(false);
+        Providers.globalProvider.logout().then((response) => {
+            console.log(response);
+            updateState();
+        }).catch((e) => {
+            console.log("Login error...");
+        });
     }
 
     function revokePermissions() {
@@ -53,49 +75,13 @@ export function MicrosoftAuthProvider({ children }) {
             email,
             error,
             login,
-            loginInit,
-            loginFailed,
             logout,
-            logoutCompleted,
             loggedIn,
             revokePermissions,
             setLoggedIn,
             state
         }
     }, [client, email, error, loggedIn, login, state]);
-
-    useEffect(() => {
-        const updateState = () => {
-            const provider = Providers.globalProvider;
-            if (provider && provider.state === ProviderState.SignedIn) {
-                const authProvider = provider;
-                const clientOptions = {
-                    authProvider
-                };
-                const client = Client.initWithMiddleware(clientOptions);
-                setClient(client);
-                setLoggedIn(true);
-            }
-        };
-
-        if (apiState === 'init') {
-            setApiState('script-loaded');
-            console.log('Creating Msal2Provider');
-            Providers.globalProvider = new Msal2Provider({
-                clientId: aadClientId,
-                loginType: LoginType.Popup,
-                authority: `https://login.microsoftonline.com/${aadTenantId}/`,
-                redirectUri: aadRedirectUrl,
-                scopes: ['user.read', 'people.read', 'calendars.read', 'files.read', 'files.read.all']
-            });
-            Providers.onProviderUpdated(updateState);
-            updateState();
-        }
-
-        return () => {
-            Providers.removeProviderUpdatedListener(updateState);
-        }
-    }, []);
 
     useEffect(() => {
         if (apiState === 'ready') {

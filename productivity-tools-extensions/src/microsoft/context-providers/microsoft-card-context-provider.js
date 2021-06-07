@@ -4,8 +4,10 @@ import PropTypes from 'prop-types';
 import { Context } from '../../context-hooks/card-context-hooks';
 import { default as NoFiles } from '../components/MicrosoftNoDriveFiles';
 import { default as NoEmail } from '../components/MicrosoftNoEmail';
+import { default as LoginButton } from '../components/MicrosoftSignInButton';
+import { default as LogoutButton } from '../components/MicrosoftSignOutButton';
 
-const microsoftRenderedLoginButton = false;
+const renderedLoginButton = false;
 
 export function MicrosoftCardProvider({children, intl}) {
     const contextValue = useMemo(() => {
@@ -13,9 +15,9 @@ export function MicrosoftCardProvider({children, intl}) {
             intl,
             components: {
             //     OpenDriveButton,
-            //     LogoutButton,
-            //     // eslint-disable-next-line react/display-name
-            //     LoginButton: (props) => (<LoginButton googleRender={googleRenderedLoginButton} {...props}/>),
+                LogoutButton,
+            // eslint-disable-next-line react/display-name
+                LoginButton: (props) => (<LoginButton microsoftRender={renderedLoginButton} {...props}/>),
                 NoFiles,
                 NoEmail
             }
