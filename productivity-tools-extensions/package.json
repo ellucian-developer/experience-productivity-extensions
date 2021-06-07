@@ -1,7 +1,7 @@
 {
   "name": "ms-exp-extn-productivity-tools-extensions",
-  "version": "1.0.6",
-  "description": "MS EXP EXTN Productivity Tools extensions",
+  "version": "1.0",
+  "description": "Productivity Tools extensions",
   "main": "index.js",
   "license": "UNLICENSED",
   "scripts": {

@@ -181,7 +181,8 @@ function OutlookMail({ classes }) {
     const { intl } = useIntl();
 
     const { error: authError, login, loginInit, loginFailed, loggedIn, logout, logoutCompleted } = useAuth();
-    const { error: mailError, mails, userIds } = useMail();
+    const { error: mailError, mails, userPhotos } = useMail();
+    let userPhotoUrl;
 
     const [displayState, setDisplayState] = useState('init');
     const [colorsContext] = useState({ colorsUsed: [], colorsByUser: {}});
@@ -245,14 +246,24 @@ function OutlookMail({ classes }) {
                         const localReceivedDateTime = new Date(receivedDateTime);
                         const diaplayReceivedDateTime = isToday(localReceivedDateTime) ? timeFormater.format(localReceivedDateTime) : dateFormater.format(localReceivedDateTime);
 
-                        const first = index === 0;
-                        const last = index === mails.length - 1;
+                        // const first = index === 0;
+                        // const last = index === mails.length - 1;
                         const avatarColor = pickAvatarColor(address, colorsContext);
+
+                        // console.debug('10:provider.userPhotos:-', userPhotos);
+                        if ((userPhotos !== undefined) && (userPhotos.get(address) !== undefined)) {
+                            userPhotoUrl = userPhotos.get(address);
+                        } else {
+                            userPhotoUrl = ("");
+                        }
 
                         return (
                             <Fragment key={id}>
                                 <div className={classes.row}>
-                                    <Avatar className={classes.avatar} style={{backgroundColor: avatarColor}}
+                                    <Avatar
+                                        className={classes.avatar}
+                                        style={{backgroundColor: avatarColor}}
+                                        src={userPhotoUrl}
                                     >
                                         {/* <img src={URL.createObjectURL(userIds[index])} /> */}
                                         {name.substr(0, 1)}
@@ -273,12 +284,12 @@ function OutlookMail({ classes }) {
                                         </div>
                                         <div className={classes.subjectBox}>
                                             <TextLink className={classes.subjectLink} href={webLink} target='_blank'>
-                                                <Typography component='div' noWrap className={classnames(classes.subject, { [classes.bold]: !isRead })} variant="body2">
+                                                <Typography component='div' noWrap className={classnames(classes.subject, { [classes.unread]: !isRead })} variant="body2">
                                                     {subject}
                                                 </Typography>
                                             </TextLink>
                                             { hasAttachments && (
-                                                <Tooltip title={intl.formatMessage({id: 'outlookMail.attachment'})}>
+                                                <Tooltip title={intl.formatMessage({id: 'mail.attachment'})}>
                                                     <Icon className={classes.attachment} name='file-text' />
                                                 </Tooltip>
                                             )}

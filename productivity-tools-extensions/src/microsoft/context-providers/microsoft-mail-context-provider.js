@@ -14,7 +14,7 @@ export function MicrosoftMailProvider({children}) {
     const [error, setError] = useState(false);
     const [state, setState] = useState('load');
     const [mails, setMails] = useState();
-    const [userIds, setUserIds] = useState();
+    const [userPhotos, setUserPhotos] = useState(new Map());
 
     const refresh = useCallback(async () => {
         if (loggedIn) {
@@ -37,12 +37,12 @@ export function MicrosoftMailProvider({children}) {
                 const filteredMails = response.value;
                 unstable_batchedUpdates(() => {
                     setMails(() => filteredMails);
-                    // setState('load');
+                    setState('load');
                 });
-                console.debug('filteredMails:- ', JSON.stringify(filteredMails));
+                // console.debug('filteredMails:- ', JSON.stringify(filteredMails));
 
-                /* if (!(filteredMails === undefined)) {
-                    const userPhotos = filteredMails.map((mail) => {
+                if (filteredMails !== undefined) {
+                    const responsePhotos = filteredMails.map((mail, index) => {
                         const {
                             from: {
                                 emailAddress: {
@@ -50,46 +50,49 @@ export function MicrosoftMailProvider({children}) {
                                 }
                             }
                         } = mail;
+                        const last = index === filteredMails.length - 1;
 
-                        console.debug('address:- ', address);
                         const responsePhoto2 = (async () => {
-                            try {
+                            // console.debug('context 10', userPhotos);
+                            if ((userPhotos !== undefined) && (userPhotos.get(address) === undefined)) {
+                                // console.debug('context 20:- ', address);
                                 const responseUserId = await client
                                 .api(`/users`)
                                 .filter(`mail eq '${address}'`)
                                 .select('id')
                                 .get();
+                                // console.debug('context 30', address, responseUserId);
                                 if (responseUserId.value[0]) {
-                                    const responsePhoto = await client
-                                    .api(`/users/${responseUserId.value[0].id}/photo/$value`)
-                                    .get();
-                                    // console.debug('responsePhoto:- ', responsePhoto);
-                                    return [address, responsePhoto];
-                                } else {
-                                    return [address, undefined];
+                                    try {
+                                        const responsePhoto = await client
+                                        .api(`/users/${responseUserId.value[0].id}/photo/$value`)
+                                        .get();
+                                        setUserPhotos(
+                                            responsePhoto
+                                            ? userPhotos.set(address, URL.createObjectURL(responsePhoto))
+                                            : setUserPhotos(userPhotos.set(address, ""))
+                                        );
+                                        setState('loadPhoto');
+                                        // console.debug('context 50 last', userPhotos);
+                                    } catch (error) {
+                                        // did we get logged out or credentials were revoked?
+                                        if (error && error.status === 401) {
+                                            setLoggedIn(false);
+                                            // console.debug('context 80');
+                                        } else {
+                                            setUserPhotos(userPhotos.set(address, ""));
+                                            // console.log('Profile photo download failed for email: ', address, error);
+                                        }
+                                    }
                                 }
-                            } catch (error) {
-                                // did we get logged out or credentials were revoked?
-                                if (error && error.status === 401) {
-                                    setLoggedIn(false);
-                                } else if (error.status === 404) {
-                                    console.log('Profile photo not found for email: ', address);
-                                } else {
-                                    console.log('Profile download failed\n', error);
-                                    // setState(() => ({ error: 'api'}));
-                                    setError(error);
-                                }
+                                return null;
                             }
                         })();
                         // console.debug('responsePhoto2:- ', responsePhoto2);
-                        return responsePhoto2;
+                        return null;
                     })
                     // console.debug('userPhotos:- ', userPhotos);
-                    unstable_batchedUpdates(() => {
-                        setUserIds(userPhotos);
-                        setState('load');
-                    });
-                } */
+                }
                 // console.debug('userIds:- ', userIds);
             } catch (error) {
                 // did we get logged out or credentials were revoked?
@@ -106,7 +109,7 @@ export function MicrosoftMailProvider({children}) {
     }, [loggedIn, state])
 
     useEffect(() => {
-        if (loggedIn && (state === 'load' || state === 'refresh')) {
+        if (loggedIn && (state === 'load' || state === 'refresh' || state === 'loadPhoto')) {
             refresh();
         }
     }, [loggedIn, refresh, state])
@@ -167,10 +170,10 @@ export function MicrosoftMailProvider({children}) {
         return {
             error,
             mails,
-            userIds,
+            userPhotos,
             refresh: () => { setState('refresh') }
         }
-    }, [ error, mails, userIds, setState ]);
+    }, [ error, mails, userPhotos, setState ]);
 
     if (process.env.NODE_ENV === 'development') {
         useEffect(() => {
