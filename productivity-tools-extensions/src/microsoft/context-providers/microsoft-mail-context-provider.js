@@ -39,7 +39,9 @@ export function MicrosoftMailProvider({children}) {
                     setMails(() => filteredMails);
                     setState('load');
                 });
-                // console.debug('filteredMails:- ', JSON.stringify(filteredMails));
+                if (process.env.NODE_ENV === 'development') {
+                    console.debug('Inbox emails: ', filteredMails);
+                }
 
                 if (filteredMails !== undefined) {
                     const responsePhotos = filteredMails.map((mail, index) => {
@@ -53,47 +55,41 @@ export function MicrosoftMailProvider({children}) {
                         const last = index === filteredMails.length - 1;
 
                         const responsePhoto2 = (async () => {
-                            // console.debug('context 10', userPhotos);
                             if ((userPhotos !== undefined) && (userPhotos.get(address) === undefined)) {
-                                // console.debug('context 20:- ', address);
                                 const responseUserId = await client
                                 .api(`/users`)
                                 .filter(`mail eq '${address}'`)
                                 .select('id')
                                 .get();
-                                // console.debug('context 30', address, responseUserId);
+
                                 if (responseUserId.value[0]) {
                                     try {
                                         const responsePhoto = await client
                                         .api(`/users/${responseUserId.value[0].id}/photo/$value`)
                                         .get();
-                                        setUserPhotos(
-                                            responsePhoto
-                                            ? userPhotos.set(address, URL.createObjectURL(responsePhoto))
-                                            : setUserPhotos(userPhotos.set(address, ""))
-                                        );
-                                        setState('loadPhoto');
-                                        // console.debug('context 50 last', userPhotos);
+                                        unstable_batchedUpdates(() => {
+                                            setUserPhotos(
+                                                responsePhoto
+                                                ? userPhotos.set(address, URL.createObjectURL(responsePhoto))
+                                                : setUserPhotos(userPhotos.set(address, ""))
+                                            );
+                                            setState('loadPhoto');
+                                        });
                                     } catch (error) {
                                         // did we get logged out or credentials were revoked?
                                         if (error && error.status === 401) {
                                             setLoggedIn(false);
-                                            // console.debug('context 80');
                                         } else {
                                             setUserPhotos(userPhotos.set(address, ""));
-                                            // console.log('Profile photo download failed for email: ', address, error);
                                         }
                                     }
                                 }
                                 return null;
                             }
                         })();
-                        // console.debug('responsePhoto2:- ', responsePhoto2);
                         return null;
                     })
-                    // console.debug('userPhotos:- ', userPhotos);
                 }
-                // console.debug('userIds:- ', userIds);
             } catch (error) {
                 // did we get logged out or credentials were revoked?
                 if (error && error.status === 401) {

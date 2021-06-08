@@ -50,7 +50,8 @@ export function MicrosoftAuthProvider({ children }) {
             console.log("login sucessful");
             updateState();
         }).catch((e) => {
-            console.log("Login error...", e);
+            console.log("MS Auth Login error...", e);
+            setError(error);
         });
     }
 
@@ -90,6 +91,22 @@ export function MicrosoftAuthProvider({ children }) {
     }, [client, email, error, loggedIn, login, state]);
 
     useEffect(() => {
+        if (apiState === 'init') {
+            const { mapi } = window;
+
+            if (!mapi) {
+                ( async() => {
+                    setApiState('script-loading');
+                    await login();
+                    setApiState('script-loaded');
+                })();
+            } else {
+                setApiState('script-loaded');
+            }
+        }
+    }, [apiState, setApiState]);
+
+    useEffect(() => {
         if (apiState === 'ready') {
             setState('ready');
         }
@@ -99,7 +116,7 @@ export function MicrosoftAuthProvider({ children }) {
         if (loggedIn) {
             // TODO: Set the Email. Remove testEmailNeedToBeChanged
             console.log('Email set to: testEmailNeedToBeChanged');
-            const userId = "Krishna.Kant@ellucian.com";
+            const userId = "testEmailNeedToBeChanged";
             setEmail(userId);
         }
     }, [loggedIn]);

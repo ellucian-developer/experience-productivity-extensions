@@ -227,7 +227,6 @@ function OutlookMail({ classes }) {
 
                         const avatarColor = pickAvatarColor(address, colorsContext);
 
-                        // console.debug('10:provider.userPhotos:-', userPhotos);
                         if ((userPhotos !== undefined) && (userPhotos.get(address) !== undefined)) {
                             userPhotoUrl = userPhotos.get(address);
                         } else {
