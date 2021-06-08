@@ -171,9 +171,10 @@ export function MicrosoftMailProvider({children}) {
             error,
             mails,
             userPhotos,
-            refresh: () => { setState('refresh') }
+            refresh: () => { setState('refresh') },
+            state
         }
-    }, [ error, mails, userPhotos, setState ]);
+    }, [ error, mails, userPhotos, state ]);
 
     if (process.env.NODE_ENV === 'development') {
         useEffect(() => {

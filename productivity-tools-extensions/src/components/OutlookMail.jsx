@@ -124,8 +124,7 @@ const styles = () => ({
         marginLeft: spacing30
     },
     unread: {
-        fontWeight: fontWeightBold,
-        color: colorTextNeutral600
+        fontWeight: fontWeightBold
     },
     noWrap: {
         overflow: 'hidden',
@@ -161,7 +160,7 @@ function OutlookMail({ classes }) {
     const { LoginButton, LogoutButton } = useComponents();
 
     const { error: authError, login, loggedIn, logout } = useAuth();
-    const { error: mailError, mails, userPhotos } = useMail();
+    const { error: mailError, mails, userPhotos, state: mailState } = useMail();
     let userPhotoUrl;
 
     const [displayState, setDisplayState] = useState('init');

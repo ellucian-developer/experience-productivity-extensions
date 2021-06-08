@@ -1,5 +1,5 @@
 {
-  "name": "ms-exp-extn-productivity-tools-extensions",
+  "name": "productivity-tools-extensions",
   "version": "1.0",
   "description": "Productivity Tools extensions",
   "main": "index.js",
