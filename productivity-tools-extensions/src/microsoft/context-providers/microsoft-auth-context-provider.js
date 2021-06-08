@@ -31,36 +31,42 @@ export function MicrosoftAuthProvider({ children }) {
             setApiState('ready');
         } else {
             setLoggedIn(false);
-            setApiState('init');
         }
     };
 
     function login() {
         console.log("MS Auth login");
-        Providers.globalProvider = new Msal2Provider({
+        const msal2Config = {
             clientId: aadClientId,
             loginType: LoginType.Popup,
             authority: `https://login.microsoftonline.com/${aadTenantId}/`,
             redirectUri: aadRedirectUrl,
             scopes: ['user.read', 'people.read', 'calendars.read', 'files.read', 'files.read.all']
-        });
+        };
+        Providers.globalProvider = new Msal2Provider(msal2Config);
         Providers.onProviderUpdated(updateState);
         console.log(Providers.globalProvider);
-        Providers.globalProvider.login().then((response) => {
-            console.log(response);
+        Providers.globalProvider.login().then(() => {
+            console.log("login sucessful");
             updateState();
         }).catch((e) => {
-            console.log("Login error...");
+            console.log("Login error...", e);
         });
     }
 
     function logout() {
         console.log("MS Auth logout Initiated");
-        Providers.globalProvider.logout().then((response) => {
-            console.log(response);
+        const logoutRequest = {
+            account: Providers.globalProvider.publicClientApplication.getActiveAccount(),
+            onRedirectNavigate: (url) => {
+                return false;
+            }
+        };
+        Providers.globalProvider.publicClientApplication.logoutRedirect(logoutRequest).then(() => {
+            Providers.globalProvider.setState(ProviderState.SignedOut);
             updateState();
         }).catch((e) => {
-            console.log("Login error...");
+            console.log("Login error...", e);
         });
     }
 
