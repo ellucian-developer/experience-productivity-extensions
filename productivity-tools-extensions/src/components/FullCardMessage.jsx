@@ -41,7 +41,7 @@ const styles = () => ({
     }
 });
 
-function GoogleLoginButton({ classes, imageName, title, message }) {
+function FullCardMessage({ classes, imageName, title, message }) {
     const { LogoutButton } = useComponents();
     const { logout } = useAuth();
 
@@ -61,11 +61,11 @@ function GoogleLoginButton({ classes, imageName, title, message }) {
     );
 }
 
-GoogleLoginButton.propTypes = {
+FullCardMessage.propTypes = {
     classes: PropTypes.object.isRequired,
     imageName: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     message: PropTypes.string.isRequired
 };
 
-export default withStyles(styles)(GoogleLoginButton);
+export default withStyles(styles)(FullCardMessage);
