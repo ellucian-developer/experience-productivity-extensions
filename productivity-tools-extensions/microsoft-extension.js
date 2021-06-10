@@ -20,10 +20,10 @@ module.exports = {
             }]
 	},
     "cards": [{
-        "type": "Outlook Mail WIP",
+        "type": "Outlook",
         "source": "./src/microsoft/cards/OutlookMailCard",
-        "title": "Outlook Mail WIP",
-        "displayCardType": "MsOutlookMail WIP",
+        "title": "Outlook",
+        "displayCardType": "Outlook",
         "description": "This card displays Office 365 Mail"
     },
     {

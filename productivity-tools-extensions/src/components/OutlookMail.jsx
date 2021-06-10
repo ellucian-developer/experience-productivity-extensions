@@ -157,7 +157,7 @@ function OutlookMail({ classes }) {
     const { locale } = useUserInfo();
 
     const { intl } = useIntl();
-    const { LoginButton, LogoutButton } = useComponents();
+    const { LoginButton, LogoutButton, NoEmail } = useComponents();
 
     const { error: authError, login, loggedIn, logout } = useAuth();
     const { error: mailError, mails, userPhotos, state: mailState } = useMail();
@@ -259,7 +259,11 @@ function OutlookMail({ classes }) {
                                             </Typography>
                                         </div>
                                         <div className={classes.subjectBox}>
-                                            <TextLink className={{ [classes.subjectLink90]: hasAttachments, [classes.subjectLink100]: !hasAttachments}} href={webLink} target='_blank'>
+                                            <TextLink
+                                                className={{ [classes.subjectLink90]: hasAttachments, [classes.subjectLink100]: !hasAttachments}}
+                                                href={webLink.substr(0, webLink.indexOf("?", -1))}
+                                                target='_blank'
+                                            >
                                                 <Typography component='div' noWrap className={classnames(classes.subject, { [classes.unread]: !isRead })} variant="body2">
                                                     {subject}
                                                 </Typography>
@@ -291,17 +295,7 @@ function OutlookMail({ classes }) {
                 </div>
             );
         } else if (mails) {
-            return (
-                <div className={classes.messageCard}>
-                    <Illustration name={IMAGES.NO_TASKS} />
-                    <Typography className={classes.title} component='div' variant='h3'>
-                        {intl.formatMessage({id: 'outlookMail.noEmailTitle'})}
-                    </Typography>
-                    <Typography className={classes.messages} component='div' align='center' variant='body2'>
-                        {intl.formatMessage({id: 'outlookMail.noEmailMessage'})}
-                    </Typography>
-                </div>
-            )
+            return <NoEmail title='microsoft.noEmailTitle' message='microsoft.noEmailMessage'/>;
         }
     } else if (displayState === 'loggedOut') {
         return (

@@ -274,7 +274,7 @@ function Mail({ classes }) {
                 </div>
             );
         } else if (messages) {
-            return <NoEmail/>;
+            return <NoEmail title='google.noEmailTitle' message='google.noEmailMessage'/>;
         }
     } else if (displayState === 'loggedOut') {
         return (
