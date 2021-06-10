@@ -29,12 +29,19 @@ export function MicrosoftDriveProvider({children}) {
 
             try {
                 const response = await client.api(
-                    `/me/drive/search(q='')?$orderby=lastModifiedDateTime%20desc&$top=10&$select=id,name,file,webUrl,lastModifiedBy,lastModifiedDateTime`
+                    `/me/drive/search(q='')?$orderby=lastModifiedDateTime%20desc&$top=20&$select=id,name,file,folder,package,webUrl,lastModifiedBy,lastModifiedDateTime`
                 ).get();
 
                 console.log("MS OneDrive Items 1 ", response);
 
-                const filteredFiles = response.value;
+                let filteredFiles = response.value;
+                filteredFiles = filteredFiles.filter(file => file.folder === undefined)
+                const totalFileCount = filteredFiles.length;
+                if (totalFileCount > 10) {
+                    for (let index = totalFileCount; index > 9; index--) {
+                        filteredFiles.splice(index, 1);
+                    }
+                }
                 unstable_batchedUpdates(() => {
                     setFiles(() => filteredFiles);
                     setState('loaded');
@@ -57,12 +64,11 @@ export function MicrosoftDriveProvider({children}) {
     useEffect(() => {
         if (loggedIn && (state === 'load' || state === 'refresh')) {
             refresh();
+        } else if (!loggedIn && state === 'loaded') {
+            // force refresh when logged back in
+            setFiles(undefined);
+            setState('load');
         }
-        // } else if (!loggedIn && state === 'loaded') {
-        //     // force refresh when logged back in
-        //     setFiles(undefined);
-        //     setState('load');
-        // }
     }, [loggedIn, refresh, state])
 
     useEffect(() => {

@@ -19,21 +19,19 @@ module.exports = {
 				"required": true
             }]
 	},
-    "cards": [
-
-        /* {
-        "type": "MSEXPEXTN OneDriveCard",
-        "source": "./src/microsoft/cards/OneDriveCard",
-        "title": "MSEXPEXTN OneDrive",
-        "displayCardType": "MSEXPEXTN MsOneDrive",
-        "description": "This card displays MSEXPEXTN OneDrive"
-    }, */
-    {
+    "cards": [{
         "type": "Outlook Mail WIP",
         "source": "./src/microsoft/cards/OutlookMailCard",
         "title": "Outlook Mail WIP",
         "displayCardType": "MsOutlookMail WIP",
         "description": "This card displays Office 365 Mail"
+    },
+    {
+        "type": "OneDriveCard",
+        "source": "./src/microsoft/cards/OneDriveCard",
+        "title": "OneDrive",
+        "displayCardType": "MSEXPEXTN OneDrive",
+        "description": "This card displays OneDrive"
     }],
     "licensing": {
         "options": [

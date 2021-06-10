@@ -5,14 +5,14 @@ import classnames from 'classnames';
 
 import { Divider, Illustration, IMAGES, Popper, Typography } from "@hedtech/react-design-system/core";
 import { withStyles } from "@hedtech/react-design-system/core/styles";
-import { colorBrandNeutral250, colorCtaIrisActive, colorBrandNeutral300, fontWeightBold, fontWeightNormal, spacing30, spacing40, spacing50 } from "@hedtech/react-design-system/core/styles/tokens";
+import { colorBrandNeutral250, colorBrandNeutral300, fontWeightBold, fontWeightNormal, spacing30, spacing40, spacing50 } from "@hedtech/react-design-system/core/styles/tokens";
 import { useExtensionControl, useUserInfo } from '@ellucian/experience-extension-hooks';
 
 import { useComponents, useIntl } from '../context-hooks/card-context-hooks';
 import { useAuth } from '../context-hooks/auth-context-hooks';
 import { useDrive } from "../context-hooks/drive-context-hooks";
 
-import { File } from '@microsoft/mgt-react';
+import { getFileTypeIconUriByExtension } from '@microsoft/mgt-components/dist/es6/styles/fluent-icons';
 
 const styles = () => ({
     card: {
@@ -66,7 +66,9 @@ const styles = () => ({
     fileIcon: {
         alignSelf: 'flex-start',
         marginTop: spacing30,
-        marginRight: spacing40
+        marginRight: spacing40,
+        height: spacing50,
+        width: spacing50
     },
     fileName: {
         display: '-webkit-box',
@@ -109,20 +111,6 @@ const styles = () => ({
         justifyContent: 'center',
         marginTop: spacing40,
         marginBottom: spacing40
-    },
-    button: {
-        cursor: 'pointer',
-        '&:hover': {
-            backgroundColor: colorCtaIrisActive,
-            color: colorBrandNeutral250
-        }
-    },
-    fileImage: {
-        '& .item__file-type-icon': {
-            padding: '0px',
-            paddingLeft: spacing30,
-            paddingRight: spacing30
-        }
     }
 });
 
@@ -222,6 +210,18 @@ function OneDrive({ classes }) {
         }));
     }
 
+    function getFileIcon(file) {
+        const re = /(?:\.([^.]+))?$/;
+        let fileType = 'folder';
+        if (file.package === undefined && file.folder === undefined) {
+            fileType = re.exec(file.name)[1] ? re.exec(file.name)[1].toLowerCase() : 'null'
+        } else if (file.package !== undefined) {
+            fileType = file.package.type === 'oneNote' ? 'onetoc' : 'folder'
+        }
+        const fileIconSrc = getFileTypeIconUriByExtension(fileType, 48, 'svg');
+        return fileIconSrc;
+    }
+
     if (displayState === 'filesLoaded') {
         if (files && files.length > 0) {
             return (
@@ -232,59 +232,55 @@ function OneDrive({ classes }) {
                             ? fileDateFormater.format(fileModified)
                             : fileDateFormaterWithYear.format(fileModified);
                         const modifiedBy = file.lastModifiedBy.user ? file.lastModifiedBy.user.displayName : 'unknown';
-                        if (file.file === undefined) {
-                            return "";
-                        }
-                        else {
-                            return (
-                                <Fragment key={file.id}>
-                                    <div className={classnames(classes.row, classes[`row${index}`])}>
-                                    <a
-                                        style={{ textDecoration: "none", color: "initial" }}
-                                        href={file.webUrl}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                    >
-                                        <div className={classes.fileBox}>
-                                            <File className={classes.fileImage} fileDetails={file} view="image"/>
-                                            <div className={classes.fileNameBox}>
-                                                <Typography
-                                                    className={classes.fileName}
-                                                    component='div'
-                                                    variant={"body2"}
-                                                    ref={node => fileNameRef(node, file.id)}
-                                                    onFocus={event => openPopper(event, file.id)}
-                                                    onMouseOver={event => openPopper(event, file.id)}
-                                                    onBlur={() => closePopper()}
-                                                    onMouseLeave={() => closePopper()}
-                                                >
-                                                    {file.name}
-                                                </Typography>
-                                                <Popper
-                                                    className={classes.fileNamePopper}
-                                                    anchorEl={popperContext.anchor}
-                                                    container={contentNode}
-                                                    open={popperContext.id === file.id && popperContext.overflowedFileIds.includes(file.id)}
-                                                    modifiers={{
-                                                        preventOverflow: {
-                                                            enabled: true,
-                                                            padding: spacing40
-                                                        }
-                                                    }}
-                                                >
-                                                    <Typography>{file.name}</Typography>
-                                                </Popper>
-                                            <Typography className={classes.modified} component='div' variant={"body3"}>
-                                                {intl.formatMessage({id: 'drive.modifiedBy'}, {date: modified, name: modifiedBy})}
+                        const iconLink = getFileIcon(file);
+                        return (
+                            <Fragment key={file.id}>
+                                <div className={classnames(classes.row, classes[`row${index}`])}>
+                                <a
+                                    style={{ textDecoration: "none", color: "initial" }}
+                                    href={file.webUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                >
+                                    <div className={classes.fileBox}>
+                                        <img className={classes.fileIcon} aria-label="file icon" src={iconLink}/>
+                                        <div className={classes.fileNameBox}>
+                                            <Typography
+                                                className={classes.fileName}
+                                                component='div'
+                                                variant={"body2"}
+                                                ref={node => fileNameRef(node, file.id)}
+                                                onFocus={event => openPopper(event, file.id)}
+                                                onMouseOver={event => openPopper(event, file.id)}
+                                                onBlur={() => closePopper()}
+                                                onMouseLeave={() => closePopper()}
+                                            >
+                                                {file.name}
                                             </Typography>
-                                        </div>
+                                            <Popper
+                                                className={classes.fileNamePopper}
+                                                anchorEl={popperContext.anchor}
+                                                container={contentNode}
+                                                open={popperContext.id === file.id && popperContext.overflowedFileIds.includes(file.id)}
+                                                modifiers={{
+                                                    preventOverflow: {
+                                                        enabled: true,
+                                                        padding: spacing40
+                                                    }
+                                                }}
+                                            >
+                                                <Typography>{file.name}</Typography>
+                                            </Popper>
+                                        <Typography className={classes.modified} component='div' variant={"body3"}>
+                                            {intl.formatMessage({id: 'drive.modifiedBy'}, {date: modified, name: modifiedBy})}
+                                        </Typography>
                                     </div>
-                                </a>
                                 </div>
-                                    <Divider className={classes.divider} variant={"middle"} />
-                                </Fragment>
-                            );
-                        }
+                            </a>
+                            </div>
+                                <Divider className={classes.divider} variant={"middle"} />
+                            </Fragment>
+                        );
                     })}
                     <div className={classes.logoutBox}>
                         <LogoutButton onClick={logout}/>
@@ -293,7 +289,7 @@ function OneDrive({ classes }) {
             );
         }
         else if (files) {
-            return <NoFiles/>;
+            return <NoFiles title='microsoft.noFilesTitle' message='microsoft.noFilesMessage'/>;
         }
     } else if (displayState === 'loggedOut') {
         return (
