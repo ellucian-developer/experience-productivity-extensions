@@ -289,7 +289,7 @@ function OneDrive({ classes }) {
             );
         }
         else if (files) {
-            return <NoFiles/>;
+            return <NoFiles title='microsoft.noFilesTitle' message='microsoft.noFilesMessage'/>;
         }
     } else if (displayState === 'loggedOut') {
         return (

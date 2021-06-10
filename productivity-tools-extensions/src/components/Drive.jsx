@@ -276,7 +276,7 @@ function Drive({ classes }) {
                 </div>
             );
         } else if (files) {
-            return <NoFiles/>;
+            return <NoFiles title='google.noFilesTitle' message='google.noFilesMessage'/>;
         }
     } else if (displayState === 'loggedOut') {
         return (
