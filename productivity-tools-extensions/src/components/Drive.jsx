@@ -231,7 +231,7 @@ function Drive({ classes }) {
                                     )}
                                     {!FileComponent && (
                                             <div className={classes.fileBox}>
-                                                <img className={classes.fileIcon} src={iconLink}/>
+                                                <img className={classes.fileIcon} aria-label="file icon" src={iconLink}/>
                                                 <div className={classes.fileNameBox}>
                                                     <Typography
                                                         className={classes.fileName}
@@ -276,7 +276,7 @@ function Drive({ classes }) {
                 </div>
             );
         } else if (files) {
-            return <NoFiles/>;
+            return <NoFiles title='google.noFilesTitle' message='google.noFilesMessage'/>;
         }
     } else if (displayState === 'loggedOut') {
         return (

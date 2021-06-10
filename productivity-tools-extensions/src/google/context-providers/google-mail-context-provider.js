@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 // eslint-disable-next-line camelcase
 import { unstable_batchedUpdates } from 'react-dom';
 import PropTypes from 'prop-types';
@@ -212,8 +212,4 @@ export function MailProvider({children}) {
 
 MailProvider.propTypes = {
     children: PropTypes.object.isRequired
-}
-
-export function useMail() {
-    return useContext(Context);
 }

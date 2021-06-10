@@ -20,11 +20,11 @@ module.exports = {
             }]
 	},
     "cards": [{       
-        "type": "MSEXPEXTN OneDriveCard",
+        "type": "OneDriveCard",
         "source": "./src/microsoft/cards/OneDriveCard",
-        "title": "MSEXPEXTN OneDrive",
-        "displayCardType": "MSEXPEXTN MsOneDrive",
-        "description": "This card displays MSEXPEXTN OneDrive" 
+        "title": "OneDrive",
+        "displayCardType": "MSEXPEXTN OneDrive",
+        "description": "This card displays OneDrive" 
     }],
     "licensing": {
         "options": [
