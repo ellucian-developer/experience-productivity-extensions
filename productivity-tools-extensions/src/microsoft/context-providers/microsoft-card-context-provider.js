@@ -5,7 +5,7 @@ import { Context } from '../../context-hooks/card-context-hooks';
 import { default as NoFiles } from '../../components/NoDriveFiles';
 import { default as NoEmail } from '../components/MicrosoftNoEmail';
 import { default as LoginButton } from '../components/MicrosoftSignInButton';
-import { default as LogoutButton } from '../components/MicrosoftSignOutButton';
+import { default as LogoutButton } from '../../components/SignOutButton';
 
 const renderedLoginButton = false;
 

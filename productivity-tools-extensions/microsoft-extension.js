@@ -34,8 +34,9 @@ module.exports = {
                 ]
             }
         ]
-    },
-    "page": {
-        "source": "./src/page/index.jsx"
     }
+    // ,
+    // "page": {
+    //     "source": "./src/page/index.jsx"
+    // }
 }

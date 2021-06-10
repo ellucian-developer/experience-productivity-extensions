@@ -283,7 +283,7 @@ function OneDrive({ classes }) {
                         );
                     })}
                     <div className={classes.logoutBox}>
-                        <LogoutButton onClick={logout}/>
+                        <LogoutButton onClick={logout} logo='microsoft'/>
                     </div>
                 </div>
             );

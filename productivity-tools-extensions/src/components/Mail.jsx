@@ -269,7 +269,7 @@ function Mail({ classes }) {
                         );
                     })}
                     <div className={classes.logoutBox}>
-                        <LogoutButton className={classes.logout} onClick={logout}/>
+                        <LogoutButton className={classes.logout} onClick={logout} logo='google'/>
                     </div>
                 </div>
             );

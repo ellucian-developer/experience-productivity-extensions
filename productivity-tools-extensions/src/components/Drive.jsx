@@ -271,7 +271,7 @@ function Drive({ classes }) {
                         );
                     })}
                     <div className={classes.logoutBox}>
-                        <LogoutButton onClick={logout}/>
+                        <LogoutButton onClick={logout} logo='google'/>
                     </div>
                 </div>
             );

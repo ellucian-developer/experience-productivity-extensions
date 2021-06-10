@@ -8,9 +8,10 @@ import { Button } from "@hedtech/react-design-system/core";
 import { withStyles } from "@hedtech/react-design-system/core/styles";
 import { spacing30 } from "@hedtech/react-design-system/core/styles/tokens";
 
-import { useIntl } from '../../context-hooks/card-context-hooks';
+import { useIntl } from '../context-hooks/card-context-hooks';
 
-import logo from '../images/ms_symbollockup_mssymbol_19.svg';
+import microsoftLogo from '../images/microsoft-logo.svg';
+import googleLogo from '../images/google-logo.svg';
 
 const styles = () => ({
     button: {
@@ -21,21 +22,22 @@ const styles = () => ({
     }
 });
 
-function MicrosoftSignOutButton({classes, className = '', onClick}) {
+function SignOutButton({classes, className = '', onClick, logo}) {
     const { intl } = useIntl();
 
     return (
         <Button className={classnames(className, classes.button)} color='secondary' onClick={onClick}>
-            <img className={classes.image} src={logo}/>
+            <img className={classes.image} src={logo === 'google' ? googleLogo : microsoftLogo}/>
             {intl.formatMessage({id: 'signOut'})}
         </Button>
     );
 }
 
-MicrosoftSignOutButton.propTypes = {
+SignOutButton.propTypes = {
     classes: PropTypes.object.isRequired,
     className: PropTypes.string,
-    onClick: PropTypes.func.isRequired
+    onClick: PropTypes.func.isRequired,
+    logo: PropTypes.string
 };
 
-export default withStyles(styles)(MicrosoftSignOutButton);
+export default withStyles(styles)(SignOutButton);
