@@ -90,7 +90,7 @@ export function MicrosoftAuthProvider({ children }) {
         }
     }, [client, email, error, loggedIn, login, state]);
 
-    useEffect(() => {
+    /* useEffect(() => {
         if (apiState === 'init') {
             const { mapi } = window;
 
@@ -104,7 +104,7 @@ export function MicrosoftAuthProvider({ children }) {
                 setApiState('script-loaded');
             }
         }
-    }, [apiState, setApiState]);
+    }, [apiState, setApiState]);*/
 
     useEffect(() => {
         if (apiState === 'ready') {
