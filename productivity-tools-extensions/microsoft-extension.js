@@ -3,11 +3,6 @@ module.exports = {
     "publisher": "Ellucian",
     "configuration": {
 		"client": [{
-				"key": "aadRedirectUrl",
-				"label": "Azure AD Redirect URL",
-				"type": "url",
-				"required": true
-			}, {
 				"key": "aadClientId",
 				"label": "Azure AD Application (Client) ID",
 				"type": "text",

@@ -1,125 +1,162 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useCardInfo } from '@ellucian/experience-extension-hooks';
 import { Context } from '../../context-hooks/auth-context-hooks';
+import { PublicClientApplication } from '@azure/msal-browser';
 import { Client } from "@microsoft/microsoft-graph-client";
-import { Providers, ProviderState, LoginType } from '@microsoft/mgt-react';
-import { Msal2Provider } from '@microsoft/mgt-msal2-provider';
-
 
 export function MicrosoftAuthProvider({ children }) {
-    const { configuration: { aadRedirectUrl, aadClientId, aadTenantId } } = useCardInfo();
-    const [client, setClient] = useState();
-    const [error, setError] = useState(false);
-    const [loggedIn, setLoggedIn] = useState(false);
-    const [state, setState] = useState('initializing');
+	const {
+		configuration: {
+			aadClientId,
+			aadTenantId
+		}
+	} = useCardInfo();
 
-    const [apiState, setApiState] = useState('init');
+	const [msalClient, setMsalClient] = useState();
+	const [client, setClient] = useState();
+	const [error, setError] = useState(false);
+	const [loggedIn, setLoggedIn] = useState(false);
+	const [state, setState] = useState('initializing');
 
-    const updateState = () => {
-        const provider = Providers.globalProvider;
-        if (provider && provider.state === ProviderState.SignedIn) {
-            const authProvider = provider;
-            const clientOptions = {
-                authProvider
-            };
-            const client = Client.initWithMiddleware(clientOptions);
-            setClient(client);
-            setLoggedIn(true);
-            setApiState('ready');
-        } else {
-            setLoggedIn(false);
-        }
-    };
+	const [apiState, setApiState] = useState('init');
 
-    function login() {
-        console.log("MS Auth login");
-        const msal2Config = {
-            clientId: aadClientId,
-            loginType: LoginType.Popup,
-            authority: `https://login.microsoftonline.com/${aadTenantId}/`,
-            redirectUri: aadRedirectUrl,
-            scopes: ['user.read', 'people.read', 'calendars.read', 'files.read', 'files.read.all']
-        };
-        Providers.globalProvider = new Msal2Provider(msal2Config);
-        Providers.onProviderUpdated(updateState);
-        console.log(Providers.globalProvider);
-        Providers.globalProvider.login().then(() => {
-            console.log("login sucessful");
-            updateState();
-        }).catch((e) => {
-            console.log("MS Auth Login error...", e);
-            setError(e);
-        });
-    }
+	const processLogin = useCallback((msalClient) => {
+		const options = {
+			authProvider: {
+				getAccessToken: async () => {
+					const account = msalClient.getActiveAccount();
+					const acquireRequest = {
+						authority: `https://login.microsoftonline.com/${aadTenantId}/`,
+						clientId: aadClientId,
+						scopes: ['user.read', 'people.read', 'files.read', 'files.read.all'],
+						account
+					}
+					const response = await msalClient.acquireTokenSilent(acquireRequest);
 
-    function logout() {
-        console.log("MS Auth logout Initiated");
-        const logoutRequest = {
-            account: Providers.globalProvider.publicClientApplication.getActiveAccount(),
-            onRedirectNavigate: (url) => {
-                return false;
-            }
-        };
-        Providers.globalProvider.publicClientApplication.logoutRedirect(logoutRequest).then(() => {
-            Providers.globalProvider.setState(ProviderState.SignedOut);
-            updateState();
-        }).catch((e) => {
-            console.log("Login error...", e);
-            setError(e);
-        });
-    }
+					if (response.accessToken) {
+						return response.accessToken;
+					} else {
+						const error = Error('Unable to acquire token');
+						setError(error);
+						throw error;
+					}
+				}
+			}
+		}
+		const graphClient = Client.initWithMiddleware(options);
+		setClient(() => graphClient);
+		setLoggedIn(true);
+	}, []);
 
-    const contextValue = useMemo(() => {
-        return {
-            client,
-            error,
-            login,
-            logout,
-            loggedIn,
-            setLoggedIn,
-            state
-        }
-    }, [client, error, loggedIn, login, state]);
+	const login = useCallback(async () => {
+		const response = await msalClient.loginPopup({});
+		if (response && response.account) {
+			const {account} = response;
+			msalClient.setActiveAccount(account);
+			processLogin(msalClient, account);
+		}
+	}, [msalClient]);
 
-    /* useEffect(() => {
-        if (apiState === 'init') {
-            const { mapi } = window;
+	const logout = useCallback(() => {
+		const account = msalClient.getActiveAccount();
+		const {location: { href: redirectUri }} = window;
+		msalClient.logoutPopup({
+			account,
+			authority: `https://login.microsoftonline.com/${aadTenantId}/`,
+			redirectUri,
+			mainWindowRedirectUri: redirectUri
+		});
+	}, [msalClient]);
 
-            if (!mapi) {
-                ( async() => {
-                    setApiState('script-loading');
-                    await login();
-                    setApiState('script-loaded');
-                })();
-            } else {
-                setApiState('script-loaded');
-            }
-        }
-    }, [apiState, setApiState]);*/
+	const acquireToken = useCallback(async (msalClient, type, account) => {
+		if (msalClient) {
+			const acquireRequest = {
+					authority: `https://login.microsoftonline.com/${aadTenantId}/`,
+					clientId: aadClientId,
+					scopes: ['user.read', 'people.read', 'files.read', 'files.read.all']
+			}
+			if (account) {
+				acquireRequest.account = account;
+			}
+			const response = type === 'silent' && account
+				? await msalClient.acquireTokenSilent(acquireRequest)
+				: await msalClient.acquireTokenPopup(acquireRequest);
+			const {account: responseAccount} = response || {};
+			if (responseAccount) {
+				processLogin(msalClient, responseAccount);
+			}
+		}
+	}, [aadClientId, aadTenantId]);
 
-    useEffect(() => {
-        if (apiState === 'ready') {
-            setState('ready');
-        }
-    }, [apiState, setState]);
+	useEffect(() => {
+		if (apiState === 'init') {
+			let {location: { href: redirectUri }} = window;
+			if (!redirectUri.endsWith('/')) {
+				redirectUri += '/';
+			}
+			const msalConfig = {
+				auth: {
+					authority: `https://login.microsoftonline.com/${aadTenantId}/`,
+					clientId: aadClientId,
+					// redirectUri: window.location.href,
+					// redirectUri: aadRedirectUrl,
+					redirectUri,
+					scopes: ['user.read', 'people.read', 'files.read', 'files.read.all']
+				}
+			};
 
-    if (process.env.NODE_ENV === 'development') {
-        useEffect(() => {
-            console.log('MicrosoftAuthProvider mounted');
-            return () => {
-                console.log('MicrosoftAuthProvider unmounted');
-            }
-        }, []);
-    }
+			const msalClient = new PublicClientApplication(msalConfig);
+			setMsalClient(() => msalClient);
+			const accounts = msalClient.getAllAccounts();
+			const [ account ] = accounts;
 
-    return (
-        <Context.Provider value={contextValue}>
-            {children}
-        </Context.Provider>
-    )
+			// acquire token if possible silently
+			if (accounts && accounts.length > 1) {
+				// more than one, they need to choose which one
+				acquireToken(msalClient, 'popup');
+			} else if (accounts && accounts.length == 1) {
+				// there is only one account known, so try to get a token silently
+				msalClient.setActiveAccount(account);
+				acquireToken(msalClient, 'silent', account);
+			}
+		}
+	}, [ apiState, setApiState, setClient ]);
+
+	useEffect(() => {
+		if (apiState === 'ready') {
+			setState('ready');
+		}
+	}, [apiState, setState]);
+
+	const contextValue = useMemo(() => {
+		return {
+			client,
+			error,
+			login,
+			logout,
+			loggedIn,
+			setLoggedIn,
+			state
+		}
+	}, [client, error, loggedIn, login, state]);
+
+	if (process.env.NODE_ENV === 'development') {
+		useEffect(() => {
+			console.log('MicrosoftAuthProvider mounted');
+			return () => {
+				console.log('MicrosoftAuthProvider unmounted');
+			}
+		}, []);
+	}
+
+	return (
+		<Context.Provider value={contextValue}>
+			{children}
+		</Context.Provider>
+	)
 }
 
 MicrosoftAuthProvider.propTypes = {
-    children: PropTypes.object.isRequired
+	children: PropTypes.object.isRequired
 }
