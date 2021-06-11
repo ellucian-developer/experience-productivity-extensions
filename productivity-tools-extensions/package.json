@@ -30,7 +30,8 @@
     "react-dom": "16.9.0",
     "react-intl": "2.8.0",
     "react-router-dom": "5.2.0",
-    "safe-html": "1.0.0"
+    "safe-html": "1.0.0",
+    "uuid": "8.3.2"
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "7.12.1",

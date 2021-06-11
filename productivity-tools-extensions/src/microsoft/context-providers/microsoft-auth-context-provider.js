@@ -1,9 +1,32 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useCardInfo } from '@ellucian/experience-extension-hooks';
-import { Context } from '../../context-hooks/auth-context-hooks';
+import { v4 as uuidv4 } from 'uuid';
+
 import { PublicClientApplication } from '@azure/msal-browser';
 import { Client } from "@microsoft/microsoft-graph-client";
+
+import { useCardInfo } from '@ellucian/experience-extension-hooks';
+import { Context } from '../../context-hooks/auth-context-hooks';
+
+const instanceId = uuidv4();
+const messageSourceId = 'MicrosoftAuthProvider';
+
+function setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken) {
+	function onEllucianMicrosoftAuthEvent(event) {
+		const {data, source} = event;
+		if (source === window) {
+			// should be from the same window
+			const {sourceId, sourceInstanceId, type} = data;
+			if (sourceId === messageSourceId && sourceInstanceId !== instanceId) {
+				if (type === 'login') {
+					acquireToken(msalClient, 'silent');
+				}
+			}
+		}
+	}
+
+	window.addEventListener('message', onEllucianMicrosoftAuthEvent);
+}
 
 export function MicrosoftAuthProvider({ children }) {
 	const {
@@ -50,11 +73,18 @@ export function MicrosoftAuthProvider({ children }) {
 	}, []);
 
 	const login = useCallback(async () => {
-		const response = await msalClient.loginPopup({});
-		if (response && response.account) {
-			const {account} = response;
-			msalClient.setActiveAccount(account);
-			processLogin(msalClient, account);
+		try {
+			const response = await msalClient.loginPopup({});
+			if (response && response.account) {
+				const {account} = response;
+				msalClient.setActiveAccount(account);
+				processLogin(msalClient, account);
+
+				// post a window message to let other card pick up the session
+				window.postMessage({sourceId: messageSourceId, sourceInstanceId: instanceId, type: 'login'}, '*');
+			}
+		} catch(error) {
+			console.log('user bailed out');
 		}
 	}, [msalClient]);
 
@@ -69,22 +99,24 @@ export function MicrosoftAuthProvider({ children }) {
 		});
 	}, [msalClient]);
 
-	const acquireToken = useCallback(async (msalClient, type, account) => {
+	const acquireToken = useCallback(async (msalClient) => {
 		if (msalClient) {
+			const accounts = msalClient.getAllAccounts();
+			const [ account ] = accounts;
+
 			const acquireRequest = {
 					authority: `https://login.microsoftonline.com/${aadTenantId}/`,
 					clientId: aadClientId,
 					scopes: ['user.read', 'people.read', 'files.read', 'files.read.all']
 			}
-			if (account) {
+			if (account && accounts.length === 1) {
 				acquireRequest.account = account;
-			}
-			const response = type === 'silent' && account
-				? await msalClient.acquireTokenSilent(acquireRequest)
-				: await msalClient.acquireTokenPopup(acquireRequest);
-			const {account: responseAccount} = response || {};
-			if (responseAccount) {
-				processLogin(msalClient, responseAccount);
+				msalClient.setActiveAccount(account);
+				const response = await msalClient.acquireTokenSilent(acquireRequest);
+				const {account: responseAccount} = response || {};
+				if (responseAccount) {
+					processLogin(msalClient, responseAccount);
+				}
 			}
 		}
 	}, [aadClientId, aadTenantId]);
@@ -107,19 +139,10 @@ export function MicrosoftAuthProvider({ children }) {
 			};
 
 			const msalClient = new PublicClientApplication(msalConfig);
-			setMsalClient(() => msalClient);
-			const accounts = msalClient.getAllAccounts();
-			const [ account ] = accounts;
 
-			// acquire token if possible silently
-			if (accounts && accounts.length > 1) {
-				// more than one, they need to choose which one
-				acquireToken(msalClient, 'popup');
-			} else if (accounts && accounts.length == 1) {
-				// there is only one account known, so try to get a token silently
-				msalClient.setActiveAccount(account);
-				acquireToken(msalClient, 'silent', account);
-			}
+			setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken);
+			setMsalClient(() => msalClient);
+			acquireToken(msalClient);
 		}
 	}, [ apiState, setApiState, setClient ]);
 
