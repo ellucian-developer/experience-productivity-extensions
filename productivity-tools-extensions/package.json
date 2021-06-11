@@ -1,7 +1,7 @@
 {
-  "name": "ms-exp-extn-productivity-tools-extensions",
-  "version": "1.0.9",
-  "description": "MS EXP EXTN Productivity Tools extensions",
+  "name": "productivity-tools-extensions",
+  "version": "1.0",
+  "description": "Productivity Tools extensions",
   "main": "index.js",
   "license": "UNLICENSED",
   "scripts": {
@@ -38,9 +38,9 @@
     "@babel/preset-react": "7.12.1",
     "@calm/eslint-plugin-react-intl": "1.4.1",
     "@ellucian/experience-extension": "2.2.1",
-    "@microsoft/microsoft-graph-client": "^2.0.0",
     "@eui/ds-icons": "https://cdn.elluciancloud.com/assets/EDS2/4.5.0/umd/path_design_system_icons.tgz",
     "@hedtech/react-design-system": "https://cdn.elluciancloud.com/assets/EDS2/4.5.0/umd/path_design_system.tgz",
+    "@microsoft/microsoft-graph-client": "^2.2.1",
     "babel-eslint": "10.1.0",
     "babel-plugin-rewire": "1.2.0",
     "cross-env": "7.0.2",

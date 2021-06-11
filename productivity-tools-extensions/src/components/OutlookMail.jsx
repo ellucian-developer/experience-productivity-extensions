@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/alt-text */
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState, useMemo } from "react";
 import PropTypes from "prop-types";
 import safeHtml from 'safe-html';
 import classnames from 'classnames';
@@ -24,9 +24,9 @@ import {
     tangerine400
 } from "@hedtech/react-design-system/core/styles/tokens";
 
-import { useExtensionControl } from '@ellucian/experience-extension-hooks';
+import { useExtensionControl, useUserInfo } from '@ellucian/experience-extension-hooks';
 
-import { useComponents, useIntl } from '../context-hooks/card-context-hooks.js';
+import { useComponents, useIntl } from '../context-hooks/card-context-hooks';
 import { useAuth } from '../context-hooks/auth-context-hooks';
 import { useMail } from '../context-hooks/mail-context-hooks';
 
@@ -111,7 +111,10 @@ const styles = () => ({
         display: 'flex',
         alignItems: 'center'
     },
-    subjectLink: {
+    subjectLink90: {
+        maxWidth: '90%'
+    },
+    subjectLink100: {
         maxWidth: '100%'
     },
     subject: { },
@@ -121,8 +124,7 @@ const styles = () => ({
         marginLeft: spacing30
     },
     unread: {
-        fontWeight: fontWeightBold,
-        color: colorTextNeutral600
+        fontWeight: fontWeightBold
     },
     noWrap: {
         overflow: 'hidden',
@@ -150,35 +152,27 @@ const styles = () => ({
     }
 });
 
-function Mail({ classes }) {
+function OutlookMail({ classes }) {
     const { setErrorMessage, setLoadingStatus } = useExtensionControl();
+    const { locale } = useUserInfo();
 
     const { intl } = useIntl();
     const { LoginButton, LogoutButton, NoEmail } = useComponents();
-    const { error: authError, login, loggedIn, logout, state: authState } = useAuth();
-    const { error: mailError, messages, state: mailState } = useMail();
 
+    const { error: authError, login, loggedIn, logout } = useAuth();
+    const { error: mailError, mails, userPhotos, state: mailState } = useMail();
+    let userPhotoUrl;
+
+    const [displayState, setDisplayState] = useState('init');
     const [colorsContext] = useState({ colorsUsed: [], colorsByUser: {}});
 
-    const [displayState, setDisplayState] = useState('loading');
+    const dateFormater = useMemo(() => {
+        return new Intl.DateTimeFormat(locale, { dateStyle: 'short'})
+    }, [locale]);
 
-    const [contentNode, setContentNode] = useState();
-
-    const contentRef = (contentNode) => {
-        setContentNode(contentNode);
-    }
-
-    useEffect(() => {
-        if (contentNode) {
-            // find the parent with a title, to remove it so it doesn't interfere with the tool tip
-            const nodesWithTitle = document.querySelectorAll('div[title]');
-            for (const node of nodesWithTitle) {
-                if (node.contains(contentNode))  {
-                    node.removeAttribute('title');
-                }
-            }
-        }
-    }, [contentNode]);
+    const timeFormater = useMemo(() => {
+        return new Intl.DateTimeFormat(locale, { timeStyle: 'short'})
+    }, [locale]);
 
     useEffect(() => {
         if (authError || mailError) {
@@ -187,80 +181,100 @@ function Mail({ classes }) {
                 textMessage: intl.formatMessage({id: 'error.contactYourAdministrator'}),
                 iconName: 'warning'
             })
-        } else if (loggedIn === false && authState === 'ready') {
+        } else if (loggedIn === false) {
             setDisplayState('loggedOut');
-        } else if (mailState === 'load') {
-            setDisplayState('loading');
-        } else if (mailState === 'loaded' || mailState === 'refresh') {
-            setDisplayState('loaded');
-        } else if (mailState && mailState.error) {
-            setDisplayState('error');
+        } else if (mails !== undefined) {
+            setDisplayState('mailsLoaded');
+        } else if (loggedIn) {
+            setDisplayState('loggedIn');
         }
-    }, [ authError, authState, loggedIn, mailError, mailState ])
+    }, [ mails, loggedIn ])
 
     useEffect(() => {
-        setLoadingStatus(displayState === 'loading');
-    }, [displayState, mailState])
+        setLoadingStatus(displayState !== 'mailsLoaded' && displayState !== 'loggedOut');
+    }, [displayState])
 
-    if (displayState === 'loaded') {
-        if (messages && messages.length > 0) {
+    function isToday(dateToCheck) {
+        const today = new Date();
+        return today.getFullYear() === dateToCheck.getFullYear() &&
+            today.getMonth() === dateToCheck.getMonth() &&
+            today.getDate() === dateToCheck.getDate()
+    }
+
+    if (displayState === 'mailsLoaded') {
+        if (mails && mails.length > 0) {
             return (
-                <div className={classes.content} ref={contentRef}>
-                    {messages.map((message) => {
+                <div className={classes.content}>
+                    {mails.map((mail) => {
                         const {
-                            body,
+                            bodyPreview,
                             id,
-                            fromEmail,
-                            fromInitial,
-                            fromName,
-                            hasAttachment,
-                            messageUrl,
-                            received,
+                            from: {
+                                emailAddress: {
+                                    name,
+                                    address
+                                }
+                            },
+                            hasAttachments,
+                            webLink,
+                            receivedDateTime,
                             subject,
-                            unread
-                        } = message;
-                        const avatarColor = pickAvatarColor(fromEmail, colorsContext);
+                            isRead
+                        } = mail;
+
+                        const localReceivedDateTime = new Date(receivedDateTime);
+                        const diaplayReceivedDateTime = isToday(localReceivedDateTime) ? timeFormater.format(localReceivedDateTime) : dateFormater.format(localReceivedDateTime);
+
+                        const avatarColor = pickAvatarColor(address, colorsContext);
+
+                        if ((userPhotos !== undefined) && (userPhotos.get(address) !== undefined)) {
+                            userPhotoUrl = userPhotos.get(address);
+                        } else {
+                            userPhotoUrl = ("");
+                        }
+
                         return (
                             <Fragment key={id}>
                                 <div className={classes.row}>
-                                    <Avatar className={classes.avatar} style={{backgroundColor: avatarColor}}>{fromInitial}</Avatar>
+                                    <Avatar
+                                        className={classes.avatar}
+                                        style={{backgroundColor: avatarColor}}
+                                        src={userPhotoUrl}
+                                    >
+                                        {name.substr(0, 1)}
+                                        {(name.indexOf(",") === -1) ? "" : name.substr(name.indexOf(",")+2, 1)}
+                                    </Avatar>
                                     <div className={classes.messageDetailsBox}>
                                         <div className={classes.fromBox}>
                                             <Typography
-                                                className={classnames(classes.messageFrom, { [classes.unread]: unread })}
-                                                component='div'
+                                                className={classnames(classes.messageFrom, { [classes.unread]: !isRead })}
                                                 noWrap
-                                                variant={"body2"}
+                                                variant="body2"
                                             >
-                                                {fromName}
+                                                {name}
                                             </Typography>
-                                            <Typography
-                                                className={classes.date}
-                                                component='div'
-                                                variant={"body3"}
-                                            >
-                                                {received}
+                                            <Typography component='div' className={classnames(classes.date, { [classes.unread]: !isRead })} variant="body3">
+                                                {diaplayReceivedDateTime}
                                             </Typography>
                                         </div>
                                         <div className={classes.subjectBox}>
-                                            <TextLink className={classes.subjectLink} href={messageUrl} target='_blank'>
-                                                <Typography
-                                                    className={classnames(classes.subject, { [classes.bold]: unread })}
-                                                    component='div'
-                                                    noWrap
-                                                    variant={"body2"}
-                                                >
+                                            <TextLink
+                                                className={{ [classes.subjectLink90]: hasAttachments, [classes.subjectLink100]: !hasAttachments}}
+                                                href={webLink.substr(0, webLink.indexOf("?", -1))}
+                                                target='_blank'
+                                            >
+                                                <Typography component='div' noWrap className={classnames(classes.subject, { [classes.unread]: !isRead })} variant="body2">
                                                     {subject}
                                                 </Typography>
                                             </TextLink>
-                                            { hasAttachment && (
+                                            { hasAttachments && (
                                                 <Tooltip title={intl.formatMessage({id: 'mail.attachment'})}>
-                                                    <Icon className={classes.attachment} name='file-text' />
+                                                    <Icon className={classes.attachment} name='file-text' align='right' />
                                                 </Tooltip>
                                             )}
                                         </div>
-                                        <Typography component='div' noWrap variant='body3'>
-                                            <div className={classes.noWrap} dangerouslySetInnerHTML={{__html: safeHtml(body)}}/>
+                                        <Typography component='div' noWrap variant="body3">
+                                            <div className={classes.noWrap} dangerouslySetInnerHTML={{__html: safeHtml(bodyPreview)}}/>
                                         </Typography>
                                     </div>
                                 </div>
@@ -269,12 +283,12 @@ function Mail({ classes }) {
                         );
                     })}
                     <div className={classes.logoutBox}>
-                        <LogoutButton className={classes.logout} onClick={logout}/>
+                        <LogoutButton onClick={logout}/>
                     </div>
                 </div>
             );
-        } else if (messages) {
-            return <NoEmail title='google.noEmailTitle' message='google.noEmailMessage'/>;
+        } else if (mails) {
+            return <NoEmail title='microsoft.noEmailTitle' message='microsoft.noEmailMessage'/>;
         }
     } else if (displayState === 'loggedOut') {
         return (
@@ -287,14 +301,12 @@ function Mail({ classes }) {
             </div>
         );
     } else {
-        // eslint-disable-next-line no-warning-comments
-        // TODO add error case
         return null;
     }
 }
 
-Mail.propTypes = {
+OutlookMail.propTypes = {
     classes: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(Mail);
+export default withStyles(styles)(OutlookMail);

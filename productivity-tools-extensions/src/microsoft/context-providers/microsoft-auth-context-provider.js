@@ -50,7 +50,8 @@ export function MicrosoftAuthProvider({ children }) {
             console.log("login sucessful");
             updateState();
         }).catch((e) => {
-            console.log("Login error...", e);
+            console.log("MS Auth Login error...", e);
+            setError(e);
         });
     }
 
@@ -88,6 +89,22 @@ export function MicrosoftAuthProvider({ children }) {
             state
         }
     }, [client, email, error, loggedIn, login, state]);
+
+    /* useEffect(() => {
+        if (apiState === 'init') {
+            const { mapi } = window;
+
+            if (!mapi) {
+                ( async() => {
+                    setApiState('script-loading');
+                    await login();
+                    setApiState('script-loaded');
+                })();
+            } else {
+                setApiState('script-loaded');
+            }
+        }
+    }, [apiState, setApiState]);*/
 
     useEffect(() => {
         if (apiState === 'ready') {
