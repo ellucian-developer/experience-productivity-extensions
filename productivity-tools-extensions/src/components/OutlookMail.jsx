@@ -241,7 +241,6 @@ function OutlookMail({ classes }) {
                                         style={{backgroundColor: avatarColor}}
                                         src={userPhotoUrl}
                                     >
-                                        {/* <img src={URL.createObjectURL(userIds[index])} /> */}
                                         {name.substr(0, 1)}
                                         {(name.indexOf(",") === -1) ? "" : name.substr(name.indexOf(",")+2, 1)}
                                     </Avatar>
@@ -279,16 +278,10 @@ function OutlookMail({ classes }) {
                                         </Typography>
                                     </div>
                                 </div>
-                                {/* !last && ( */}
-                                    <Divider classes={{ root: classes.divider }} variant={"middle"} />
-                                {/* ) */}
+                                <Divider classes={{ root: classes.divider }} variant={"middle"} />
                             </Fragment>
                         );
                     })}
-                    {/* <div className={classes.openEmailBox}>
-                        <OpenMailButton className={classes.openEmail} onClick={openMail}/>
-                    </div>
-                    <DevelopmentBox/> */}
                     <div className={classes.logoutBox}>
                         <LogoutButton onClick={logout}/>
                     </div>

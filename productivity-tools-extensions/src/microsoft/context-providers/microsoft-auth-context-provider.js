@@ -51,7 +51,7 @@ export function MicrosoftAuthProvider({ children }) {
             updateState();
         }).catch((e) => {
             console.log("MS Auth Login error...", e);
-            setError(error);
+            setError(e);
         });
     }
 
