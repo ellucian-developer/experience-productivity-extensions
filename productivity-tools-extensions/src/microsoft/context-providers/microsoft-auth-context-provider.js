@@ -11,7 +11,6 @@ import { Msal2Provider } from '@microsoft/mgt-msal2-provider';
 export function MicrosoftAuthProvider({ children }) {
     const { configuration: { aadRedirectUrl, aadClientId, aadTenantId } } = useCardInfo();
     const [client, setClient] = useState();
-    const [email, setEmail] = useState();
     const [error, setError] = useState(false);
     const [loggedIn, setLoggedIn] = useState(false);
     const [state, setState] = useState('initializing');
@@ -51,6 +50,7 @@ export function MicrosoftAuthProvider({ children }) {
             updateState();
         }).catch((e) => {
             console.log("Login error...", e);
+            setError(e);
         });
     }
 
@@ -67,42 +67,27 @@ export function MicrosoftAuthProvider({ children }) {
             updateState();
         }).catch((e) => {
             console.log("Login error...", e);
+            setError(e);
         });
-    }
-
-    function revokePermissions() {
-        console.log("MS Auth revokePermissions");
-        setLoggedIn(false);
     }
 
     const contextValue = useMemo(() => {
         return {
             client,
-            email,
             error,
             login,
             logout,
             loggedIn,
-            revokePermissions,
             setLoggedIn,
             state
         }
-    }, [client, email, error, loggedIn, login, state]);
+    }, [client, error, loggedIn, login, state]);
 
     useEffect(() => {
         if (apiState === 'ready') {
             setState('ready');
         }
     }, [apiState, setState]);
-
-    useEffect(() => {
-        if (loggedIn) {
-            // TODO: Set the Email. Remove testEmailNeedToBeChanged
-            console.log('Email set to: testEmailNeedToBeChanged');
-            const userId = "testEmailNeedToBeChanged";
-            setEmail(userId);
-        }
-    }, [loggedIn]);
 
     if (process.env.NODE_ENV === 'development') {
         useEffect(() => {

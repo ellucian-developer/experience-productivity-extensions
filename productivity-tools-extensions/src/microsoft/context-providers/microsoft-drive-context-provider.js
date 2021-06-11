@@ -32,8 +32,6 @@ export function MicrosoftDriveProvider({children}) {
                     `/me/drive/search(q='')?$orderby=lastModifiedDateTime%20desc&$top=20&$select=id,name,file,folder,package,webUrl,lastModifiedBy,lastModifiedDateTime`
                 ).get();
 
-                console.log("MS OneDrive Items 1 ", response);
-
                 let filteredFiles = response.value;
                 filteredFiles = filteredFiles.filter(file => file.folder === undefined)
                 const totalFileCount = filteredFiles.length;
