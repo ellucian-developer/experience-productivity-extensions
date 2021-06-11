@@ -235,9 +235,8 @@ function OneDrive({ classes }) {
                         const iconLink = getFileIcon(file);
                         return (
                             <Fragment key={file.id}>
-                                <div className={classnames(classes.row, classes[`row${index}`])}>
                                 <a
-                                    style={{ textDecoration: "none", color: "initial" }}
+                                    className={classnames(classes.row, classes[`row${index}`])}
                                     href={file.webUrl}
                                     target="_blank"
                                     rel="noreferrer"
@@ -277,13 +276,12 @@ function OneDrive({ classes }) {
                                     </div>
                                 </div>
                             </a>
-                            </div>
                                 <Divider className={classes.divider} variant={"middle"} />
                             </Fragment>
                         );
                     })}
                     <div className={classes.logoutBox}>
-                        <LogoutButton onClick={logout}/>
+                        <LogoutButton onClick={logout} logo='microsoft'/>
                     </div>
                 </div>
             );
@@ -298,7 +296,7 @@ function OneDrive({ classes }) {
                 <Typography className={classes.fontWeightNormal} variant={"h3"} component='div'>
                     {intl.formatMessage({id: 'google.permissionsRequested'})}
                 </Typography>
-                <LoginButton onClick={login}/>
+                <LoginButton onClick={login} logo='microsoft'/>
             </div>
         );
     } else {

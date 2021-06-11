@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 // eslint-disable-next-line camelcase
 import { unstable_batchedUpdates } from 'react-dom';
@@ -31,8 +31,6 @@ export function MicrosoftDriveProvider({children}) {
                 const response = await client.api(
                     `/me/drive/search(q='')?$orderby=lastModifiedDateTime%20desc&$top=20&$select=id,name,file,folder,package,webUrl,lastModifiedBy,lastModifiedDateTime`
                 ).get();
-
-                console.log("MS OneDrive Items 1 ", response);
 
                 let filteredFiles = response.value;
                 filteredFiles = filteredFiles.filter(file => file.folder === undefined)

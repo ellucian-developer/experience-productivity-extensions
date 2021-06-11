@@ -30,7 +30,7 @@ module.exports = {
         "type": "OneDriveCard",
         "source": "./src/microsoft/cards/OneDriveCard",
         "title": "OneDrive",
-        "displayCardType": "MSEXPEXTN OneDrive",
+        "displayCardType": "OneDrive",
         "description": "This card displays OneDrive"
     }],
     "licensing": {
@@ -41,8 +41,5 @@ module.exports = {
                 ]
             }
         ]
-    },
-    "page": {
-        "source": "./src/page/index.jsx"
     }
 }

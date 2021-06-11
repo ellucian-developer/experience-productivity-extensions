@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Context } from '../../context-hooks/card-context-hooks';
 import { default as OpenDriveButton } from '../components/GoogleDriveOpenButton';
 import { default as LoginButton } from '../components/GoogleLoginButton';
-import { default as LogoutButton } from '../components/GoogleLogoutButton';
+import { default as LogoutButton } from '../../components/SignOutButton';
 import { default as NoFiles } from '../../components/NoDriveFiles';
 import { default as NoEmail } from '../../components/NoEmails';
 
