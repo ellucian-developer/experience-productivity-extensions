@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { v4 as uuidv4 } from 'uuid';
 
 import { PublicClientApplication } from '@azure/msal-browser';
-import { Client } from "@microsoft/microsoft-graph-client";
+import { Client } from '@microsoft/microsoft-graph-client';
 
 import { useCardInfo } from '@ellucian/experience-extension-hooks';
 import { Context } from '../../context-hooks/auth-context-hooks';

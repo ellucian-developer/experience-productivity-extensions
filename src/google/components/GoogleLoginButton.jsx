@@ -1,12 +1,12 @@
 /* eslint-disable jsx-a11y/alt-text */
-import React, { useEffect, useState } from "react";
-import PropTypes from "prop-types";
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 
 import { v4 as uuidv4 } from 'uuid';
 
-import { Button } from "@ellucian/react-design-system/core";
-import { withStyles } from "@ellucian/react-design-system/core/styles";
-import { spacing30 } from "@ellucian/react-design-system/core/styles/tokens";
+import { Button } from '@ellucian/react-design-system/core';
+import { withStyles } from '@ellucian/react-design-system/core/styles';
+import { spacing30 } from '@ellucian/react-design-system/core/styles/tokens';
 
 import { useIntl } from '../../context-hooks/card-context-hooks';
 

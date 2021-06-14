@@ -62,7 +62,7 @@ export function MailProvider({children}) {
 
                     const unread = labelIds.includes('UNREAD');
                     const from = getValueFromArray(headers, 'From', 'Unknown');
-                    const fromMatches = from.match(/"?([^<>"]*)"?\s*<(.*)>/);
+                    const fromMatches = from.match(/'?([^<>']*)'?\s*<(.*)>/);
                     const fromName = fromMatches[1].trim();
                     const fromEmail = fromMatches[2].trim().toLocaleLowerCase();
                     const fromNameSplit = fromName.split(/[, ]/);

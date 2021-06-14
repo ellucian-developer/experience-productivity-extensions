@@ -1,29 +1,29 @@
 /* eslint-disable jsx-a11y/alt-text */
-import React, { useState, useEffect, useMemo, Fragment } from "react";
-import PropTypes from "prop-types";
+import React, { useState, useEffect, useMemo, Fragment } from 'react';
+import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
-import { Divider, Illustration, IMAGES, Popper, Typography } from "@ellucian/react-design-system/core";
-import { withStyles } from "@ellucian/react-design-system/core/styles";
-import { colorBrandNeutral250, colorBrandNeutral300, fontWeightBold, fontWeightNormal, spacing30, spacing40, spacing50 } from "@ellucian/react-design-system/core/styles/tokens";
+import { Divider, Illustration, IMAGES, Popper, Typography } from '@ellucian/react-design-system/core';
+import { withStyles } from '@ellucian/react-design-system/core/styles';
+import { colorBrandNeutral250, colorBrandNeutral300, fontWeightBold, fontWeightNormal, spacing30, spacing40, spacing50 } from '@ellucian/react-design-system/core/styles/tokens';
 import { useExtensionControl, useUserInfo } from '@ellucian/experience-extension-hooks';
 
 import { useComponents, useIntl } from '../context-hooks/card-context-hooks';
 import { useAuth } from '../context-hooks/auth-context-hooks';
-import { useDrive } from "../context-hooks/drive-context-hooks";
+import { useDrive } from '../context-hooks/drive-context-hooks';
 
 import { getFileTypeIconUriByExtension } from '@microsoft/mgt-components/dist/es6/styles/fluent-icons';
 
 const styles = () => ({
     card: {
-        flex: "1 0 auto",
-        width: "100%",
-        height: "100%",
-        display: "flex",
+        flex: '1 0 auto',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
         padding: spacing40,
-        flexFlow: "column",
-        alignItems: "center",
-        justifyContent: "center",
+        flexFlow: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
         '& > *': {
             marginBottom: spacing40
         },
@@ -32,8 +32,8 @@ const styles = () => ({
         }
     },
     content: {
-        display: "flex",
-        flexFlow: "column",
+        display: 'flex',
+        flexFlow: 'column',
         marginLeft: spacing40,
         marginRight: spacing40,
         '& hr:last-of-type': {
@@ -53,9 +53,9 @@ const styles = () => ({
         }
     },
     fileBox: {
-        display: "flex",
-        padding: "0 9px",
-        alignItems: "center"
+        display: 'flex',
+        padding: '0 9px',
+        alignItems: 'center'
     },
     fileNameBox: {
         flex: '1 1 auto',
@@ -241,16 +241,16 @@ function OneDrive({ classes }) {
                                 <a
                                     className={classnames(classes.row, classes[`row${index}`])}
                                     href={file.webUrl}
-                                    target="_blank"
-                                    rel="noreferrer"
+                                    target='_blank'
+                                    rel='noreferrer'
                                 >
                                     <div className={classes.fileBox}>
-                                        <img className={classes.fileIcon} aria-label="file icon" src={iconLink}/>
+                                        <img className={classes.fileIcon} aria-label='file icon' src={iconLink}/>
                                         <div className={classes.fileNameBox}>
                                             <Typography
                                                 className={classes.fileName}
                                                 component='div'
-                                                variant={"body2"}
+                                                variant={'body2'}
                                                 ref={node => fileNameRef(node, file.id)}
                                                 onFocus={event => openPopper(event, file.id)}
                                                 onMouseOver={event => openPopper(event, file.id)}
@@ -273,13 +273,13 @@ function OneDrive({ classes }) {
                                             >
                                                 <Typography>{file.name}</Typography>
                                             </Popper>
-                                        <Typography className={classes.modified} component='div' variant={"body3"}>
+                                        <Typography className={classes.modified} component='div' variant={'body3'}>
                                             {intl.formatMessage({id: 'drive.modifiedBy'}, {date: modified, name: modifiedBy})}
                                         </Typography>
                                     </div>
                                 </div>
                             </a>
-                                <Divider className={classes.divider} variant={"middle"} />
+                                <Divider className={classes.divider} variant={'middle'} />
                             </Fragment>
                         );
                     })}
@@ -296,7 +296,7 @@ function OneDrive({ classes }) {
         return (
             <div className={classes.card}>
                 <Illustration name={IMAGES.ID_BADGE} />
-                <Typography className={classes.fontWeightNormal} variant={"h3"} component='div'>
+                <Typography className={classes.fontWeightNormal} variant={'h3'} component='div'>
                     {intl.formatMessage({id: 'google.permissionsRequested'})}
                 </Typography>
                 <LoginButton onClick={login} logo='microsoft'/>

@@ -6,8 +6,8 @@ import { ExtensionProvider } from '@ellucian/experience-extension-hooks';
 import { withIntl } from '../../components/ReactIntlProviderWrapper';
 
 import { MicrosoftCardProvider } from '../context-providers/microsoft-card-context-provider';
-import { MicrosoftAuthProvider } from "../context-providers/microsoft-auth-context-provider";
-import { MicrosoftMailProvider } from "../context-providers/microsoft-mail-context-provider";
+import { MicrosoftAuthProvider } from '../context-providers/microsoft-auth-context-provider';
+import { MicrosoftMailProvider } from '../context-providers/microsoft-mail-context-provider';
 
 import OutlookMail from '../../components/OutlookMail';
 

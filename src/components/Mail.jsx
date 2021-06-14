@@ -1,12 +1,12 @@
 /* eslint-disable jsx-a11y/alt-text */
-import React, { Fragment, useEffect, useState } from "react";
-import PropTypes from "prop-types";
+import React, { Fragment, useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import safeHtml from 'safe-html';
 import classnames from 'classnames';
 
-import { Avatar, Divider, Illustration, IMAGES, TextLink, Tooltip, Typography } from "@ellucian/react-design-system/core";
+import { Avatar, Divider, Illustration, IMAGES, TextLink, Tooltip, Typography } from '@ellucian/react-design-system/core';
 import { Icon } from '@ellucian/ds-icons/lib';
-import { withStyles } from "@ellucian/react-design-system/core/styles";
+import { withStyles } from '@ellucian/react-design-system/core/styles';
 import {
     colorBrandNeutral250,
     colorBrandNeutral300,
@@ -22,7 +22,7 @@ import {
     purple400,
     saffron400,
     tangerine400
-} from "@ellucian/react-design-system/core/styles/tokens";
+} from '@ellucian/react-design-system/core/styles/tokens';
 
 import { useExtensionControl } from '@ellucian/experience-extension-hooks';
 
@@ -51,14 +51,14 @@ function pickAvatarColor(email, colorsContext) {
 
 const styles = () => ({
     card: {
-        flex: "1 0 auto",
-        width: "100%",
-        height: "100%",
-        display: "flex",
+        flex: '1 0 auto',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
         padding: spacing40,
-        flexFlow: "column",
-        alignItems: "center",
-        justifyContent: "center",
+        flexFlow: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
         '& > *': {
             marginBottom: spacing40
         },
@@ -67,8 +67,8 @@ const styles = () => ({
         }
     },
     content: {
-        display: "flex",
-        flexDirection: "column",
+        display: 'flex',
+        flexDirection: 'column',
         marginLeft: spacing40,
         marginRight: spacing40,
         '& :first-child': {
@@ -79,8 +79,8 @@ const styles = () => ({
         }
     },
     row: {
-        display: "flex",
-        alignItems: "center",
+        display: 'flex',
+        alignItems: 'center',
         paddingTop: spacing30,
         paddingBottom: spacing30,
         paddingLeft: spacing30,
@@ -96,7 +96,7 @@ const styles = () => ({
         paddingLeft: spacing30,
         width: 'calc(100% - 40px)',
         flex: '1 1 auto',
-        display: "flex",
+        display: 'flex',
         flexDirection: 'column',
         alignItems: 'stretch'
     },
@@ -230,14 +230,14 @@ function Mail({ classes }) {
                                                 className={classnames(classes.messageFrom, { [classes.unread]: unread })}
                                                 component='div'
                                                 noWrap
-                                                variant={"body2"}
+                                                variant={'body2'}
                                             >
                                                 {fromName}
                                             </Typography>
                                             <Typography
                                                 className={classes.date}
                                                 component='div'
-                                                variant={"body3"}
+                                                variant={'body3'}
                                             >
                                                 {received}
                                             </Typography>
@@ -248,7 +248,7 @@ function Mail({ classes }) {
                                                     className={classnames(classes.subject, { [classes.bold]: unread })}
                                                     component='div'
                                                     noWrap
-                                                    variant={"body2"}
+                                                    variant={'body2'}
                                                 >
                                                     {subject}
                                                 </Typography>
@@ -264,7 +264,7 @@ function Mail({ classes }) {
                                         </Typography>
                                     </div>
                                 </div>
-                                <Divider classes={{ root: classes.divider }} variant={"middle"} />
+                                <Divider classes={{ root: classes.divider }} variant={'middle'} />
                             </Fragment>
                         );
                     })}
@@ -280,7 +280,7 @@ function Mail({ classes }) {
         return (
             <div className={classes.card}>
                 <Illustration name={IMAGES.ID_BADGE} />
-                <Typography className={classes.fontWeightNormal} variant={"h3"} component='div'>
+                <Typography className={classes.fontWeightNormal} variant={'h3'} component='div'>
                     {intl.formatMessage({id: 'google.permissionsRequested'})}
                 </Typography>
                 <LoginButton onClick={login}/>

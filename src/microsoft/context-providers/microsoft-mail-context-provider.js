@@ -70,7 +70,7 @@ export function MicrosoftMailProvider({children}) {
                                             setUserPhotos(
                                                 responsePhoto
                                                 ? userPhotos.set(address, URL.createObjectURL(responsePhoto))
-                                                : setUserPhotos(userPhotos.set(address, ""))
+                                                : setUserPhotos(userPhotos.set(address, ''))
                                             );
                                             setState('loadPhoto');
                                         });
@@ -79,7 +79,7 @@ export function MicrosoftMailProvider({children}) {
                                         if (error && error.status === 401) {
                                             setLoggedIn(false);
                                         } else {
-                                            setUserPhotos(userPhotos.set(address, ""));
+                                            setUserPhotos(userPhotos.set(address, ''));
                                         }
                                     }
                                 }
