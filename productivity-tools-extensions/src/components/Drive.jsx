@@ -271,12 +271,12 @@ function Drive({ classes }) {
                         );
                     })}
                     <div className={classes.logoutBox}>
-                        <LogoutButton onClick={logout}/>
+                        <LogoutButton onClick={logout} logo='google'/>
                     </div>
                 </div>
             );
         } else if (files) {
-            return <NoFiles/>;
+            return <NoFiles title='google.noFilesTitle' message='google.noFilesMessage'/>;
         }
     } else if (displayState === 'loggedOut') {
         return (

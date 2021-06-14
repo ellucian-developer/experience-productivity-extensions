@@ -1,16 +1,15 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 // eslint-disable-next-line camelcase
 import { unstable_batchedUpdates } from 'react-dom';
 
-import { useAuth } from '../context-hooks/auth-context-hooks';
-import { Context } from '../context-hooks/drive-context-hooks';
+import { useAuth } from '../../context-hooks/auth-context-hooks';
+import { Context } from '../../context-hooks/drive-context-hooks';
 
 const refreshInterval = 60000;
 
 export function MicrosoftDriveProvider({children}) {
-    const { client, email, loggedIn, setLoggedIn } = useAuth();
-
+    const { client, loggedIn, setLoggedIn } = useAuth();
     const [error, setError] = useState(false);
     const [state, setState] = useState('load');
     const [files, setFiles] = useState();
@@ -30,12 +29,17 @@ export function MicrosoftDriveProvider({children}) {
 
             try {
                 const response = await client.api(
-                    `/me/drive/root/children`
+                    `/me/drive/search(q='')?$orderby=lastModifiedDateTime%20desc&$top=20&$select=id,name,file,folder,package,webUrl,lastModifiedBy,lastModifiedDateTime`
                 ).get();
 
-                console.log("MS OneDrive Items 1 ", response);
-
-                const filteredFiles = response.value;
+                let filteredFiles = response.value;
+                filteredFiles = filteredFiles.filter(file => file.folder === undefined)
+                const totalFileCount = filteredFiles.length;
+                if (totalFileCount > 10) {
+                    for (let index = totalFileCount; index > 9; index--) {
+                        filteredFiles.splice(index, 1);
+                    }
+                }
                 unstable_batchedUpdates(() => {
                     setFiles(() => filteredFiles);
                     setState('loaded');
@@ -46,8 +50,10 @@ export function MicrosoftDriveProvider({children}) {
                     setLoggedIn(false);
                 } else {
                     console.error('gapi failed', error);
-                    setState(() => ({ error: 'api'}));
-                    setError(error);
+                    unstable_batchedUpdates(() => {
+                        setState(() => ({ error: 'api'}));
+                        setError(error);
+                    })
                 }
             }
         }
@@ -56,6 +62,10 @@ export function MicrosoftDriveProvider({children}) {
     useEffect(() => {
         if (loggedIn && (state === 'load' || state === 'refresh')) {
             refresh();
+        } else if (!loggedIn && state === 'loaded') {
+            // force refresh when logged back in
+            setFiles(undefined);
+            setState('load');
         }
     }, [loggedIn, refresh, state])
 
@@ -115,12 +125,9 @@ export function MicrosoftDriveProvider({children}) {
         return {
             error,
             files,
-            openDrive: () => {
-                window.open(`https://drive.google.com?authuser=${email}`, '_blank');
-            },
             refresh: () => { setState('refresh') }
         }
-    }, [ email, error, files, setState ]);
+    }, [ error, files, setState ]);
 
     if (process.env.NODE_ENV === 'development') {
         useEffect(() => {
@@ -141,8 +148,4 @@ export function MicrosoftDriveProvider({children}) {
 
 MicrosoftDriveProvider.propTypes = {
     children: PropTypes.object.isRequired
-}
-
-export function useDrive() {
-    return useContext(Context);
 }

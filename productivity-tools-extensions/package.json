@@ -1,6 +1,6 @@
 {
   "name": "productivity-tools-extensions",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Productivity Tools extensions",
   "main": "index.js",
   "license": "UNLICENSED",
@@ -11,15 +11,18 @@
     "google-deploy-dev": "webpack --config google-webpack.config.js --progress --mode development --env verbose --env upload",
     "google-deploy-prod": "webpack --config google-webpack.config.js --progress --mode production --env verbose --env upload",
     "google-start": "webpack --config google-webpack.config.js --hot --watch --mode development --env verbose --env upload --env forceUpload",
-    "microsoft-build-dev": "webpack --progress --mode development --env verbose",
-    "microsoft-build-prod": "webpack --progress --mode production --env verbose",
-    "microsoft-deploy-dev": "webpack --progress --mode development --env verbose --env upload",
-    "microsoft-deploy-prod": "webpack --progress --mode production --env verbose --env upload",
+    "microsoft-build-dev": "webpack --config microsoft-webpack.config.js --progress --mode development --env verbose",
+    "microsoft-build-prod": "webpack --config microsoft-webpack.config.js --progress --mode production --env verbose",
+    "microsoft-deploy-dev": "webpack --config microsoft-webpack.config.js --progress --mode development --env verbose --env upload",
+    "microsoft-deploy-prod": "webpack --config microsoft-webpack.config.js --progress --mode production --env verbose --env upload",
     "microsoft-start": "webpack --config microsoft-webpack.config.js --hot --watch --mode development --env verbose --env upload --env forceUpload",
     "test": "cross-env BABEL_ENV=test JEST_JUNIT_OUTPUT=./report.xml jest --coverage"
   },
   "dependencies": {
+    "@azure/msal-browser": "2.14.2",
     "@ellucian/experience-extension-hooks": "2.2.1",
+    "@microsoft/mgt-components": "2.2.0",
+    "@microsoft/microsoft-graph-client": "2.2.1",
     "classnames": "2.3.1",
     "gapi-script": "1.2.0",
     "prop-types": "15.7.2",
@@ -28,7 +31,7 @@
     "react-intl": "2.8.0",
     "react-router-dom": "5.2.0",
     "safe-html": "1.0.0",
-    "msal": "^1.4.4"
+    "uuid": "8.3.2"
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "7.12.1",
@@ -36,7 +39,6 @@
     "@babel/preset-react": "7.12.1",
     "@calm/eslint-plugin-react-intl": "1.4.1",
     "@ellucian/experience-extension": "2.2.1",
-    "@microsoft/microsoft-graph-client": "^2.0.0",
     "@eui/ds-icons": "https://cdn.elluciancloud.com/assets/EDS2/4.5.0/umd/path_design_system_icons.tgz",
     "@hedtech/react-design-system": "https://cdn.elluciancloud.com/assets/EDS2/4.5.0/umd/path_design_system.tgz",
     "babel-eslint": "10.1.0",
