@@ -10,6 +10,8 @@ import { Context } from '../../context-hooks/auth-context-hooks';
 
 const instanceId = uuidv4();
 const messageSourceId = 'MicrosoftAuthProvider';
+const microsoftScopes = ['files.read', 'mail.read', 'user.read'];
+
 
 function setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken) {
 	function onEllucianMicrosoftAuthEvent(event) {
@@ -59,7 +61,7 @@ export function MicrosoftAuthProvider({ children }) {
 					const acquireRequest = {
 						authority: `https://login.microsoftonline.com/${aadTenantId}/`,
 						clientId: aadClientId,
-						scopes: ['user.read', 'people.read', 'files.read', 'files.read.all'],
+						scopes: microsoftScopes,
 						account
 					}
 					const response = await msalClient.acquireTokenSilent(acquireRequest);
@@ -114,7 +116,7 @@ export function MicrosoftAuthProvider({ children }) {
 			const acquireRequest = {
 					authority: `https://login.microsoftonline.com/${aadTenantId}/`,
 					clientId: aadClientId,
-					scopes: ['user.read', 'people.read', 'files.read', 'files.read.all']
+					scopes: microsoftScopes
 			}
 			if (account && accounts.length === 1) {
 				acquireRequest.account = account;
@@ -138,7 +140,7 @@ export function MicrosoftAuthProvider({ children }) {
 					// redirectUri: window.location.href,
 					// redirectUri: aadRedirectUrl,
 					redirectUri,
-					scopes: ['user.read', 'people.read', 'files.read', 'files.read.all']
+					scopes: microsoftScopes
 				}
 			};
 
