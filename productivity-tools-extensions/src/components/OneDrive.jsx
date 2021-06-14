@@ -218,7 +218,10 @@ function OneDrive({ classes }) {
         } else if (file.package !== undefined) {
             fileType = file.package.type === 'oneNote' ? 'onetoc' : 'folder'
         }
-        const fileIconSrc = getFileTypeIconUriByExtension(fileType, 48, 'svg');
+        let fileIconSrc = getFileTypeIconUriByExtension(fileType, 48, 'svg');
+        if (fileIconSrc == null) {
+            fileIconSrc = getFileTypeIconUriByExtension('genericfile', 48, 'svg');
+        }
         return fileIconSrc;
     }
 
