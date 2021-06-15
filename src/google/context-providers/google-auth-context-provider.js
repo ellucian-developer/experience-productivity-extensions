@@ -90,14 +90,6 @@ export function AuthProvider({ children }) {
         }
     }
 
-    function revokePermissions() {
-        const { gapi } = window;
-        if (gapi) {
-            gapi.auth2.getAuthInstance().currentUser.get().disconnect();
-            gapi.auth2.getAuthInstance().disconnect();
-        }
-    }
-
     const contextValue = useMemo(() => {
         return {
             email,
@@ -105,7 +97,6 @@ export function AuthProvider({ children }) {
             login,
             logout,
             loggedIn,
-            revokePermissions,
             setLoggedIn,
             state
         }
