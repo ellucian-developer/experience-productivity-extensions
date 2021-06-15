@@ -110,7 +110,7 @@ export function MicrosoftAuthProvider({ children }) {
 			const account = msalClient.getActiveAccount();
 			const logoutRequest = {
 				account,
-				onRedirectNavigate: (url) => {
+				onRedirectNavigate: () => {
 					return false;
 				}
 			};
