@@ -73,16 +73,16 @@ export function MicrosoftMailProvider({children}) {
                         webLink: messageUrl
                     } = message;
 
-                    let fromInitials;
+                    let fromInitials = '';
                     if (fromName.slice(0, 1) === '"') {
                         fromInitials = fromName.slice(1, 2);
                     } else if (fromName.includes(',')) {
                         // last name first name separated by comma
                         // eslint-disable-next-line no-unused-vars
-                        const [_, lastName, firstName] = fromName.match(/([^, ]+),[ ]*([^ ]*)/);
+                        const [_, lastName = '', firstName = ''] = fromName.match(/([^, ]+),[ ]*([^ ]*)/);
                         fromInitials = `${lastName.slice(0, 1)}${firstName.slice(0, 1)}`
                     } else {
-                        const [firstName, lastName] = fromName.split(' ');
+                        const [firstName = '', lastName = ''] = fromName.split(' ');
                         fromInitials = `${firstName.slice(0, 1)}${lastName.slice(0, 1)}`
                     }
 
