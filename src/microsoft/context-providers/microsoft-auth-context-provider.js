@@ -15,7 +15,7 @@ const messageSourceId = 'MicrosoftAuthProvider';
 const microsoftScopes = ['files.read', 'mail.read', 'user.read'];
 
 
-function setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken) {
+function setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken, setLoggedIn) {
 	function onEllucianMicrosoftAuthEvent(event) {
 		const {data, source} = event;
 		if (source === window) {
@@ -24,6 +24,8 @@ function setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken) {
 			if (sourceId === messageSourceId && sourceInstanceId !== instanceId) {
 				if (type === 'login') {
 					acquireToken(msalClient, 'silent');
+				} else if (type === 'logout') {
+					setLoggedIn(false);
 				}
 			}
 		}
@@ -82,7 +84,14 @@ export function MicrosoftAuthProvider({ children }) {
 
 	const login = useCallback(async () => {
 		try {
-			const response = await msalClient.loginPopup({});
+			const loginRequest = {
+				clientId: aadClientId,
+				prompt: 'select_account',
+				authority: `https://login.microsoftonline.com/${aadTenantId}/`,
+				redirectUri: aadRedirectUrl,
+				scopes: microsoftScopes
+			};
+			const response = await msalClient.loginPopup(loginRequest);
 			if (response && response.account) {
 				const {account} = response;
 				msalClient.setActiveAccount(account);
@@ -99,12 +108,17 @@ export function MicrosoftAuthProvider({ children }) {
 	const logout = useCallback(() => {
 		if (aadRedirectUrl && msalClient) {
 			const account = msalClient.getActiveAccount();
-			const redirectUri = aadRedirectUrl;
-			msalClient.logoutPopup({
+			const logoutRequest = {
 				account,
-				authority: `https://login.microsoftonline.com/${aadTenantId}/`,
-				redirectUri,
-				mainWindowRedirectUri: redirectUri
+				onRedirectNavigate: (url) => {
+					return false;
+				}
+			};
+			msalClient.logoutRedirect(logoutRequest).then(() => {
+				setLoggedIn(false);
+				window.postMessage({sourceId: messageSourceId, sourceInstanceId: instanceId, type: 'logout'}, '*');
+			}).catch((e) => {
+				setError(e);
 			});
 		}
 	}, [aadRedirectUrl, msalClient]);
@@ -150,7 +164,7 @@ export function MicrosoftAuthProvider({ children }) {
 
 			const msalClient = new PublicClientApplication(msalConfig);
 
-			setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken);
+			setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken, setLoggedIn);
 			setMsalClient(() => msalClient);
 			(async () => {
 				const acquiredToken = await acquireToken(msalClient);
