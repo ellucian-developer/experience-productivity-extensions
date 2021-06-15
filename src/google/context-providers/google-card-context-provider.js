@@ -2,25 +2,23 @@ import React, { useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import { Context } from '../../context-hooks/card-context-hooks';
-import { default as OpenDriveButton } from '../components/GoogleDriveOpenButton';
-import { default as LoginButton } from '../components/GoogleLoginButton';
-import { default as LogoutButton } from '../../components/SignOutButton';
-import { default as NoFiles } from '../../components/NoDriveFiles';
-import { default as NoEmail } from '../../components/NoEmails';
 
-const googleRenderedLoginButton = false;
+import buttonImage from '../images/google-logo.svg';
 
 export function CardProvider({children, intl}) {
     const contextValue = useMemo(() => {
         return {
             intl,
             components: {
-                OpenDriveButton,
-                LogoutButton,
-                // eslint-disable-next-line react/display-name
-                LoginButton: (props) => (<LoginButton googleRender={googleRenderedLoginButton} {...props}/>),
-                NoFiles,
-                NoEmail
+                buttonImage,
+                noEmail: {
+                    titleId: 'google.noEmailTitle',
+                    messageId: 'google.noEmailMessage'
+                },
+                noFiles: {
+                    titleId: 'google.noFilesTitle',
+                    messageId: 'google.noFilesMessage'
+                }
             }
         }
     }, [ intl ]);

@@ -3,10 +3,27 @@ import PropTypes from 'prop-types';
 // eslint-disable-next-line camelcase
 import { unstable_batchedUpdates } from 'react-dom';
 
+import { getFileTypeIconUriByExtension } from '@microsoft/mgt-components/dist/es6/styles/fluent-icons';
+
 import { useAuth } from '../../context-hooks/auth-context-hooks';
 import { Context } from '../../context-hooks/drive-context-hooks';
 
 const refreshInterval = 60000;
+
+function getFileIcon(file) {
+    const re = /(?:\.([^.]+))?$/;
+    let fileType = 'folder';
+    if (file.package === undefined && file.folder === undefined) {
+        fileType = re.exec(file.name)[1] ? re.exec(file.name)[1].toLowerCase() : 'null'
+    } else if (file.package !== undefined) {
+        fileType = file.package.type === 'oneNote' ? 'onetoc' : 'folder'
+    }
+    let fileIconSrc = getFileTypeIconUriByExtension(fileType, 48, 'svg');
+    if (fileIconSrc == null) {
+        fileIconSrc = getFileTypeIconUriByExtension('genericfile', 48, 'svg');
+    }
+    return fileIconSrc;
+}
 
 export function MicrosoftDriveProvider({children}) {
     const { client, loggedIn, setLoggedIn } = useAuth();
@@ -32,8 +49,21 @@ export function MicrosoftDriveProvider({children}) {
                     `/me/drive/search(q='')?$orderby=lastModifiedDateTime%20desc&$top=20&$select=id,name,file,folder,package,webUrl,lastModifiedBy,lastModifiedDateTime`
                 ).get();
 
-                let filteredFiles = response.value;
-                filteredFiles = filteredFiles.filter(file => file.folder === undefined)
+                const files = response.value;
+                // filter out folders and transform
+                const filteredFiles = files.filter(file => {
+                    if (file.folder === undefined) {
+                        file.iconLink = getFileIcon(file);
+                        file.iconSize = '24';
+                        file.lastModifyingUser = file.lastModifiedBy ? file.lastModifiedBy.user : {};
+                        delete file.lastModifiedBy;
+                        file.modifiedTime = file.lastModifiedDateTime;
+                        delete file.lastModifiedDateTime;
+                        file.webViewLink = file.webUrl;
+                        delete file.webUrl;
+                        return true;
+                    } else { return false }
+                })
                 const totalFileCount = filteredFiles.length;
                 if (totalFileCount > 10) {
                     for (let index = totalFileCount; index > 9; index--) {

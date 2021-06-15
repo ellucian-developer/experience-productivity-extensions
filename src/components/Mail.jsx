@@ -26,9 +26,13 @@ import {
 
 import { useExtensionControl } from '@ellucian/experience-extension-hooks';
 
-import { useComponents, useIntl } from '../context-hooks/card-context-hooks.js';
+import { useIntl } from '../context-hooks/card-context-hooks.js';
 import { useAuth } from '../context-hooks/auth-context-hooks';
 import { useMail } from '../context-hooks/mail-context-hooks';
+
+import SignInButton from './SignInButton';
+import SignOutButton from './SignOutButton';
+import NoEmail from './NoEmail';
 
 const colors = [ fountain400, iris400, kiwi400, meadow400, purple400, saffron400, tangerine400 ];
 function pickAvatarColor(email, colorsContext) {
@@ -112,7 +116,11 @@ const styles = () => ({
         alignItems: 'center'
     },
     subjectLink: {
-        maxWidth: '100%'
+        maxWidth: '100%',
+        padding: '0px'
+    },
+    subjectLinkUnread: {
+        fontWeight: fontWeightBold
     },
     subject: { },
     attachment: {
@@ -154,7 +162,6 @@ function Mail({ classes }) {
     const { setErrorMessage, setLoadingStatus } = useExtensionControl();
 
     const { intl } = useIntl();
-    const { LoginButton, LogoutButton, NoEmail } = useComponents();
     const { error: authError, login, loggedIn, logout, state: authState } = useAuth();
     const { error: mailError, messages, state: mailState } = useMail();
 
@@ -208,22 +215,29 @@ function Mail({ classes }) {
                 <div className={classes.content} ref={contentRef}>
                     {messages.map((message) => {
                         const {
-                            body,
+                            bodySnippet,
                             id,
                             fromEmail,
-                            fromInitial,
+                            fromInitials,
                             fromName,
                             hasAttachment,
                             messageUrl,
                             received,
                             subject,
-                            unread
+                            unread,
+                            userPhotoUrl
                         } = message;
                         const avatarColor = pickAvatarColor(fromEmail, colorsContext);
                         return (
                             <Fragment key={id}>
                                 <div className={classes.row}>
-                                    <Avatar className={classes.avatar} style={{backgroundColor: avatarColor}}>{fromInitial}</Avatar>
+                                    <Avatar
+                                        className={classes.avatar}
+                                        style={{backgroundColor: avatarColor}}
+                                        src={userPhotoUrl}
+                                    >
+                                        {fromInitials}
+                                    </Avatar>
                                     <div className={classes.messageDetailsBox}>
                                         <div className={classes.fromBox}>
                                             <Typography
@@ -243,16 +257,16 @@ function Mail({ classes }) {
                                             </Typography>
                                         </div>
                                         <div className={classes.subjectBox}>
-                                            <TextLink className={classes.subjectLink} href={messageUrl} target='_blank'>
-                                                <Typography
-                                                    className={classnames(classes.subject, { [classes.bold]: unread })}
-                                                    component='div'
-                                                    noWrap
-                                                    variant={'body2'}
-                                                >
+                                            <Typography
+                                                className={classnames(classes.subject, { [classes.subjectLinkUnread]: unread })}
+                                                component='div'
+                                                noWrap
+                                                variant={'body2'}
+                                            >
+                                                <TextLink className={classes.subjectLink} href={messageUrl} target='_blank'>
                                                     {subject}
-                                                </Typography>
-                                            </TextLink>
+                                                </TextLink>
+                                            </Typography>
                                             { hasAttachment && (
                                                 <Tooltip title={intl.formatMessage({id: 'mail.attachment'})}>
                                                     <Icon className={classes.attachment} name='file-text' />
@@ -260,7 +274,7 @@ function Mail({ classes }) {
                                             )}
                                         </div>
                                         <Typography component='div' noWrap variant='body3'>
-                                            <div className={classes.noWrap} dangerouslySetInnerHTML={{__html: safeHtml(body)}}/>
+                                            <div className={classes.noWrap} dangerouslySetInnerHTML={{__html: safeHtml(bodySnippet)}}/>
                                         </Typography>
                                     </div>
                                 </div>
@@ -269,12 +283,12 @@ function Mail({ classes }) {
                         );
                     })}
                     <div className={classes.logoutBox}>
-                        <LogoutButton className={classes.logout} onClick={logout} logo='google'/>
+                        <SignOutButton onClick={logout}/>
                     </div>
                 </div>
             );
         } else if (messages) {
-            return <NoEmail title='google.noEmailTitle' message='google.noEmailMessage'/>;
+            return <NoEmail/>;
         }
     } else if (displayState === 'loggedOut') {
         return (
@@ -283,7 +297,7 @@ function Mail({ classes }) {
                 <Typography className={classes.fontWeightNormal} variant={'h3'} component='div'>
                     {intl.formatMessage({id: 'google.permissionsRequested'})}
                 </Typography>
-                <LoginButton onClick={login}/>
+                <SignInButton onClick={login}/>
             </div>
         );
     } else {

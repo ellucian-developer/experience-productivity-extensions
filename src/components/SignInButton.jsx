@@ -6,10 +6,7 @@ import { Button } from '@ellucian/react-design-system/core';
 import { withStyles } from '@ellucian/react-design-system/core/styles';
 import { spacing30 } from '@ellucian/react-design-system/core/styles/tokens';
 
-import { useIntl } from '../context-hooks/card-context-hooks';
-
-import microsoftLogo from '../images/microsoft-logo.svg';
-import googleLogo from '../images/google-logo.svg';
+import { useComponents, useIntl } from '../context-hooks/card-context-hooks';
 
 const styles = () => ({
     button: {
@@ -20,12 +17,13 @@ const styles = () => ({
     }
 });
 
-function SignInButton({ classes, onClick, logo }) {
+function SignInButton({ classes, onClick}) {
     const { intl } = useIntl();
+    const { buttonImage } = useComponents();
 
     return (
         <Button className={classes.button} color='secondary' onClick={onClick}>
-            <img className={classes.image} src={logo === 'google' ? googleLogo : microsoftLogo}/>
+            <img className={classes.image} src={buttonImage}/>
             {intl.formatMessage({id: 'signIn'})}
         </Button>
     );
@@ -33,8 +31,7 @@ function SignInButton({ classes, onClick, logo }) {
 
 SignInButton.propTypes = {
     classes: PropTypes.object.isRequired,
-    onClick: PropTypes.func.isRequired,
-    logo: PropTypes.string
+    onClick: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(SignInButton);

@@ -2,24 +2,23 @@ import React, { useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import { Context } from '../../context-hooks/card-context-hooks';
-import { default as NoFiles } from '../../components/NoDriveFiles';
-import { default as NoEmail } from '../../components/NoEmails';
-import { default as LoginButton } from '../../components/SignInButton';
-import { default as LogoutButton } from '../../components/SignOutButton';
 
-
-const renderedLoginButton = false;
+import buttonImage from '../images/microsoft-logo.svg';
 
 export function MicrosoftCardProvider({children, intl}) {
     const contextValue = useMemo(() => {
         return {
             intl,
             components: {
-                LogoutButton,
-                // eslint-disable-next-line react/display-name
-                LoginButton: (props) => (<LoginButton microsoftRender={renderedLoginButton} {...props}/>),
-                NoFiles,
-                NoEmail
+                buttonImage,
+                noEmail: {
+                    titleId: 'microsoft.noEmailTitle',
+                    messageId: 'microsoft.noEmailMessage'
+                },
+                noFiles: {
+                    titleId: 'microsoft.noFilesTitle',
+                    messageId: 'microsoft.noFilesMessage'
+                }
             }
         }
     }, [ intl ]);

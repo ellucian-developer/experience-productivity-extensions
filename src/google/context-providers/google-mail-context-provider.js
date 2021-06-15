@@ -55,7 +55,7 @@ export function MailProvider({children}) {
                             headers,
                             parts
                         },
-                        snippet: body
+                        snippet
                     } = message;
 
                     const receivedDate = new Date(getValueFromArray(headers, 'Date', undefined));
@@ -67,7 +67,7 @@ export function MailProvider({children}) {
                     const fromEmail = fromMatches[2].trim().toLocaleLowerCase();
                     const fromNameSplit = fromName.split(/[, ]/);
                     const firstName = fromName.includes(',') ? fromNameSplit[2] : (fromNameSplit[0] || '');
-                    const fromInitial = firstName.slice(0, 1);
+                    const fromInitials = firstName.slice(0, 1);
 
                     const subject = getValueFromArray(headers, 'Subject', 'No Subject');
 
@@ -78,10 +78,10 @@ export function MailProvider({children}) {
                     const received = isToday(receivedDate) ? timeFormater.format(receivedDate) : dateFormater.format(receivedDate);
 
                     return {
-                        body,
+                        bodySnippet: snippet,
                         id,
                         fromEmail,
-                        fromInitial,
+                        fromInitials,
                         fromName,
                         hasAttachment,
                         messageUrl,
@@ -92,7 +92,7 @@ export function MailProvider({children}) {
                     }
                 });
 
-                // ensure sorted by recieved date
+                // ensure sorted by received date
                 transformedMessages.sort((left, right) => right.receivedDate.getTime() - left.receivedDate.getTime());
 
                 unstable_batchedUpdates(() => {

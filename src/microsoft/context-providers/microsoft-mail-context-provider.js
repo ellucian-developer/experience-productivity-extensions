@@ -3,18 +3,37 @@ import PropTypes from 'prop-types';
 // eslint-disable-next-line camelcase
 import { unstable_batchedUpdates } from 'react-dom';
 
+import { useUserInfo } from '@ellucian/experience-extension-hooks';
+
 import { useAuth } from '../../context-hooks/auth-context-hooks';
 import { Context } from '../../context-hooks/mail-context-hooks';
 
 const refreshInterval = 60000;
 
+function isToday(dateToCheck) {
+    const today = new Date();
+    return today.getFullYear() === dateToCheck.getFullYear() &&
+        today.getMonth() === dateToCheck.getMonth() &&
+        today.getDate() === dateToCheck.getDate()
+}
+
 export function MicrosoftMailProvider({children}) {
+    const { locale } = useUserInfo();
     const { client, loggedIn, setLoggedIn } = useAuth();
 
     const [error, setError] = useState(false);
     const [state, setState] = useState('load');
-    const [mails, setMails] = useState();
-    const [userPhotos, setUserPhotos] = useState(new Map());
+    const [messages, setMessages] = useState();
+    const [userPhotos] = useState({});
+    const [renderCount, setRenderCount] = useState(0);
+
+    const dateFormater = useMemo(() => {
+        return new Intl.DateTimeFormat(locale, { dateStyle: 'short'})
+    }, [locale]);
+
+    const timeFormater = useMemo(() => {
+        return new Intl.DateTimeFormat(locale, { timeStyle: 'short'})
+    }, [locale]);
 
     const refresh = useCallback(async () => {
         if (loggedIn) {
@@ -26,7 +45,7 @@ export function MicrosoftMailProvider({children}) {
                 return;
             }
             if (process.env.NODE_ENV === 'development') {
-                console.log(`${mails === undefined ? 'loading' : 'refreshing'} mails`);
+                console.log(`${messages === undefined ? 'loading' : 'refreshing'} mails`);
             }
 
             try {
@@ -34,60 +53,107 @@ export function MicrosoftMailProvider({children}) {
                 .api('/me/mailFolders/Inbox/messages')
                 .get();
 
-                const filteredMails = response.value;
-                unstable_batchedUpdates(() => {
-                    setMails(() => filteredMails);
-                    setState('load');
+                const messages = response.value;
+
+                // transform to what the UI needs
+                const transformedMessages = messages.map( message => {
+                    const {
+                        bodyPreview,
+                        from: {
+                            emailAddress: {
+                                name: fromName,
+                                address: fromEmail
+                            }
+                        },
+                        id,
+                        isRead,
+                        hasAttachments: hasAttachment,
+                        receivedDateTime,
+                        subject,
+                        webLink: messageUrl
+                    } = message;
+
+                    const fromNameSplit = fromName.split(/[, ]/);
+                    const firstName = fromName.includes(',') ? fromNameSplit[2] : (fromNameSplit[0] || '');
+                    const lastName = fromName.includes(',') ? fromNameSplit[0] : (fromNameSplit[2] || '');
+                    const fromInitials = firstName.slice(0, 1) + lastName.slice(0, 1);
+
+                    const receivedDate = new Date(receivedDateTime);
+                    const received = isToday(receivedDate) ? timeFormater.format(receivedDate) : dateFormater.format(receivedDate);
+
+                    return {
+                        bodySnippet: bodyPreview.trim(),
+                        id,
+                        fromEmail,
+                        fromInitials,
+                        fromName,
+                        hasAttachment,
+                        messageUrl,
+                        received,
+                        subject,
+                        unread: !isRead,
+                        userPhotoUrl: userPhotos[fromEmail]
+                    }
                 });
+
+                unstable_batchedUpdates(() => {
+                    setMessages(() => transformedMessages);
+                    setState('loaded');
+                });
+
                 if (process.env.NODE_ENV === 'development') {
-                    console.debug('Inbox emails: ', filteredMails);
+                    console.debug('Inbox emails: ', transformedMessages);
                 }
 
-                if (filteredMails !== undefined) {
-                    filteredMails.map(mail => {
-                        const {
-                            from: {
-                                emailAddress: {
-                                    address
-                                }
-                            }
-                        } = mail;
+                // attempt to load photos
+                for (const message of transformedMessages) {
+                    const {
+                        fromEmail
+                    } = message;
 
-                        (async () => {
-                            if ((userPhotos !== undefined) && (userPhotos.get(address) === undefined)) {
-                                const responseUserId = await client
-                                .api(`/users`)
-                                .filter(`mail eq '${address}'`)
-                                .select('id')
-                                .get();
+                    (async () => {
+                        // check if we already have this user's photo
+                        const userPhotoUrl = userPhotos[fromEmail];
+                        if (message.userPhotoUrl) {
+                            // already read from cache
+                            return undefined;
+                        } else if (userPhotoUrl) {
+                            message.userPhotoUrl = userPhotoUrl;
+                            // triggers a context update
+                            setRenderCount(count => count + 1);
+                        } else {
+                            const responseUserId = await client
+                            .api(`/users`)
+                            .filter(`mail eq '${fromEmail}'`)
+                            .select('id')
+                            .get();
 
-                                if (responseUserId.value[0]) {
-                                    try {
-                                        const responsePhoto = await client
-                                        .api(`/users/${responseUserId.value[0].id}/photo/$value`)
-                                        .get();
-                                        unstable_batchedUpdates(() => {
-                                            setUserPhotos(
-                                                responsePhoto
-                                                ? userPhotos.set(address, URL.createObjectURL(responsePhoto))
-                                                : setUserPhotos(userPhotos.set(address, ''))
-                                            );
-                                            setState('loadPhoto');
-                                        });
-                                    } catch (error) {
-                                        // did we get logged out or credentials were revoked?
-                                        if (error && error.status === 401) {
-                                            setLoggedIn(false);
-                                        } else {
-                                            setUserPhotos(userPhotos.set(address, ''));
-                                        }
+                            const [{id: userId} = {}] = responseUserId.value;
+
+                            if (userId) {
+                                try {
+                                    const responsePhoto = await client
+                                    .api(`/users/${userId}/photo/$value`)
+                                    .get();
+
+                                    if (responsePhoto) {
+                                        // add it to the message
+                                        message.userPhotoUrl = URL.createObjectURL(responsePhoto);
+                                        userPhotos[fromEmail] = message.userPhotoUrl;
+                                    }
+                                    // triggers a context update
+                                    setRenderCount(count => count + 1);
+                                } catch (error) {
+                                    // did we get logged out or credentials were revoked?
+                                    if (error && error.status === 401) {
+                                        setLoggedIn(false);
+                                    } else {
+                                        userPhotos[fromEmail] = '';
                                     }
                                 }
-                                return null;
                             }
-                        })();
-                        return null;
-                    })
+                        }
+                    })();
                 }
             } catch (error) {
                 // did we get logged out or credentials were revoked?
@@ -104,7 +170,7 @@ export function MicrosoftMailProvider({children}) {
     }, [loggedIn, state])
 
     useEffect(() => {
-        if (loggedIn && (state === 'load' || state === 'refresh' || state === 'loadPhoto')) {
+        if (loggedIn && (state === 'load' || state === 'refresh')) {
             refresh();
         }
     }, [loggedIn, refresh, state])
@@ -164,12 +230,11 @@ export function MicrosoftMailProvider({children}) {
     const contextValue = useMemo(() => {
         return {
             error,
-            mails,
-            userPhotos,
+            messages,
             refresh: () => { setState('refresh') },
             state
         }
-    }, [ error, mails, userPhotos, state ]);
+    }, [ error, messages, renderCount, state ]);
 
     if (process.env.NODE_ENV === 'development') {
         useEffect(() => {

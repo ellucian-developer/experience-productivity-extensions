@@ -8,10 +8,7 @@ import { Button } from '@ellucian/react-design-system/core';
 import { withStyles } from '@ellucian/react-design-system/core/styles';
 import { spacing30 } from '@ellucian/react-design-system/core/styles/tokens';
 
-import { useIntl } from '../context-hooks/card-context-hooks';
-
-import microsoftLogo from '../images/microsoft-logo.svg';
-import googleLogo from '../images/google-logo.svg';
+import { useComponents, useIntl } from '../context-hooks/card-context-hooks';
 
 const styles = () => ({
     button: {
@@ -22,12 +19,14 @@ const styles = () => ({
     }
 });
 
-function SignOutButton({classes, className = '', onClick, logo}) {
+function SignOutButton({classes, className = '', onClick}) {
     const { intl } = useIntl();
+    const { buttonImage } = useComponents();
+
 
     return (
         <Button className={classnames(className, classes.button)} color='secondary' onClick={onClick}>
-            <img className={classes.image} src={logo === 'google' ? googleLogo : microsoftLogo}/>
+            <img className={classes.image} src={buttonImage}/>
             {intl.formatMessage({id: 'signOut'})}
         </Button>
     );
@@ -36,8 +35,7 @@ function SignOutButton({classes, className = '', onClick, logo}) {
 SignOutButton.propTypes = {
     classes: PropTypes.object.isRequired,
     className: PropTypes.string,
-    onClick: PropTypes.func.isRequired,
-    logo: PropTypes.string
+    onClick: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(SignOutButton);

@@ -6,8 +6,9 @@ import { Illustration, Typography } from '@ellucian/react-design-system/core';
 import { withStyles } from '@ellucian/react-design-system/core/styles';
 import { colorTextNeutral600, fontWeightNormal, spacing30, spacing40, spacing50 } from '@ellucian/react-design-system/core/styles/tokens';
 
-import { useComponents } from '../context-hooks/card-context-hooks.js';
 import { useAuth } from '../context-hooks/auth-context-hooks';
+
+import SignOutButton from './SignOutButton.jsx';
 
 const styles = () => ({
     card: {
@@ -35,14 +36,13 @@ const styles = () => ({
         marginLeft: spacing50,
         marginRight: spacing50
     },
-    logout: {
+    signout: {
         marginTop: spacing40,
         marginBottom: spacing40
     }
 });
 
 function FullCardMessage({ classes, imageName, title, message }) {
-    const { LogoutButton } = useComponents();
     const { logout } = useAuth();
 
     return (
@@ -55,7 +55,7 @@ function FullCardMessage({ classes, imageName, title, message }) {
                 <Typography className={classes.message} component='div' align='center' variant={'body2'}>
                     {message}
                 </Typography>
-                <LogoutButton className={classes.logout} onClick={logout}/>
+                <SignOutButton className={classes.signout} onClick={logout}/>
             </div>
         </div>
     );

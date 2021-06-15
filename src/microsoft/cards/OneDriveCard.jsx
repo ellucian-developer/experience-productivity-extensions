@@ -9,7 +9,7 @@ import { MicrosoftCardProvider } from '../context-providers/microsoft-card-conte
 import { MicrosoftAuthProvider } from '../context-providers/microsoft-auth-context-provider';
 import { MicrosoftDriveProvider } from '../context-providers/microsoft-drive-context-provider';
 
-import OneDrive from '../../components/OneDrive';
+import Drive from '../../components/Drive';
 
 function OneDriveCard(props) {
     return (
@@ -17,7 +17,7 @@ function OneDriveCard(props) {
             <MicrosoftCardProvider {...props}>
                 <MicrosoftAuthProvider>
                     <MicrosoftDriveProvider>
-                        <OneDrive/>
+                        <Drive/>
                     </MicrosoftDriveProvider>
                 </MicrosoftAuthProvider>
             </MicrosoftCardProvider>

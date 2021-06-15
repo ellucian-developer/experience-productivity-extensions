@@ -1,4 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+// eslint-disable-next-line camelcase
+import { unstable_batchedUpdates } from 'react-dom';
 import PropTypes from 'prop-types';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -77,8 +79,11 @@ export function MicrosoftAuthProvider({ children }) {
 			}
 		}
 		const graphClient = Client.initWithMiddleware(options);
-		setClient(() => graphClient);
-		setLoggedIn(true);
+
+		unstable_batchedUpdates(() => {
+			setClient(() => graphClient);
+			setLoggedIn(true);
+		});
 	}, []);
 
 	const login = useCallback(async () => {
@@ -125,9 +130,12 @@ export function MicrosoftAuthProvider({ children }) {
 				const {account: responseAccount} = response || {};
 				if (responseAccount) {
 					processLogin(msalClient, responseAccount);
+					return true;
 				}
 			}
 		}
+
+		return false;
 	}, [aadClientId, aadTenantId]);
 
 	useEffect(() => {
@@ -148,7 +156,12 @@ export function MicrosoftAuthProvider({ children }) {
 
 			setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken);
 			setMsalClient(() => msalClient);
-			acquireToken(msalClient);
+			(async () => {
+				const acquiredToken = await acquireToken(msalClient);
+				if (!acquiredToken) {
+					setState('ready');
+				}
+			})();
 		}
 	}, [ apiState, setApiState, setClient ]);
 

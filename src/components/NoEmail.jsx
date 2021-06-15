@@ -6,21 +6,21 @@ import { useComponents, useIntl } from '../context-hooks/card-context-hooks';
 
 import FullCardMessage from './FullCardMessage';
 
-function NoDriveFiles() {
+function NoEmails() {
     const { intl } = useIntl();
-    const { noFiles } = useComponents();
+    const { noEmail } = useComponents();
 
-    if (!noFiles) {
+    if (!noEmail) {
         return null;
     }
 
     return (
         <FullCardMessage
             imageName={IMAGES.NO_TASKS}
-            title={intl.formatMessage({id: noFiles.titleId})}
-            message={intl.formatMessage({id: noFiles.messageId})}
+            title={intl.formatMessage({id: noEmail.titleId})}
+            message={intl.formatMessage({id: noEmail.messageId})}
         />
     );
 }
 
-export default NoDriveFiles;
+export default NoEmails;

@@ -9,7 +9,7 @@ import { MicrosoftCardProvider } from '../context-providers/microsoft-card-conte
 import { MicrosoftAuthProvider } from '../context-providers/microsoft-auth-context-provider';
 import { MicrosoftMailProvider } from '../context-providers/microsoft-mail-context-provider';
 
-import OutlookMail from '../../components/OutlookMail';
+import Mail from '../../components/Mail';
 
 function OutlookMailCard(props) {
     return (
@@ -17,7 +17,7 @@ function OutlookMailCard(props) {
             <MicrosoftCardProvider {...props}>
                 <MicrosoftAuthProvider>
                     <MicrosoftMailProvider>
-                        <OutlookMail/>
+                        <Mail/>
                     </MicrosoftMailProvider>
                 </MicrosoftAuthProvider>
             </MicrosoftCardProvider>

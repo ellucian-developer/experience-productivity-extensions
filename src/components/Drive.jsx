@@ -8,11 +8,13 @@ import { withStyles } from '@ellucian/react-design-system/core/styles';
 import { colorBrandNeutral250, colorBrandNeutral300, fontWeightBold, fontWeightNormal, spacing30, spacing40, spacing50 } from '@ellucian/react-design-system/core/styles/tokens';
 
 import { useExtensionControl, useUserInfo } from '@ellucian/experience-extension-hooks';
-
-import { useComponents, useIntl } from '../context-hooks/card-context-hooks';
-
+import { useIntl } from '../context-hooks/card-context-hooks';
 import { useAuth } from '../context-hooks/auth-context-hooks';
 import { useDrive } from '../context-hooks/drive-context-hooks';
+
+import SignInButton from './SignInButton';
+import SignOutButton from './SignOutButton';
+import NoDriveFiles from './NoDriveFiles';
 
 const styles = () => ({
     card: {
@@ -68,6 +70,14 @@ const styles = () => ({
         marginTop: spacing30,
         marginRight: spacing40
     },
+    fileIcon16: {
+        width: '16px',
+        height: '16px'
+    },
+    fileIcon24: {
+        width: '24px',
+        height: '24px'
+    },
     fileName: {
         display: '-webkit-box',
         '-webkit-line-clamp': '2',
@@ -117,7 +127,6 @@ function Drive({ classes }) {
     const { locale } = useUserInfo();
 
     const { intl } = useIntl();
-    const { LogoutButton, LoginButton, NoFiles } = useComponents();
 
     const { error: authError, login, loggedIn, logout } = useAuth();
     const { error: driveError, files } = useDrive();
@@ -212,7 +221,7 @@ function Drive({ classes }) {
             return (
                 <div className={classes.content} ref={contentRef}>
                     {files.map((file, index) => {
-                        const { component: FileComponent, iconLink, id, lastModifyingUser, modifiedTime: fileModifiedTime, name, webViewLink } = file;
+                        const { iconLink, iconSize = '16', id, lastModifyingUser, modifiedTime: fileModifiedTime, name, webViewLink } = file;
                         const fileModified = new Date(fileModifiedTime);
                         const modified = new Date().getFullYear() === fileModified.getFullYear()
                             ? fileDateFormater.format(fileModified)
@@ -226,57 +235,52 @@ function Drive({ classes }) {
                                     target='_blank'
                                     rel='noreferrer'
                                 >
-                                    {FileComponent && (
-                                        <FileComponent/>
-                                    )}
-                                    {!FileComponent && (
-                                            <div className={classes.fileBox}>
-                                                <img className={classes.fileIcon} aria-label='file icon' src={iconLink}/>
-                                                <div className={classes.fileNameBox}>
-                                                    <Typography
-                                                        className={classes.fileName}
-                                                        component='div'
-                                                        variant={'body2'}
-                                                        ref={node => fileNameRef(node, id)}
-                                                        onFocus={event => openPopper(event, id)}
-                                                        onMouseOver={event => openPopper(event, id)}
-                                                        onBlur={() => closePopper()}
-                                                        onMouseLeave={() => closePopper()}
-                                                    >
-                                                        {name}
-                                                    </Typography>
-                                                    <Popper
-                                                        className={classes.fileNamePopper}
-                                                        anchorEl={popperContext.anchor}
-                                                        container={contentNode}
-                                                        open={popperContext.id === id && popperContext.overflowedFileIds.includes(id)}
-                                                        modifiers={{
-                                                            preventOverflow: {
-                                                                enabled: true,
-                                                                padding: spacing40
-                                                            }
-                                                        }}
-                                                    >
-                                                        <Typography>{name}</Typography>
-                                                    </Popper>
-                                                    <Typography className={classes.modified} component='div' variant={'body3'}>
-                                                        {intl.formatMessage({id: 'drive.modifiedBy'}, {date: modified, name: modifiedBy})}
-                                                    </Typography>
-                                                </div>
-                                            </div>
-                                    )}
+                                    <div className={classes.fileBox}>
+                                        <img className={classnames(classes.fileIcon, classes['fileIcon'+iconSize])} aria-label='file icon' src={iconLink}/>
+                                        <div className={classes.fileNameBox}>
+                                            <Typography
+                                                className={classes.fileName}
+                                                component='div'
+                                                variant={'body2'}
+                                                ref={node => fileNameRef(node, id)}
+                                                onFocus={event => openPopper(event, id)}
+                                                onMouseOver={event => openPopper(event, id)}
+                                                onBlur={() => closePopper()}
+                                                onMouseLeave={() => closePopper()}
+                                            >
+                                                {name}
+                                            </Typography>
+                                            <Popper
+                                                className={classes.fileNamePopper}
+                                                anchorEl={popperContext.anchor}
+                                                container={contentNode}
+                                                open={popperContext.id === id && popperContext.overflowedFileIds.includes(id)}
+                                                modifiers={{
+                                                    preventOverflow: {
+                                                        enabled: true,
+                                                        padding: spacing40
+                                                    }
+                                                }}
+                                            >
+                                                <Typography>{name}</Typography>
+                                            </Popper>
+                                            <Typography className={classes.modified} component='div' variant={'body3'}>
+                                                {intl.formatMessage({id: 'drive.modifiedBy'}, {date: modified, name: modifiedBy})}
+                                            </Typography>
+                                        </div>
+                                    </div>
                                 </a>
                                 <Divider className={classes.divider} variant={'middle'} />
                             </Fragment>
                         );
                     })}
                     <div className={classes.logoutBox}>
-                        <LogoutButton onClick={logout} logo='google'/>
+                        <SignOutButton onClick={logout}/>
                     </div>
                 </div>
             );
         } else if (files) {
-            return <NoFiles title='google.noFilesTitle' message='google.noFilesMessage'/>;
+            return <NoDriveFiles/>;
         }
     } else if (displayState === 'loggedOut') {
         return (
@@ -285,7 +289,7 @@ function Drive({ classes }) {
                 <Typography className={classes.fontWeightNormal} variant={'h3'} component='div'>
                     {intl.formatMessage({id: 'google.permissionsRequested'})}
                 </Typography>
-                <LoginButton onClick={login}/>
+                <SignInButton onClick={login}/>
             </div>
         );
     } else {
