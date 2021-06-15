@@ -6,7 +6,8 @@ export async function getMessagesFromThreads({ max = 10 } = {}) {
 
     const listOptions = {
         userId: 'me',
-        maxResults: max
+        maxResults: max,
+        q: 'label:inbox'
     };
 
     const response = await gapi.client.gmail.users.threads.list(listOptions);
