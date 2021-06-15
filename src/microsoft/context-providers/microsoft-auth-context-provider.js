@@ -32,16 +32,10 @@ function setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken) {
 	window.addEventListener('message', onEllucianMicrosoftAuthEvent);
 }
 
-function calculateExperienceRedirectUri() {
-	const {location: { href }} = window;
-	const matches = href.match(/(https:\/\/[^/]+\/[^/]+)/);
-
-	return matches && matches.length > 0 ? matches[0] + '/' : '';
-}
-
 export function MicrosoftAuthProvider({ children }) {
 	const {
 		configuration: {
+			aadRedirectUrl,
 			aadClientId,
 			aadTenantId
 		}
@@ -103,15 +97,17 @@ export function MicrosoftAuthProvider({ children }) {
 	}, [msalClient]);
 
 	const logout = useCallback(() => {
-		const account = msalClient.getActiveAccount();
-		const redirectUri = calculateExperienceRedirectUri();
-		msalClient.logoutPopup({
-			account,
-			authority: `https://login.microsoftonline.com/${aadTenantId}/`,
-			redirectUri,
-			mainWindowRedirectUri: redirectUri
-		});
-	}, [msalClient]);
+		if (aadRedirectUrl && msalClient) {
+			const account = msalClient.getActiveAccount();
+			const redirectUri = aadRedirectUrl;
+			msalClient.logoutPopup({
+				account,
+				authority: `https://login.microsoftonline.com/${aadTenantId}/`,
+				redirectUri,
+				mainWindowRedirectUri: redirectUri
+			});
+		}
+	}, [aadRedirectUrl, msalClient]);
 
 	const acquireToken = useCallback(async (msalClient) => {
 		if (msalClient) {
@@ -139,8 +135,8 @@ export function MicrosoftAuthProvider({ children }) {
 	}, [aadClientId, aadTenantId]);
 
 	useEffect(() => {
-		if (apiState === 'init') {
-			const redirectUri = calculateExperienceRedirectUri();
+		if (aadRedirectUrl && apiState && apiState === 'init') {
+			const redirectUri = aadRedirectUrl;
 			const msalConfig = {
 				auth: {
 					authority: `https://login.microsoftonline.com/${aadTenantId}/`,
@@ -163,7 +159,7 @@ export function MicrosoftAuthProvider({ children }) {
 				}
 			})();
 		}
-	}, [ apiState, setApiState, setClient ]);
+	}, [ aadRedirectUrl, apiState, setApiState, setClient ]);
 
 	useEffect(() => {
 		if (apiState === 'ready') {

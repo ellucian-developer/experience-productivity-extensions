@@ -2,17 +2,22 @@ module.exports = {
     "name": "Microsoft Productivity Tools",
     "publisher": "Ellucian",
     "configuration": {
-		"client": [{
-				"key": "aadClientId",
-				"label": "Azure AD Application (Client) ID",
-				"type": "text",
-				"required": true
-			}, {
-				"key": "aadTenantId",
-				"label": "Azure AD Tenant ID",
-				"type": "text",
-				"required": true
-            }]
+        "client": [{
+            "key": "aadRedirectUrl",
+            "label": "Azure AD Redirect URL",
+            "type": "url",
+            "required": true
+        }, {
+            "key": "aadClientId",
+            "label": "Azure AD Application (Client) ID",
+            "type": "text",
+            "required": true
+        }, {
+            "key": "aadTenantId",
+            "label": "Azure AD Tenant ID",
+            "type": "text",
+            "required": true
+        }]
 	},
     "cards": [{
         "type": "OutlookCard",
