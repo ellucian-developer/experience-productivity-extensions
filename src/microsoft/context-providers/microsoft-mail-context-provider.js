@@ -73,10 +73,18 @@ export function MicrosoftMailProvider({children}) {
                         webLink: messageUrl
                     } = message;
 
-                    const fromNameSplit = fromName.split(/[, ]/);
-                    const firstName = fromName.includes(',') ? fromNameSplit[2] : (fromNameSplit[0] || '');
-                    const lastName = fromName.includes(',') ? fromNameSplit[0] : (fromNameSplit[2] || '');
-                    const fromInitials = firstName.slice(0, 1) + lastName.slice(0, 1);
+                    let fromInitials = '';
+                    if (fromName.slice(0, 1) === '"') {
+                        fromInitials = fromName.slice(1, 2);
+                    } else if (fromName.includes(',')) {
+                        // last name first name separated by comma
+                        // eslint-disable-next-line no-unused-vars
+                        const [_, lastName = '', firstName = ''] = fromName.match(/([^, ]+),[ ]*([^ ]*)/);
+                        fromInitials = `${lastName.slice(0, 1)}${firstName.slice(0, 1)}`
+                    } else {
+                        const [firstName = '', lastName = ''] = fromName.split(' ');
+                        fromInitials = `${firstName.slice(0, 1)}${lastName.slice(0, 1)}`
+                    }
 
                     const receivedDate = new Date(receivedDateTime);
                     const received = isToday(receivedDate) ? timeFormater.format(receivedDate) : dateFormater.format(receivedDate);

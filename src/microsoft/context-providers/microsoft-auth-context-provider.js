@@ -15,7 +15,7 @@ const messageSourceId = 'MicrosoftAuthProvider';
 const microsoftScopes = ['files.read', 'mail.read', 'user.read'];
 
 
-function setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken) {
+function setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken, setLoggedIn) {
 	function onEllucianMicrosoftAuthEvent(event) {
 		const {data, source} = event;
 		if (source === window) {
@@ -24,6 +24,8 @@ function setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken) {
 			if (sourceId === messageSourceId && sourceInstanceId !== instanceId) {
 				if (type === 'login') {
 					acquireToken(msalClient, 'silent');
+				} else if (type === 'logout') {
+					setLoggedIn(false);
 				}
 			}
 		}
@@ -32,16 +34,10 @@ function setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken) {
 	window.addEventListener('message', onEllucianMicrosoftAuthEvent);
 }
 
-function calculateExperienceRedirectUri() {
-	const {location: { href }} = window;
-	const matches = href.match(/(https:\/\/[^/]+\/[^/]+)/);
-
-	return matches && matches.length > 0 ? matches[0] + '/' : '';
-}
-
 export function MicrosoftAuthProvider({ children }) {
 	const {
 		configuration: {
+			aadRedirectUrl,
 			aadClientId,
 			aadTenantId
 		}
@@ -88,7 +84,14 @@ export function MicrosoftAuthProvider({ children }) {
 
 	const login = useCallback(async () => {
 		try {
-			const response = await msalClient.loginPopup({});
+			const loginRequest = {
+				clientId: aadClientId,
+				prompt: 'select_account',
+				authority: `https://login.microsoftonline.com/${aadTenantId}/`,
+				redirectUri: aadRedirectUrl,
+				scopes: microsoftScopes
+			};
+			const response = await msalClient.loginPopup(loginRequest);
 			if (response && response.account) {
 				const {account} = response;
 				msalClient.setActiveAccount(account);
@@ -103,15 +106,22 @@ export function MicrosoftAuthProvider({ children }) {
 	}, [msalClient]);
 
 	const logout = useCallback(() => {
-		const account = msalClient.getActiveAccount();
-		const redirectUri = calculateExperienceRedirectUri();
-		msalClient.logoutPopup({
-			account,
-			authority: `https://login.microsoftonline.com/${aadTenantId}/`,
-			redirectUri,
-			mainWindowRedirectUri: redirectUri
-		});
-	}, [msalClient]);
+		if (aadRedirectUrl && msalClient) {
+			const account = msalClient.getActiveAccount();
+			const logoutRequest = {
+				account,
+				onRedirectNavigate: () => {
+					return false;
+				}
+			};
+			msalClient.logoutRedirect(logoutRequest).then(() => {
+				setLoggedIn(false);
+				window.postMessage({sourceId: messageSourceId, sourceInstanceId: instanceId, type: 'logout'}, '*');
+			}).catch((e) => {
+				setError(e);
+			});
+		}
+	}, [aadRedirectUrl, msalClient]);
 
 	const acquireToken = useCallback(async (msalClient) => {
 		if (msalClient) {
@@ -139,8 +149,8 @@ export function MicrosoftAuthProvider({ children }) {
 	}, [aadClientId, aadTenantId]);
 
 	useEffect(() => {
-		if (apiState === 'init') {
-			const redirectUri = calculateExperienceRedirectUri();
+		if (aadRedirectUrl && apiState && apiState === 'init') {
+			const redirectUri = aadRedirectUrl;
 			const msalConfig = {
 				auth: {
 					authority: `https://login.microsoftonline.com/${aadTenantId}/`,
@@ -154,7 +164,7 @@ export function MicrosoftAuthProvider({ children }) {
 
 			const msalClient = new PublicClientApplication(msalConfig);
 
-			setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken);
+			setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken, setLoggedIn);
 			setMsalClient(() => msalClient);
 			(async () => {
 				const acquiredToken = await acquireToken(msalClient);
@@ -163,7 +173,7 @@ export function MicrosoftAuthProvider({ children }) {
 				}
 			})();
 		}
-	}, [ apiState, setApiState, setClient ]);
+	}, [ aadRedirectUrl, apiState, setApiState, setClient ]);
 
 	useEffect(() => {
 		if (apiState === 'ready') {

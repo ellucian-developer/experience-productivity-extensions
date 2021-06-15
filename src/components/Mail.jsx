@@ -169,24 +169,6 @@ function Mail({ classes }) {
 
     const [displayState, setDisplayState] = useState('loading');
 
-    const [contentNode, setContentNode] = useState();
-
-    const contentRef = (contentNode) => {
-        setContentNode(contentNode);
-    }
-
-    useEffect(() => {
-        if (contentNode) {
-            // find the parent with a title, to remove it so it doesn't interfere with the tool tip
-            const nodesWithTitle = document.querySelectorAll('div[title]');
-            for (const node of nodesWithTitle) {
-                if (node.contains(contentNode))  {
-                    node.removeAttribute('title');
-                }
-            }
-        }
-    }, [contentNode]);
-
     useEffect(() => {
         if (authError || mailError) {
             setErrorMessage({
@@ -212,7 +194,7 @@ function Mail({ classes }) {
     if (displayState === 'loaded') {
         if (messages && messages.length > 0) {
             return (
-                <div className={classes.content} ref={contentRef}>
+                <div className={classes.content}>
                     {messages.map((message) => {
                         const {
                             bodySnippet,
