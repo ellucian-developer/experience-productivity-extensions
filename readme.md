@@ -65,10 +65,34 @@ Use your favorite Git tool to clone this repository.
 # <a name="google-configuration"></a>Google Configuration
 The Google cards use a Google OAuth client ID to initiate an OAuth Authorization Code flow with PKCE. This is done using Google Identity's Google Sign-In for Websites [see reference](https://developers.google.com/identity/sign-in/web/reference)
 
-The Google OAuth client ID needs to be added by using Experience -> Configuration -> Card Management. Each card will need to be configured to add the required 'Card tags', chose role(s) and to add the OAuth client ID. The OAuth client ID is on step three of the card configuration wizard. A valid Google OAuth client ID will end with '.apps.googleusercontent.com'.
+The Google OAuth client ID needs to be added by using Experience -> Configuration -> Card Management. Each card will need to be configured to add the required 'Card tags', chose role(s) and to add the OAuth client ID. The OAuth client ID is on step three of the card configuration wizard. A valid Google OAuth client ID will end with '.apps.googleusercontent.com'. Details on creating the OAuth Client ID are below.
 
 ## <a name="google-credentials"></a>Creating an Google Cloud API credentials for OAuth
-details coming
+### Create a project
+1. Login to Google Cloud Platform console at https://console.cloud.google.com.
+1. Click on the project dropdown in the nav bar and click on "New Project", name apropriately, something like "Experience Test". Click on "Create"
+
+### Create an OAuth Consent
+1. Click on "APIs & Services", then OAuth consent screen
+1. Select a User Type of "Internal" (Note if you use external you will need to manage test users and later publish), then click on "Create"
+1. Enter an App name, such as Experience. Select a required support email and if desired the App logo.
+1. Then add an Authorized domain of "elluciancloud.com"
+1. Then add the required Developer email address, then "SAVE AND CONTINUE"
+1. On this step you are defining what permissions this app is allowed to request. Click on "ADD OR REMOVE SCOPES".
+1. In the dialog near the top there is an info box which has a link to Google API Library. Click this link and it will open a new tab.
+1. In the new tab search for Gmail and click on "Gmail API". When it opens click on the "Enable" button. Wait for it to complete, then close the tab
+1. Once more click on the "Google API Library" link and which opens in a new tab
+1. In the new tab search for Google Drive and click on "Google Drive API". When it opens click on the "Enable" button. Wait for it to complete, then close the tab.
+1. Now to get the newly enabled API permissions to show in the list, refresh the browser. You may have to click on "SAVE AND CONTINUE" again to get to the "ADD OR REMOVE SCOPES" button. Click this again as well.
+1. Now filter for gmail.readonly and select the check box next to it - Don't worry about the mislabled API on this one. It shows Google Drive API even though this is for Gmail API
+1. Clear the filter and filter for drive.readonly, then select the check box for this permission.
+1. Click on the "UPDATE" button, then the "SAVE AND CONTINUE" - OAuth consent is done.
+
+### Create an OAuth Credential
+1. In the left nav select "Credentials". You need to create an OAuth 2.0 Client ID. Click on "CREATE CREDENTIALS" at the top and pick OAuth client ID
+1. Choose Application type of "Web application", then name it something like "Experience"
+1. Add a URI to the Authorized JavaScript origins. For Test use https://experience-test.elluciancloud.com. For Prod use https://experience.elluciancloud.com.
+1. Click on "CREATE". You can copy the Client ID from here. Client Secret is not needed.
 
 # <a name="microsoft-build"></a>Microsoft Extension - build, upload and configure
 
@@ -85,7 +109,7 @@ The Microsoft cards use a Azure AD Application ID to initiate an OAuth Authoriza
 The Microsoft Azure Redirect URL, Applciation ID, and Tenant ID need to be added by using Experience -> Configuration -> Card Management. Each card will need to be configured to add the required 'Card tags', chose role(s) and to add the URL and IDs. The URL and IDs are entered on step three of the card configuration wizard.
 
 ## <a name="microsoft-credentials"></a>Creating an Azure Application with OAuth
-#### Follow the steps below to configure the application in Azure Active Directory:
+### Follow the steps below to configure the application in Azure Active Directory:
 1. Login to Azure portal https://portal.azure.com and select the Azure Active Directory Service.
 2. Click the ‘App Registrations’ and create a new application in the tenant of your choice.
 3. Provide the name of your choice eg. Experience-Office365-Integration.
@@ -93,7 +117,7 @@ The Microsoft Azure Redirect URL, Applciation ID, and Tenant ID need to be added
 5. Click the application link you just created, and navigate to Redirect URIs ‘spa’ link.
 6. Make sure it shows the Grant Type ‘Your Redirect URI is eligible for the Authorization Code Flow with PKCE’.
 7. The application has been created successfully.
-#### Set API Permissions
+### Set API Permissions
 1. You are now good to add permissions for the application, open the API permissions for the selected application.
 2. Click ‘Add a permission’.
 3. Click Microsoft Graph and select the delegated permissions.
