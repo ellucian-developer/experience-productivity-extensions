@@ -96,7 +96,7 @@ export function MicrosoftMailProvider({children}) {
                         fromInitials,
                         fromName,
                         hasAttachment,
-                        messageUrl,
+                        messageUrl: messageUrl.split('?')[0],
                         received,
                         subject,
                         unread: !isRead,
