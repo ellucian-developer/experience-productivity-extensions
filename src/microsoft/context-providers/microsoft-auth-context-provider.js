@@ -7,13 +7,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { PublicClientApplication } from '@azure/msal-browser';
 import { Client } from '@microsoft/microsoft-graph-client';
 
-import { useCardInfo } from '@ellucian/experience-extension-hooks';
+import { useCache, useCardInfo } from '@ellucian/experience-extension-hooks';
 import { Context } from '../../context-hooks/auth-context-hooks';
 
 const instanceId = uuidv4();
 const messageSourceId = 'MicrosoftAuthProvider';
 const microsoftScopes = ['files.read', 'mail.read', 'user.read'];
-
+const lastUserIdCacheKey = 'last-user-id';
 
 function setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken, setLoggedIn) {
 	function onEllucianMicrosoftAuthEvent(event) {
@@ -23,7 +23,7 @@ function setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken, setLoggedIn
 			const {sourceId, sourceInstanceId, type} = data;
 			if (sourceId === messageSourceId && sourceInstanceId !== instanceId) {
 				if (type === 'login') {
-					acquireToken(msalClient, 'silent');
+					acquireToken(msalClient, true);
 				} else if (type === 'logout') {
 					setLoggedIn(false);
 				}
@@ -35,6 +35,7 @@ function setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken, setLoggedIn
 }
 
 export function MicrosoftAuthProvider({ children }) {
+    const { getItem: cacheGetItem, storeItem: cacheStoreItem } = useCache();
 	const {
 		configuration: {
 			aadRedirectUrl,
@@ -49,9 +50,7 @@ export function MicrosoftAuthProvider({ children }) {
 	const [loggedIn, setLoggedIn] = useState(false);
 	const [state, setState] = useState('initializing');
 
-	const [apiState, setApiState] = useState('init');
-
-	const processLogin = useCallback((msalClient) => {
+	const processLogin = useCallback((msalClient, account) => {
 		const options = {
 			authProvider: {
 				getAccessToken: async () => {
@@ -75,6 +74,10 @@ export function MicrosoftAuthProvider({ children }) {
 			}
 		}
 		const graphClient = Client.initWithMiddleware(options);
+
+		// store user in cache to detect user changes
+		const {homeAccountId} = account;
+		cacheStoreItem({key: lastUserIdCacheKey, data: homeAccountId})
 
 		unstable_batchedUpdates(() => {
 			setClient(() => graphClient);
@@ -106,7 +109,7 @@ export function MicrosoftAuthProvider({ children }) {
 	}, [msalClient]);
 
 	const logout = useCallback(() => {
-		if (aadRedirectUrl && msalClient) {
+		if (msalClient) {
 			const account = msalClient.getActiveAccount();
 			const logoutRequest = {
 				account,
@@ -114,50 +117,60 @@ export function MicrosoftAuthProvider({ children }) {
 					return false;
 				}
 			};
-			msalClient.logoutRedirect(logoutRequest).then(() => {
-				setLoggedIn(false);
-				window.postMessage({sourceId: messageSourceId, sourceInstanceId: instanceId, type: 'logout'}, '*');
-			}).catch((e) => {
-				setError(e);
-			});
+			msalClient.logoutRedirect(logoutRequest);
+			setLoggedIn(false);
+			window.postMessage({sourceId: messageSourceId, sourceInstanceId: instanceId, type: 'logout'}, '*');
 		}
-	}, [aadRedirectUrl, msalClient]);
+	}, [msalClient]);
 
-	const acquireToken = useCallback(async (msalClient) => {
+	const acquireToken = useCallback(async (msalClient, treatAsLogin = false) => {
 		if (msalClient) {
 			const accounts = msalClient.getAllAccounts();
 			const [ account ] = accounts;
 
-			const acquireRequest = {
-					authority: `https://login.microsoftonline.com/${aadTenantId}/`,
-					clientId: aadClientId,
-					scopes: microsoftScopes
-			}
 			if (account && accounts.length === 1) {
+				const acquireRequest = {
+						authority: `https://login.microsoftonline.com/${aadTenantId}/`,
+						clientId: aadClientId,
+						scopes: microsoftScopes
+				}
 				acquireRequest.account = account;
 				msalClient.setActiveAccount(account);
 				const response = await msalClient.acquireTokenSilent(acquireRequest);
 				const {account: responseAccount} = response || {};
+
 				if (responseAccount) {
-					processLogin(msalClient, responseAccount);
-					return true;
+					// verify that the same user's home account ID was stored in cache
+					// if not do a logout
+					const {data: lastUserId} = cacheGetItem({key: lastUserIdCacheKey});
+					const {homeAccountId} = responseAccount;
+					if (!treatAsLogin && lastUserId !== homeAccountId) {
+						setState('do-logout');
+					} else {
+						processLogin(msalClient, responseAccount);
+						return true;
+					}
 				}
 			}
 		}
 
 		return false;
-	}, [aadClientId, aadTenantId]);
+	}, [aadClientId, aadTenantId, msalClient]);
 
 	useEffect(() => {
-		if (aadRedirectUrl && apiState && apiState === 'init') {
-			const redirectUri = aadRedirectUrl;
+		if (status === 'do-logout') {
+			logout();
+			setState('ready');
+		}
+	}, [ status ]);
+
+	useEffect(() => {
+		if (aadRedirectUrl) {
 			const msalConfig = {
 				auth: {
 					authority: `https://login.microsoftonline.com/${aadTenantId}/`,
 					clientId: aadClientId,
-					// redirectUri: window.location.href,
-					// redirectUri: aadRedirectUrl,
-					redirectUri,
+					redirectUri: aadRedirectUrl,
 					scopes: microsoftScopes
 				}
 			};
@@ -173,13 +186,7 @@ export function MicrosoftAuthProvider({ children }) {
 				}
 			})();
 		}
-	}, [ aadRedirectUrl, apiState, setApiState, setClient ]);
-
-	useEffect(() => {
-		if (apiState === 'ready') {
-			setState('ready');
-		}
-	}, [apiState, setState]);
+	}, [ aadRedirectUrl ]);
 
 	const contextValue = useMemo(() => {
 		return {

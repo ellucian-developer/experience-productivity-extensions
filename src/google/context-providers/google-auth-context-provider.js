@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 // eslint-disable-next-line camelcase
 import { unstable_batchedUpdates } from 'react-dom';
 
-import { useCardInfo } from '@ellucian/experience-extension-hooks';
-
+import { useCache, useCardInfo } from '@ellucian/experience-extension-hooks';
 import { Context } from '../../context-hooks/auth-context-hooks';
+
+const lastUserIdCacheKey = 'last-user-id';
 
 function loadGapiScript() {
     return new Promise(resolve => {
@@ -22,7 +23,7 @@ function loadGapiScript() {
     });
 }
 
-function loadGapi(clientId, setApiState, setLoggedIn, setError) {
+function loadGapi(clientId, setApiState, setLoggedIn, setError, cacheGetItem) {
     const { gapi } = window;
     gapi.load('client:auth2', async () => {
         const discoveryDocs = [
@@ -38,15 +39,38 @@ function loadGapi(clientId, setApiState, setLoggedIn, setError) {
                 scope
             });
 
-            gapi.auth2.getAuthInstance().isSignedIn.listen(isSignedIn => setLoggedIn(isSignedIn));
+            const googleAuth = gapi.auth2.getAuthInstance();
+
+            googleAuth.isSignedIn.listen(isSignedIn => setLoggedIn(isSignedIn));
 
             // Handle the initial sign-in state.
-            const signedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
+            const signedIn = googleAuth.isSignedIn.get();
 
-            unstable_batchedUpdates(() => {
-                setLoggedIn(signedIn);
-                setApiState('ready');
-            });
+            if (signedIn) {
+                // if user is signed in,
+                // verify that the same user was stored in in cache
+                // if not do a logout
+                const {data: lastUser} = cacheGetItem({key: lastUserIdCacheKey});
+
+                const googleUserId = googleAuth.currentUser.get().getId();
+
+                if (lastUser !== googleUserId) {
+                    unstable_batchedUpdates(() => {
+                        setLoggedIn(false);
+                        setApiState('do-logout');
+                    });
+                } else {
+                    unstable_batchedUpdates(() => {
+                        setLoggedIn(signedIn);
+                        setApiState('ready');
+                    });
+                }
+            } else {
+                unstable_batchedUpdates(() => {
+                    setLoggedIn(signedIn);
+                    setApiState('ready');
+                });
+            }
         } catch (error) {
             if (setError) {
                 setError(error);
@@ -57,12 +81,11 @@ function loadGapi(clientId, setApiState, setLoggedIn, setError) {
 }
 
 export function AuthProvider({ children }) {
+    const { getItem: cacheGetItem, storeItem: cacheStoreItem } = useCache();
     const { configuration: { googleOAuthClientId } } = useCardInfo();
 
     const [email, setEmail] = useState();
     const [error, setError] = useState(false);
-    // eslint-disable-next-line no-empty-function
-    // const [login, setLogin] = useState(() => {});
     const [loggedIn, setLoggedIn] = useState();
     const [state, setState] = useState('initializing');
 
@@ -71,7 +94,6 @@ export function AuthProvider({ children }) {
     function login(scope) {
         const { gapi } = window;
         if (gapi) {
-            // gapi.auth2.getAuthInstance().signIn();
             const options = {
                 prompt: 'select_account',
                 'ux_mode': 'popup'
@@ -90,18 +112,6 @@ export function AuthProvider({ children }) {
         }
     }
 
-    const contextValue = useMemo(() => {
-        return {
-            email,
-            error,
-            login,
-            logout,
-            loggedIn,
-            setLoggedIn,
-            state
-        }
-    }, [email, error, loggedIn, login, state]);
-
     useEffect(() => {
         if (apiState === 'init') {
             const { gapi } = window;
@@ -116,15 +126,18 @@ export function AuthProvider({ children }) {
                 setApiState('script-loaded');
             }
         } else if (apiState === 'script-loaded') {
-            loadGapi(googleOAuthClientId, setApiState, setLoggedIn, setError);
+            loadGapi(googleOAuthClientId, setApiState, setLoggedIn, setError, cacheGetItem);
         }
-    }, [apiState, setApiState, setLoggedIn, setError]);
+    }, [apiState, setLoggedIn, setError]);
 
     useEffect(() => {
         if (apiState === 'ready') {
             setState('ready');
+        } else if (apiState === 'do-logout') {
+            logout();
+            setApiState('ready');
         }
-    }, [apiState, setState]);
+    }, [apiState]);
 
     useEffect(() => {
         if (loggedIn) {
@@ -132,8 +145,25 @@ export function AuthProvider({ children }) {
             const user = gapi.auth2.getAuthInstance().currentUser.get();
             const email = user.getBasicProfile().getEmail();
             setEmail(email);
+
+            // store user in cache to detect user changes
+            const googleUserId = gapi.auth2.getAuthInstance().currentUser.get().getId();
+            cacheStoreItem({key: lastUserIdCacheKey, data: googleUserId})
+
         }
     }, [loggedIn]);
+
+    const contextValue = useMemo(() => {
+        return {
+            email,
+            error,
+            login,
+            logout,
+            loggedIn,
+            setLoggedIn,
+            state
+        }
+    }, [email, error, loggedIn, login, state]);
 
     if (process.env.NODE_ENV === 'development') {
         useEffect(() => {
