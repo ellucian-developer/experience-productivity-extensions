@@ -85,4 +85,29 @@ The Microsoft cards use a Azure AD Application ID to initiate an OAuth Authoriza
 The Microsoft Azure Redirect URL, Applciation ID, and Tenant ID need to be added by using Experience -> Configuration -> Card Management. Each card will need to be configured to add the required 'Card tags', chose role(s) and to add the URL and IDs. The URL and IDs are entered on step three of the card configuration wizard.
 
 ## <a name="microsoft-credentials"></a>Creating an Azure Application with OAuth
-details coming
+#### Follow the steps below to configure the application in Azure Active Directory:
+1. Login to Azure portal https://portal.azure.com and select the Azure Active Directory Service.
+2. Click the ‘App Registrations’ and create a new application in the tenant of your choice.
+3. Provide the name of your choice eg. Experience-Office365-Integration.
+4. Set the Redirect URI for Single Page application, set this to the Ellucian Experience Dashboard URL from the About tab in Experience Setup . 
+5. Click the application link you just created, and navigate to Redirect URIs ‘spa’ link.
+6. Make sure it shows the Grant Type ‘Your Redirect URI is eligible for the Authorization Code Flow with PKCE’.
+7. The application has been created successfully.
+#### Set API Permissions
+1. You are now good to add permissions for the application, open the API permissions for the selected application.
+2. Click ‘Add a permission’.
+3. Click Microsoft Graph and select the delegated permissions.
+4. You would now be able to add permissions by selecting the permission and click Add Permission button, you would need to add the following permissions:
+    1. User.Read
+    2. User.ReadBasic.All
+    3. Mail.Read
+    4. Mail.Read.Shared
+    5. Files.Read
+    6. Files.Read.All
+5. Click the Grant Admin consent.
+
+    After setting the API permissions, here is how it will look:
+    ![](docs/images/microsoft-application-api-permission.png)
+
+1. The API permissions are set now.
+2. Copy the ClientId and TenantId for the application, and configure it in the Experience OneDrive card configuration.
