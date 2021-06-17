@@ -62,12 +62,22 @@ export function MailProvider({children}) {
 
                     const unread = labelIds.includes('UNREAD');
                     const from = getValueFromArray(headers, 'From', 'Unknown');
-                    const fromMatches = from.match(/'?([^<>']*)'?\s*<(.*)>/);
-                    const fromName = fromMatches[1].trim();
-                    const fromEmail = fromMatches[2].trim().toLocaleLowerCase();
-                    const fromNameSplit = fromName.split(/[, ]/);
-                    const firstName = fromName.includes(',') ? fromNameSplit[2] : (fromNameSplit[0] || '');
-                    const fromInitials = firstName.slice(0, 1);
+                    // pull out the parts if it is a name and email address
+                    const fromMatches = from.match(/['"]?([^<>'"]*)['"]?\s*<(.*)>/);
+
+                    let fromEmail = '', fromInitials = '', fromName = '';
+                    if (fromMatches) {
+                        fromName = (fromMatches[1] || '').trim();
+                        fromEmail = (fromMatches[2] || '').trim().toLocaleLowerCase();
+                        const fromNameSplit = fromName.split(/[, ]/);
+                        const firstName = fromName.includes(',') ? fromNameSplit[2] : (fromNameSplit[0] || '');
+                        fromInitials = firstName.slice(0, 1);
+                    } else {
+                        // just a bare email address
+                        fromName = from;
+                        fromEmail = from;
+                        fromInitials = from.slice(0, 1);
+                    }
 
                     const subject = getValueFromArray(headers, 'Subject', 'No Subject');
 
