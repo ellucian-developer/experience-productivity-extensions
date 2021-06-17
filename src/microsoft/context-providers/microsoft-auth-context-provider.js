@@ -119,6 +119,7 @@ export function MicrosoftAuthProvider({ children }) {
 			};
 			msalClient.logoutRedirect(logoutRequest);
 			setLoggedIn(false);
+			setState('ready');
 			window.postMessage({sourceId: messageSourceId, sourceInstanceId: instanceId, type: 'logout'}, '*');
 		}
 	}, [msalClient]);
