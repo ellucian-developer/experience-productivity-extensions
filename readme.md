@@ -109,7 +109,7 @@ The Google OAuth client ID needs to be added by using Experience -> Configuratio
 1. Obtain an upload token from Experience Setup. See Experience documentation - [Explore the SDK sample content](https://resources.elluciancloud.com/bundle/ellucian_experience_acn_use/page/t_explore_sdk_sample_content.html)
 2. Add the upload token to .env. See sample.env in package root.
 3. Run 'npm install' to install all the dependencies.
-4. Run one a deployment npm scripts, such as 'npm run google-start' (for development)
+4. Run one a deployment npm scripts, such as 'npm run microsoft-start' (for development)
 5. Enable the extension and add it to an environment(s) in [Experience Setup -> Extensions](https://experiencesetup-test.elluciancloud.com/extensions)
 6. Configure the cards in the Dashboard -> Configuration -> Card Management. Adding the Azure Redirect URL, Applciation ID, and Tenant ID in step 3. Details below.
 

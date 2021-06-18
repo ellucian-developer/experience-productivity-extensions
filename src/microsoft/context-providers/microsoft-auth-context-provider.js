@@ -12,10 +12,10 @@ import { Context } from '../../context-hooks/auth-context-hooks';
 
 const instanceId = uuidv4();
 const messageSourceId = 'MicrosoftAuthProvider';
-const microsoftScopes = ['files.read', 'mail.read', 'user.read'];
+const microsoftScopes = ['files.read', 'files.read.all', 'mail.read', 'mail.read.shared', 'user.read', 'user.readbasic.all'];
 const lastUserIdCacheKey = 'last-user-id';
 
-function setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken, setLoggedIn) {
+function setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken, setLoggedIn, setState) {
 	function onEllucianMicrosoftAuthEvent(event) {
 		const {data, source} = event;
 		if (source === window) {
@@ -26,6 +26,7 @@ function setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken, setLoggedIn
 					acquireToken(msalClient, true);
 				} else if (type === 'logout') {
 					setLoggedIn(false);
+					setState('ready');
 				}
 			}
 		}
@@ -178,7 +179,7 @@ export function MicrosoftAuthProvider({ children }) {
 
 			const msalClient = new PublicClientApplication(msalConfig);
 
-			setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken, setLoggedIn);
+			setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken, setLoggedIn, setState);
 			setMsalClient(() => msalClient);
 			(async () => {
 				const acquiredToken = await acquireToken(msalClient);
