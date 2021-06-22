@@ -13,7 +13,13 @@ import { Context } from '../../context-hooks/auth-context-hooks';
 const instanceId = uuidv4();
 const messageSourceId = 'MicrosoftAuthProvider';
 const microsoftScopes = ['files.read', 'files.read.all', 'mail.read', 'mail.read.shared', 'user.read', 'user.readbasic.all'];
+
+const cacheScope = 'microsoft-productivity';
 const lastUserIdCacheKey = 'last-user-id';
+const cacheOptions = {
+    scope: cacheScope,
+    key: lastUserIdCacheKey
+}
 
 function setUpOnEllucianMicrosoftAuthEvent(msalClient, acquireToken, setLoggedIn, setState) {
 	function onEllucianMicrosoftAuthEvent(event) {
@@ -78,7 +84,7 @@ export function MicrosoftAuthProvider({ children }) {
 
 		// store user in cache to detect user changes
 		const {homeAccountId} = account;
-		cacheStoreItem({key: lastUserIdCacheKey, data: homeAccountId})
+		cacheStoreItem({...cacheOptions, data: homeAccountId})
 
 		unstable_batchedUpdates(() => {
 			setClient(() => graphClient);
@@ -125,7 +131,7 @@ export function MicrosoftAuthProvider({ children }) {
 		}
 	}, [msalClient]);
 
-	const acquireToken = useCallback(async (msalClient, treatAsLogin = false) => {
+	const acquireToken = useCallback(async (msalClient) => {
 		if (msalClient) {
 			const accounts = msalClient.getAllAccounts();
 			const [ account ] = accounts;
@@ -144,9 +150,9 @@ export function MicrosoftAuthProvider({ children }) {
 				if (responseAccount) {
 					// verify that the same user's home account ID was stored in cache
 					// if not do a logout
-					const {data: lastUserId} = cacheGetItem({key: lastUserIdCacheKey});
+					const {data: lastUserId} = cacheGetItem(cacheOptions);
 					const {homeAccountId} = responseAccount;
-					if (!treatAsLogin && lastUserId !== homeAccountId) {
+					if (lastUserId !== homeAccountId) {
 						setState('do-logout');
 					} else {
 						processLogin(msalClient, responseAccount);
