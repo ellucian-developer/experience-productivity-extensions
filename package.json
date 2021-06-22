@@ -1,6 +1,6 @@
 {
   "name": "productivity-tools-extensions",
-  "version": "1.0.10",
+  "version": "1.0.3-beta",
   "description": "Productivity Tools extensions",
   "main": "index.js",
   "license": "UNLICENSED",

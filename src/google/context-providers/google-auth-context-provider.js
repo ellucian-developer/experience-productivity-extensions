@@ -6,7 +6,12 @@ import { unstable_batchedUpdates } from 'react-dom';
 import { useCache, useCardInfo } from '@ellucian/experience-extension-hooks';
 import { Context } from '../../context-hooks/auth-context-hooks';
 
+const cacheScope = 'google-productivity';
 const lastUserIdCacheKey = 'last-user-id';
+const cacheOptions = {
+    scope: cacheScope,
+    key: lastUserIdCacheKey
+}
 
 function loadGapiScript() {
     return new Promise(resolve => {
@@ -50,11 +55,11 @@ function loadGapi(clientId, setApiState, setLoggedIn, setError, cacheGetItem) {
                 // if user is signed in,
                 // verify that the same user was stored in in cache
                 // if not do a logout
-                const {data: lastUser} = cacheGetItem({key: lastUserIdCacheKey});
+                const {data: lastUserId} = cacheGetItem(cacheOptions);
 
                 const googleUserId = googleAuth.currentUser.get().getId();
 
-                if (lastUser !== googleUserId) {
+                if (lastUserId !== googleUserId) {
                     unstable_batchedUpdates(() => {
                         setLoggedIn(false);
                         setApiState('do-logout');
@@ -148,8 +153,7 @@ export function AuthProvider({ children }) {
 
             // store user in cache to detect user changes
             const googleUserId = gapi.auth2.getAuthInstance().currentUser.get().getId();
-            cacheStoreItem({key: lastUserIdCacheKey, data: googleUserId})
-
+            cacheStoreItem({...cacheOptions, data: googleUserId})
         }
     }, [loggedIn]);
 
