@@ -2,7 +2,6 @@ const dotenv = require('dotenv');
 const packageJson = require('./package.json');
 const extensionConfig = require('./google-extension.js');
 const Dotenv = require('dotenv-webpack');
-// const path = require('path');
 
 dotenv.config();
 
@@ -31,7 +30,7 @@ module.exports = async (env, options) => {
 
     // this is needed for @ellucian/experience-extension-hooks
     webpackConfig.module.rules.forEach( rule => {
-        if (rule.loader === 'babel-loader' || rule.loader === 'eslit-loader') {
+        if (rule.loader === 'babel-loader') {
             rule.exclude = /node_modules\/(?!(@ellucian)\/)/
         }
     })
