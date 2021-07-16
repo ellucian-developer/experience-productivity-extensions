@@ -4,6 +4,7 @@
   "description": "Productivity Tools extensions",
   "main": "index.js",
   "license": "UNLICENSED",
+  "private": true,
   "scripts": {
     "lint": "npx eslint --ext .jsx,.js src",
     "google-build-dev": "webpack --config google-webpack.config.js --progress --mode development --env verbose",
