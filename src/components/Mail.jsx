@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import safeHtml from 'safe-html';
+import sanitizeHtml from 'sanitize-html';
 import classnames from 'classnames';
 
 import { Avatar, Divider, Illustration, IMAGES, TextLink, Tooltip, Typography } from '@ellucian/react-design-system/core';
@@ -256,7 +256,7 @@ function Mail({ classes }) {
                                             )}
                                         </div>
                                         <Typography component='div' noWrap variant='body3'>
-                                            <div className={classes.noWrap} dangerouslySetInnerHTML={{__html: safeHtml(bodySnippet)}}/>
+                                            <div className={classes.noWrap} dangerouslySetInnerHTML={{__html: sanitizeHtml(bodySnippet)}}/>
                                         </Typography>
                                     </div>
                                 </div>

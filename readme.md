@@ -148,7 +148,7 @@ The Microsoft Azure Redirect URL, Application ID, and Tenant ID will be configur
 
     After setting the API permissions, here is how it will look:
     <p align="center">
-        <img src="docs/images/microsoft-application-api-permission.png" width="80%"/>
+        <img src="docs/images/microsoft-application-api-permission.png"/>
     </p>
 
 ## <a name="configure-microsoft-cards"></a>Configure Microsoft Cards

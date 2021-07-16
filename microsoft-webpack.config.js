@@ -31,7 +31,7 @@ module.exports = async (env, options) => {
 
     // this is needed for @ellucian/experience-extension-hooks
     webpackConfig.module.rules.forEach( rule => {
-        if (rule.loader === 'babel-loader' || rule.loader === 'eslit-loader') {
+        if (rule.loader === 'babel-loader') {
             rule.exclude = /node_modules\/(?!(@ellucian)\/)/
         }
     })
