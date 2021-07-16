@@ -1,6 +1,6 @@
 {
   "name": "productivity-tools-extensions",
-  "version": "1.0.3-beta",
+  "version": "1.0.4-beta",
   "description": "Productivity Tools extensions",
   "main": "index.js",
   "license": "UNLICENSED",
@@ -29,7 +29,7 @@
     "react-dom": "16.9.0",
     "react-intl": "2.8.0",
     "react-router-dom": "5.2.0",
-    "safe-html": "1.0.0",
+    "sanitize-html": "2.4.0",
     "uuid": "8.3.2"
   },
   "devDependencies": {
