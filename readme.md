@@ -26,14 +26,14 @@ The Google extension includes two cards: Gmail and Google Drive.
 ## Gmail card
 The Gmail card in Ellucian Experience displays the 10 most recent inbox emails (both read and unread) from a user’s Gmail account. For each email, the card displays the sender’s name, subject, first line of the message, date received, and document icon (if an attachment exists). The user can click on any email in the Experience card to launch Gmail and open that email.
 
-When a user first adds the Gmail card to their Experience Dashboard, they are prompted to sign in to grant permissions and authenticate their Google account. Only one account may be authenticated to the Gmail card at a time. To switch to another account, the user can sign out and then sign in with the other account.
+When a user first adds the Gmail card to their Experience Dashboard, they are prompted to sign in to grant permissions and authenticate their Google account.  A user must select the 'View your email messages and settings' box on the Google permissions window to allow Elluciancloud access to display emails on the Gmail Experience card. If the box is not checked the Gmail Experience card will continue to display the 'Permissions Requested' message along with the Sign In button. Only one account may be authenticated to the Gmail card at a time. To switch to another account, the user can sign out and then sign in with the other account.
 
 The list of emails in the card updates automatically every 60 seconds to display any new emails.
 
 ## Google Drive card
 The Google Drive card in Ellucian Experience displays the 10 most recently modified documents from a user’s Google Drive account. For each document, the card displays the document title, modified date, name of the user who last modified the document, and an icon representing the document type. The user can click on any file name in the card to launch the Google Drive web application and open the selected file.
 
-When a user first adds the Google Drive card to their Experience Dashboard, they are prompted to sign in to grant permissions and authenticate their Google account. Only one account may be authenticated to the Google Drive card at a time. To switch to another account, the user can sign out and then sign in with the other account.
+When a user first adds the Google Drive card to their Experience Dashboard, they are prompted to sign in to grant permissions and authenticate their Google account. A user must select the 'See and download all your Google Drive files' box on the Google permissions window to allow Elluciancloud access to display the files on the Google Drive Experience card. If the box is not checked the Google Drive Experience card will continue to display the 'Permissions Requested' message along with the Sign In button.  Only one account may be authenticated to the Google Drive card at a time. To switch to another account, the user can sign out and then sign in with the other account.
 
 The list of documents in the card updates automatically every 60 seconds to display any newly modified documents.
 
