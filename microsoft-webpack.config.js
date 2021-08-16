@@ -2,7 +2,6 @@ const dotenv = require('dotenv');
 const packageJson = require('./package.json');
 const extensionConfig = require('./microsoft-extension.js');
 const Dotenv = require('dotenv-webpack');
-// const path = require('path');
 
 dotenv.config();
 

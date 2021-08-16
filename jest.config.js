@@ -3,7 +3,7 @@ module.exports = {
     collectCoverage: false,
     "collectCoverageFrom": [
       "src/**/*.{js,jsx}",
-      "!<rootDir>/src/test-utils/enzymeSetup"
+      "!<rootDir>/test/test-utils/enzymeSetup"
     ],
     coveragePathIgnorePatterns: [
         "<rootDir>/node_modules"
@@ -11,7 +11,7 @@ module.exports = {
     coverageDirectory: 'coverage',
     setupFiles:[
       'raf/polyfill',
-      '<rootDir>/src/test-utils/enzymeSetup'
+      '<rootDir>/test/test-utils/enzymeSetup'
     ],
     coverageReporters: [
         "lcov", "text", "cobertura"

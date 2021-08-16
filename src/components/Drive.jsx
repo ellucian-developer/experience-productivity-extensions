@@ -15,6 +15,7 @@ import { useDrive } from '../context-hooks/drive-context-hooks';
 import SignInButton from './SignInButton';
 import SignOutButton from './SignOutButton';
 import NoDriveFiles from './NoDriveFiles';
+import { prepareFiles } from '../util/drive';
 
 const styles = () => ({
     card: {
@@ -122,6 +123,7 @@ const styles = () => ({
     }
 });
 
+
 function Drive({ classes }) {
     const { setErrorMessage, setLoadingStatus } = useExtensionControl();
     const { locale } = useUserInfo();
@@ -217,16 +219,12 @@ function Drive({ classes }) {
     }
 
     if (displayState === 'filesLoaded') {
+        prepareFiles(files, fileDateFormater, fileDateFormaterWithYear);
         if (files && files.length > 0) {
             return (
                 <div className={classes.content} ref={contentRef}>
                     {files.map((file, index) => {
-                        const { iconLink, iconSize = '16', id, lastModifyingUser, modifiedTime: fileModifiedTime, name, webViewLink } = file;
-                        const fileModified = new Date(fileModifiedTime);
-                        const modified = new Date().getFullYear() === fileModified.getFullYear()
-                            ? fileDateFormater.format(fileModified)
-                            : fileDateFormaterWithYear.format(fileModified);
-                        const modifiedBy = lastModifyingUser ? lastModifyingUser.displayName : 'unknown';
+                        const { iconLink, iconSize = '16', id, modifiedBy, modified, name, webViewLink } = file;
                         return (
                             <Fragment key={id}>
                                 <a

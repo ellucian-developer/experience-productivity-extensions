@@ -1,3 +1,6 @@
+// eslint-disable-next-line camelcase
+import { unstable_batchedUpdates } from 'react-dom';
+
 export async function getMessagesFromThreads({ max = 10 } = {}) {
     const { gapi } = window;
     if (!gapi) {
@@ -53,4 +56,96 @@ export async function getMessagesFromThreads({ max = 10 } = {}) {
     }
 
     return messages;
+}
+
+function getValueFromArray(data, name, defaultValue) {
+    return ((data || []).find(item => item.name === name) || {}).value || defaultValue;
+}
+
+function isToday(dateToCheck) {
+    const today = new Date();
+    return today.getFullYear() === dateToCheck.getFullYear() &&
+        today.getMonth() === dateToCheck.getMonth() &&
+        today.getDate() === dateToCheck.getDate()
+}
+
+export function transformMessages({dateFormater, email, newMessages, timeFormater}) {
+    // transform to what UI needs
+    const transformedMessages = newMessages.map( message => {
+        const {
+            id,
+            labelIds,
+            payload: {
+                headers,
+                parts
+            },
+            snippet
+        } = message;
+
+        const receivedDate = new Date(getValueFromArray(headers, 'Date', undefined));
+
+        const unread = labelIds.includes('UNREAD');
+        const from = getValueFromArray(headers, 'From', 'Unknown');
+        const fromMatches = from.match(/'?([^<>']*)'?\s*<(.*)>/);
+        const fromName = fromMatches[1].trim();
+        const fromEmail = fromMatches[2].trim().toLocaleLowerCase();
+        const fromNameSplit = fromName.split(/[, ]/);
+        const firstName = fromName.includes(',') ? fromNameSplit[2] : (fromNameSplit[0] || '');
+        const fromInitials = firstName.slice(0, 1);
+
+        const subject = getValueFromArray(headers, 'Subject', 'No Subject');
+
+        const messageUrl = `https://mail.google.com/mail/?authuser=${email}#all/${id}`;
+
+        const hasAttachment = parts && parts.some(part => part.filename !== '');
+
+        const received = isToday(receivedDate) ? timeFormater.format(receivedDate) : dateFormater.format(receivedDate);
+
+        return {
+            bodySnippet: snippet,
+            id,
+            fromEmail,
+            fromInitials,
+            fromName,
+            hasAttachment,
+            messageUrl,
+            received,
+            receivedDate,
+            subject,
+            unread
+        }
+    });
+
+    // ensure sorted by received date
+    transformedMessages.sort((left, right) => right.receivedDate.getTime() - left.receivedDate.getTime());
+
+    return transformedMessages;
+}
+
+export async function refresh({dateFormater, email, state, setError, setLoggedIn, setMessages, setState, timeFormater}) {
+    if (process.env.NODE_ENV === 'development') {
+        console.log(`${state}ing gmail`);
+    }
+    try {
+        const newMessages = await getMessagesFromThreads();
+
+        const transformedMessages = transformMessages({dateFormater, email, newMessages, timeFormater});
+
+        unstable_batchedUpdates(() => {
+            setMessages(() => transformedMessages);
+            setState('loaded');
+        })
+    } catch (error) {
+        // did we get logged out or credentials were revoked?
+        if (error && (error.status === 401 || error.status === 403)) {
+            console.log('getMessageFromThreads failed because status:', error.status);
+            setLoggedIn(false);
+        } else {
+            console.error('gapi failed', error);
+            unstable_batchedUpdates(() => {
+                setError(error);
+                setState(() => ({ error: 'api'}));
+            })
+        }
+    }
 }
