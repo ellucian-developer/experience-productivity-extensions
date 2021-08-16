@@ -5,6 +5,7 @@ import { unstable_batchedUpdates } from 'react-dom';
 
 import { useAuth } from '../../context-hooks/auth-context-hooks';
 import { Context } from '../../context-hooks/drive-context-hooks';
+import { getDriveFiles } from '../util/google-drive';
 
 const refreshInterval = 60000;
 
@@ -27,36 +28,17 @@ export function DriveProvider({children}) {
             if (process.env.NODE_ENV === 'development') {
                 console.log(`${files === undefined ? 'loading' : 'refreshing'} drive files`);
             }
-            const search = `mimeType != 'application/vnd.google-apps.folder'`;
             try {
-                const { gapi } = window;
-                const response = await gapi.client.drive.files.list({
-                    pageSize: 20,
-                    fields: 'nextPageToken, files(id, iconLink, name, lastModifyingUser, modifiedTime, trashed, viewedByMe, webViewLink)',
-                    // fields: '*',
-                    q: search
-                });
-
-                const data = JSON.parse(response.body);
-
-                // filter out trashed items and limit to 10
-                let filteredCount = 0;
-                const filteredFiles = data.files.filter(file => {
-                    if (!file.trashed) {
-                        filteredCount++;
-                        return filteredCount <= 10
-                    } else {
-                        return false;
-                    }
-                });
+                const files = await getDriveFiles();
 
                 unstable_batchedUpdates(() => {
-                    setFiles(() => filteredFiles);
+                    setFiles(() => files);
                     setState('loaded');
                 })
             } catch (error) {
                 // did we get logged out or credentials were revoked?
-                if (error && error.status === 401) {
+                if (error && (error.status === 401 || error.status === 403)) {
+                    console.log('getMessageFromThreads failed because status:', error.status);
                     setLoggedIn(false);
                 } else {
                     console.error('gapi failed', error);

@@ -46,7 +46,10 @@ function loadGapi(clientId, setApiState, setLoggedIn, setError, cacheGetItem) {
 
             const googleAuth = gapi.auth2.getAuthInstance();
 
-            googleAuth.isSignedIn.listen(isSignedIn => setLoggedIn(isSignedIn));
+            googleAuth.isSignedIn.listen(isSignedIn => {
+                console.log('isSignedIn changed:', isSignedIn);
+                setLoggedIn(isSignedIn)
+            });
 
             // Handle the initial sign-in state.
             const signedIn = googleAuth.isSignedIn.get();
@@ -106,6 +109,11 @@ export function AuthProvider({ children }) {
             if (typeof scope === 'string') {
                 options.scope = scope;
             }
+            // might be needing to login because of permission issues.
+            // in this case the user is actually logged in
+            // so logout out first so we get notified when they login again.
+            gapi.auth2.getAuthInstance().signOut();
+
             gapi.auth2.getAuthInstance().signIn(options);
         }
     }

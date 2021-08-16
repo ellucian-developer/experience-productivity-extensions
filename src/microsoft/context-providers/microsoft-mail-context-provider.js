@@ -7,15 +7,9 @@ import { useUserInfo } from '@ellucian/experience-extension-hooks';
 
 import { useAuth } from '../../context-hooks/auth-context-hooks';
 import { Context } from '../../context-hooks/mail-context-hooks';
+import { isToday, getInitials } from '../../util/mail';
 
 const refreshInterval = 60000;
-
-function isToday(dateToCheck) {
-    const today = new Date();
-    return today.getFullYear() === dateToCheck.getFullYear() &&
-        today.getMonth() === dateToCheck.getMonth() &&
-        today.getDate() === dateToCheck.getDate()
-}
 
 export function MicrosoftMailProvider({children}) {
     const { locale } = useUserInfo();
@@ -73,18 +67,7 @@ export function MicrosoftMailProvider({children}) {
                         webLink: messageUrl
                     } = message;
 
-                    let fromInitials = '';
-                    if (fromName.slice(0, 1) === '"') {
-                        fromInitials = fromName.slice(1, 2);
-                    } else if (fromName.includes(',')) {
-                        // last name first name separated by comma
-                        // eslint-disable-next-line no-unused-vars
-                        const [_, lastName = '', firstName = ''] = fromName.match(/([^, ]+),[ ]*([^ ]*)/);
-                        fromInitials = `${lastName.slice(0, 1)}${firstName.slice(0, 1)}`
-                    } else {
-                        const [firstName = '', lastName = ''] = fromName.split(' ');
-                        fromInitials = `${firstName.slice(0, 1)}${lastName.slice(0, 1)}`
-                    }
+                    const fromInitials = getInitials(fromName);
 
                     const receivedDate = new Date(receivedDateTime);
                     const received = isToday(receivedDate) ? timeFormater.format(receivedDate) : dateFormater.format(receivedDate);

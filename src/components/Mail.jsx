@@ -14,14 +14,7 @@ import {
     fontWeightBold,
     fontWeightNormal,
     spacing30,
-    spacing40,
-    fountain400,
-    iris400,
-    kiwi400,
-    meadow400,
-    purple400,
-    saffron400,
-    tangerine400
+    spacing40
 } from '@ellucian/react-design-system/core/styles/tokens';
 
 import { useExtensionControl } from '@ellucian/experience-extension-hooks';
@@ -34,24 +27,7 @@ import SignInButton from './SignInButton';
 import SignOutButton from './SignOutButton';
 import NoEmail from './NoEmail';
 
-const colors = [ fountain400, iris400, kiwi400, meadow400, purple400, saffron400, tangerine400 ];
-function pickAvatarColor(email, colorsContext) {
-    const { colorsUsed, colorsByUser } = colorsContext;
-    let color = colorsByUser[email];
-    if (!color) {
-        let colorsLeft = colors.filter( c => !colorsUsed.includes(c) );
-        if (colorsLeft.length === 0) {
-            colorsLeft = colors;
-        }
-
-        const colorIndex = Math.floor(Math.random() * colorsLeft.length);
-        color = colorsLeft[colorIndex];
-        colorsUsed.push(color);
-        colorsByUser[email] = color;
-    }
-
-    return color;
-}
+import { pickAvatarColor } from '../util/mail.js';
 
 const styles = () => ({
     card: {
