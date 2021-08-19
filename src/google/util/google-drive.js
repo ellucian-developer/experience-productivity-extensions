@@ -1,31 +1,14 @@
-export function filterFiles(filesIn) {
-	// filter out trashed items and limit to 10
-	let filteredCount = 0;
-	const files = filesIn.filter(file => {
-		if (!file.trashed) {
-			filteredCount++;
-			return filteredCount <= 10
-		} else {
-			return false;
-		}
-	});
-
-	return files;
-}
-
 export async function getDriveFiles() {
-	const search = `mimeType != 'application/vnd.google-apps.folder'`;
+	const search = 'mimeType != \'application/vnd.google-apps.folder\' and trashed = false';
 	const { gapi } = window;
 	const response = await gapi.client.drive.files.list({
-		pageSize: 20,
+		pageSize: 10,
 		fields: 'nextPageToken, files(id, iconLink, name, lastModifyingUser, modifiedTime, trashed, viewedByMe, webViewLink)',
 		// fields: '*',
 		q: search
 	});
 
-	const data = JSON.parse(response.body);
-
-	const files = filterFiles(data.files);
+	const {files} = JSON.parse(response.body);
 
 	return files;
 }
