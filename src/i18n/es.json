@@ -1,0 +1,23 @@
+{
+  "messages": {
+    "error.contentNotAvailable": "Contenido no disponible",
+    "error.contactYourAdministrator": "Contacte a su administrador",
+    "drive.modifiedBy": "Modificado: {date} por {name}",
+    "google.signIn": "Abrir sesión con Google",
+    "google.openDrive": "Abrir Drive",
+    "google.openGmail": "Abrir Gmail",
+    "google.permissionsRequested": "Permisos solicitados",
+    "google.noFilesTitle": "No hay archivos en Google Drive",
+    "google.noFilesMessage": "Vaya a Google Drive para agregar archivos",
+    "google.noEmailTitle": "No hay correos en Gmail",
+    "google.noEmailMessage": "Su bandeja de entrada está vacía, vaya a Gmail para iniciar el envío y recepción de correo electrónico",
+    "mail.attachment": "Adjunto",
+    "mail.noMessages": "Aún no tiene correo electrónico",
+    "microsoft.noFilesTitle": "No hay archivos en OneDrive",
+    "microsoft.noFilesMessage": "Vaya a OneDrive para agregar archivos",
+    "microsoft.noEmailTitle": "No hay correos electrónicos",
+    "microsoft.noEmailMessage": "Su bandeja de entrada está vacía.",
+    "signIn": "Abrir sesión",
+    "signOut": "Cerrar sesión"
+  }
+}

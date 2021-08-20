@@ -1,0 +1,23 @@
+{
+  "messages": {
+    "error.contentNotAvailable": "Contenu non disponible",
+    "error.contactYourAdministrator": "Contactez votre administrateur",
+    "drive.modifiedBy": "Modifié le {date} par {name}",
+    "google.signIn": "Se connecter avec Google",
+    "google.openDrive": "Ouvrir Drive",
+    "google.openGmail": "Ouvrir Gmail",
+    "google.permissionsRequested": "Permissions demandées",
+    "google.noFilesTitle": "Aucun fichier dans Google Drive",
+    "google.noFilesMessage": "Accédez à Google Drive pour commencer à ajouter des fichiers",
+    "google.noEmailTitle": "Aucun courriel dans Gmail",
+    "google.noEmailMessage": "Votre boîte de réception est vide, accédez à Gmail pour commencer à envoyer et recevoir des courriels.",
+    "mail.attachment": "Pièce jointe",
+    "mail.noMessages": "Vous n'avez pas encore de courriel.",
+    "microsoft.noFilesTitle": "Aucun fichier dans OneDrive",
+    "microsoft.noFilesMessage": "Accédez à One Drive pour commencer à ajouter des fichiers",
+    "microsoft.noEmailTitle": "Aucun courriel",
+    "microsoft.noEmailMessage": "Votre boîte de réception est vide.",
+    "signIn": "Se connecter",
+    "signOut": "Déconnexion"
+  }
+}

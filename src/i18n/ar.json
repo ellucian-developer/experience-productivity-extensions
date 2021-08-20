@@ -1,0 +1,23 @@
+{
+  "messages": {
+    "error.contentNotAvailable": "المحتوى غير متوفر",
+    "error.contactYourAdministrator": "تواصل مع مسؤول النظام",
+    "drive.modifiedBy": "تم تعديل: {date} بواسطة {name}",
+    "google.signIn": "تسجيل الدخول باستخدام حساب Google",
+    "google.openDrive": "فتح Drive",
+    "google.openGmail": "فتح Gmail",
+    "google.permissionsRequested": "الأذونات المطلوبة",
+    "google.noFilesTitle": "لا توجد ملفات في Google Drive",
+    "google.noFilesMessage": "الانتقال إلى Google Drive للبدء في إضافة الملفات",
+    "google.noEmailTitle": "لا توجد رسائل بريد إلكتروني في Gmail",
+    "google.noEmailMessage": "بريدك الوارد فارغ. انتقل إلى Gmail للبدء في إرساء واستلام رسائل البريد الإلكتروني",
+    "mail.attachment": "مرفق",
+    "mail.noMessages": "ليس لديك أي رسائل بريد إلكتروني حتى الآن",
+    "microsoft.noFilesTitle": "لا توجد ملفات في OneDrive",
+    "microsoft.noFilesMessage": "الانتقال إلى OneDrive للبدء في إضافة الملفات",
+    "microsoft.noEmailTitle": "لا توجد رسائل بريد إلكتروني",
+    "microsoft.noEmailMessage": "بريدك الوارد بك فارغ.",
+    "signIn": "تسجيل الدخول",
+    "signOut": "تسجيل الخروج"
+  }
+}

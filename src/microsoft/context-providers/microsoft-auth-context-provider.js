@@ -111,7 +111,7 @@ export function MicrosoftAuthProvider({ children }) {
 				window.postMessage({sourceId: messageSourceId, sourceInstanceId: instanceId, type: 'login'}, '*');
 			}
 		} catch(error) {
-			console.log('user bailed out');
+			console.log('user bailed out', error);
 		}
 	}, [msalClient]);
 

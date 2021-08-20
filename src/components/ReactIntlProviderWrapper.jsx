@@ -2,12 +2,14 @@
 import React from 'react';
 import { injectIntl, IntlProvider, addLocaleData } from 'react-intl';
 import PropTypes from 'prop-types';
+import ar from 'react-intl/locale-data/ar';
 import en from 'react-intl/locale-data/en';
 import es from 'react-intl/locale-data/es';
+import fr from 'react-intl/locale-data/fr';
 
 import ENGLISH_TRANSLATION from '../i18n/en.json';
 
-addLocaleData([ ...en, ...es ]);
+addLocaleData([ ...en, ...es, ...fr, ...ar ]);
 
 const getMessages = (userLocale) => {
     const {messages: baseMessages } = ENGLISH_TRANSLATION;
