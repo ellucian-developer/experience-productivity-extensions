@@ -201,6 +201,7 @@ function Mail({ classes }) {
                                             <Typography
                                                 className={classnames(classes.messageFrom, { [classes.unread]: unread })}
                                                 component='div'
+                                                dir={'auto'}
                                                 noWrap
                                                 variant={'body2'}
                                             >
@@ -218,6 +219,7 @@ function Mail({ classes }) {
                                             <Typography
                                                 className={classnames(classes.subject, { [classes.subjectLinkUnread]: unread })}
                                                 component='div'
+                                                dir={'auto'}
                                                 noWrap
                                                 variant={'body2'}
                                             >
@@ -231,7 +233,7 @@ function Mail({ classes }) {
                                                 </Tooltip>
                                             )}
                                         </div>
-                                        <Typography component='div' noWrap variant='body3'>
+                                        <Typography component='div' dir={'auto'} noWrap variant='body3'>
                                             <div className={classes.noWrap} dangerouslySetInnerHTML={{__html: sanitizeHtml(bodySnippet)}}/>
                                         </Typography>
                                     </div>
