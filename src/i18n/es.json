@@ -3,6 +3,7 @@
     "error.contentNotAvailable": "Contenido no disponible",
     "error.contactYourAdministrator": "Contacte a su administrador",
     "drive.modifiedBy": "Modificado: {date} por {name}",
+    "drive.modified": "Modificado: {date}",
     "google.signIn": "Abrir sesión con Google",
     "google.openDrive": "Abrir Drive",
     "google.openGmail": "Abrir Gmail",

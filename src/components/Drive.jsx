@@ -263,7 +263,7 @@ function Drive({ classes }) {
                                                 <Typography>{name}</Typography>
                                             </Popper>
                                             <Typography className={classes.modified} component='div' variant={'body3'}>
-                                                {intl.formatMessage({id: 'drive.modifiedBy'}, {date: modified, name: modifiedBy})}
+                                                {intl.formatMessage({id: modifiedBy ? 'drive.modifiedBy' : 'drive.modified'}, {date: modified, name: modifiedBy})}
                                             </Typography>
                                         </div>
                                     </div>

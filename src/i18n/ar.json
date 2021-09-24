@@ -3,6 +3,7 @@
     "error.contentNotAvailable": "المحتوى غير متوفر",
     "error.contactYourAdministrator": "تواصل مع مسؤول النظام",
     "drive.modifiedBy": "تم تعديل: {date} بواسطة {name}",
+    "drive.modified": "تم تعديل: {date}",
     "google.signIn": "تسجيل الدخول باستخدام حساب Google",
     "google.openDrive": "فتح Drive",
     "google.openGmail": "فتح Gmail",
