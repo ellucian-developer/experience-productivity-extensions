@@ -73,6 +73,7 @@ Use your favorite Git tool to clone this repository.
 # <a name="google"></a>Google Extension
 ## <a name="google-build"></a>Google Extension - build and upload
 1. Obtain an upload token from Experience Setup and add that token to .env, as described in [Build and upload an extension](https://resources.elluciancloud.com/bundle/ellucian_experience_acn_use/page/t_upload_extension.html).
+1. Update publisher in `google-extension.js`.
 1. Run 'npm install' to install all the dependencies.
 1. Run one of the deployment npm scripts, such as 'npm run google-start' (for development).
 1. Enable the extension and add it to an environment(s) in Experience Setup -> Extensions, using the procedure in [Enable an extension in Experience environments](https://resources.elluciancloud.com/bundle/ellucian_experience_acn_use/page/t_enable_extension_experience_envs.html). 
@@ -110,11 +111,12 @@ The Google Client ID will be configured in Experience later.
 ## <a name="configure-google-cards"></a>Configure Google Cards
 Configure the Google cards using the procedure in [Set up an extension card in an environment](https://resources.elluciancloud.com/bundle/ellucian_experience_acn_use/page/t_set_up_extension_card.html). In the Configure step of the wizard, enter the Google OAuth client ID that you created in Google. A valid Google OAuth client ID will end with '.apps.googleusercontent.com'.
 
-The Configure step values are shared by both Microsoft Cards because it is an extension-level setting.
+The Configure step values are shared by both Google Cards because it is an extension-level setting.
 
 # <a name="microsoft"></a>Microsoft Extension
 ## <a name="microsoft-build"></a>Microsoft Extension - build and upload
 1. Obtain an upload token from Experience Setup and add that token to .env, as described in [Build and upload an extension](https://resources.elluciancloud.com/bundle/ellucian_experience_acn_use/page/t_upload_extension.html).
+1. Update publisher in `microsoft-extension.js`.
 1. Run 'npm install' to install all the dependencies.
 1. Run one of the deployment npm scripts, such as 'npm run microsoft-start' (for development).
 1. Enable the extension and add it to an environment(s) in Experience Setup -> Extensions, using the procedure in [Enable an extension in Experience environments](https://resources.elluciancloud.com/bundle/ellucian_experience_acn_use/page/t_enable_extension_experience_envs.html). 
