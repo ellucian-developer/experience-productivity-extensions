@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 // eslint-disable-next-line camelcase
 import { unstable_batchedUpdates } from 'react-dom';
 
+import stringTemplate from 'string-template';
+
 import { useUserInfo } from '@ellucian/experience-extension-hooks';
 
 import { useAuth } from '../../context-hooks/auth-context-hooks';
@@ -11,6 +13,8 @@ import { isToday, getInitials } from '../../util/mail';
 
 const refreshInterval = 60000;
 
+const outlookMessageTemplateUrl = process.env.OUTLOOK_MESSAGE_TEMPLATE_URL || 'https://outlook.office.com/mail/inbox/id/{id}';
+
 export function MicrosoftMailProvider({children}) {
     const { locale } = useUserInfo();
     const { client, loggedIn, setLoggedIn } = useAuth();
@@ -18,7 +22,7 @@ export function MicrosoftMailProvider({children}) {
     const [error, setError] = useState(false);
     const [state, setState] = useState('load');
     const [messages, setMessages] = useState();
-    const [userPhotos] = useState({});
+    const [userPhotos, setUserPhotos] = useState({});
     const [renderCount, setRenderCount] = useState(0);
 
     const dateFormater = useMemo(() => {
@@ -53,6 +57,7 @@ export function MicrosoftMailProvider({children}) {
                 const transformedMessages = messages.map( message => {
                     const {
                         bodyPreview,
+                        conversationId,
                         from: {
                             emailAddress: {
                                 name: fromName,
@@ -64,13 +69,21 @@ export function MicrosoftMailProvider({children}) {
                         hasAttachments: hasAttachment,
                         receivedDateTime,
                         subject,
-                        webLink: messageUrl
+                        webLink
                     } = message;
 
                     const fromInitials = getInitials(fromName);
 
                     const receivedDate = new Date(receivedDateTime);
                     const received = isToday(receivedDate) ? timeFormater.format(receivedDate) : dateFormater.format(receivedDate);
+
+                    let messageUrl;
+                    if (process.env.OUTLOOK_USE_WEB_LINK === 'true') {
+                        messageUrl = webLink
+                    } else {
+                        const encodedId = encodeURIComponent(conversationId);
+                        messageUrl = stringTemplate(outlookMessageTemplateUrl, {id: encodedId});
+                    }
 
                     return {
                         bodySnippet: bodyPreview.trim(),
@@ -79,7 +92,7 @@ export function MicrosoftMailProvider({children}) {
                         fromInitials,
                         fromName,
                         hasAttachment,
-                        messageUrl: messageUrl.split('?')[0],
+                        messageUrl,
                         received,
                         subject,
                         unread: !isRead,
@@ -152,17 +165,25 @@ export function MicrosoftMailProvider({children}) {
                     setLoggedIn(false);
                 } else {
                     console.error('mapi failed\n', error);
-                    setState(() => ({ error: 'api'}));
-                    setError(error);
+                    unstable_batchedUpdates(() => {
+                        setState(() => ({ error: 'api'}));
+                        setError(error);
+                    });
                 }
             }
-
         }
     }, [loggedIn, state])
 
     useEffect(() => {
         if (loggedIn && (state === 'load' || state === 'refresh')) {
             refresh();
+        }
+
+        if (!loggedIn && state === 'loaded') {
+            setMessages([]);
+            setState('load');
+            setUserPhotos({});
+            setRenderCount(0);
         }
     }, [loggedIn, refresh, state])
 
