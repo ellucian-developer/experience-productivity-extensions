@@ -115,7 +115,10 @@ The Configure step values are shared by both Google Cards because it is an exten
 
 # <a name="microsoft"></a>Microsoft Extension
 ## <a name="microsoft-build"></a>Microsoft Extension - build and upload
-1. Obtain an upload token from Experience Setup and add that token to .env, as described in [Build and upload an extension](https://resources.elluciancloud.com/bundle/ellucian_experience_acn_use/page/t_upload_extension.html).
+1. Obtain an upload token from Experience Setup and add that token to .env, as described in [Build and upload an extension](https://resources.elluciancloud.com/bundle/ellucian_experience_acn_use/page/t_upload_extension.html).</br>
+optional .env variables.</br>
+`OUTLOOK_MESSAGE_TEMPLATE_URL` can be used to customize the URL opened when you click on a mail message. Default is `'https://outlook.office.com/mail/inbox/id/{id}'`</br>
+`OUTLOOK_USE_WEB_LINK` set to `'true'` can be used to use the deep link webLink URL as sent by the Microsoft Graph API with the message. Default is false.
 1. Update publisher in `microsoft-extension.js`.
 1. Run 'npm install' to install all the dependencies.
 1. Run one of the deployment npm scripts, such as 'npm run microsoft-start' (for development).

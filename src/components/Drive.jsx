@@ -130,7 +130,7 @@ function Drive({ classes }) {
 
     const { intl } = useIntl();
 
-    const { error: authError, login, loggedIn, logout } = useAuth();
+    const { error: authError, login, loggedIn, logout, state: authState } = useAuth();
     const { error: driveError, files } = useDrive();
 
     const [displayState, setDisplayState] = useState('init');
@@ -178,14 +178,14 @@ function Drive({ classes }) {
                 textMessage: intl.formatMessage({id: 'error.contactYourAdministrator'}),
                 iconName: 'warning'
             })
-        } else if (loggedIn === false) {
+        } else if (loggedIn === false && authState === 'ready') {
             setDisplayState('loggedOut');
         } else if (files !== undefined) {
             setDisplayState('filesLoaded');
         } else if (loggedIn) {
             setDisplayState('loggedIn');
         }
-    }, [ files, loggedIn ])
+    }, [ authError, authState, driveError, files, loggedIn ])
 
     useEffect(() => {
         setLoadingStatus(displayState !== 'filesLoaded' && displayState !== 'loggedOut');
