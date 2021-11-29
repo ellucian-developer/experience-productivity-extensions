@@ -81,7 +81,9 @@ export function MicrosoftMailProvider({children}) {
                     if (process.env.OUTLOOK_USE_WEB_LINK === 'true') {
                         messageUrl = webLink
                     } else {
-                        const encodedId = encodeURIComponent(conversationId);
+                        let encodedId = encodeURIComponent(conversationId);
+                        encodedId = encodedId.replaceAll('-', '%2F');
+                        encodedId = encodedId.replaceAll('_', '%2B');
                         messageUrl = stringTemplate(outlookMessageTemplateUrl, {id: encodedId});
                     }
 

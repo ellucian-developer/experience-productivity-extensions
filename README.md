@@ -43,7 +43,7 @@ The Microsoft extension includes two cards: Outlook and OneDrive.
 ![](docs/images/microsoft-cards.png)
 
 ## Outlook card
-The Outlook card in Ellucian Experience displays the 10 most recent inbox emails (both read and unread) from a user’s Outlook account. For each email, the card displays the sender’s profile image, name, subject, first line of the message, date received, and document icon (if an attachment exists). The user can click on any email in the Experience card to launch Outlook.
+The Outlook card in Ellucian Experience displays the 10 most recent inbox emails (both read and unread) from a user’s Outlook account. For each email, the card displays the sender’s profile image, name, subject, first line of the message, date received, and document icon (if an attachment exists). The user can click on any email in the Experience card to launch Outlook and open that email.
 
 When a user first adds the Outlook card to their Experience Dashboard, they are prompted to sign in to grant permissions and authenticate their Outlook account. Only one account may be authenticated to the Outlook card at a time. To switch to another account, the user can sign out and then sign in with the other account.
 
