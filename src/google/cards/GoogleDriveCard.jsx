@@ -11,6 +11,9 @@ import { DriveProvider } from '../context-providers/google-drive-context-provide
 
 import Drive from '../../components/Drive';
 
+import { initializeLogging } from '../../util/log-level';
+initializeLogging('Google');
+
 function GoogleDriveCard(props) {
     return (
         <ExtensionProvider {...props}>

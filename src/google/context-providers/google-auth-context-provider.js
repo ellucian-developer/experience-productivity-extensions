@@ -6,6 +6,9 @@ import { unstable_batchedUpdates } from 'react-dom';
 import { useCache, useCardInfo } from '@ellucian/experience-extension-hooks';
 import { Context } from '../../context-hooks/auth-context-hooks';
 
+import log from 'loglevel';
+const logger = log.getLogger('Google');
+
 const cacheScope = 'google-productivity';
 const lastUserIdCacheKey = 'last-user-id';
 const cacheOptions = {
@@ -47,7 +50,7 @@ function loadGapi(clientId, setApiState, setLoggedIn, setError, cacheGetItem) {
             const googleAuth = gapi.auth2.getAuthInstance();
 
             googleAuth.isSignedIn.listen(isSignedIn => {
-                console.log('isSignedIn changed:', isSignedIn);
+                logger.debug('Google isSignedIn changed:', isSignedIn);
                 setLoggedIn(isSignedIn)
             });
 
@@ -83,7 +86,7 @@ function loadGapi(clientId, setApiState, setLoggedIn, setError, cacheGetItem) {
             if (setError) {
                 setError(error);
             }
-            console.error('gapi failed', error);
+            error('gapi failed', error);
         }
     });
 }
@@ -177,15 +180,13 @@ export function AuthProvider({ children }) {
         }
     }, [email, error, loggedIn, login, state]);
 
-    if (process.env.NODE_ENV === 'development') {
-        useEffect(() => {
-            console.log('AuthProvider mounted');
+    useEffect(() => {
+        logger.debug('GoogleAuthProvider mounted');
 
-            return () => {
-                console.log('AuthProvider unmounted');
-            }
-        }, []);
-    }
+        return () => {
+            logger.debug('GoogleAuthProvider unmounted');
+        }
+    }, []);
 
     return (
         <Context.Provider value={contextValue}>

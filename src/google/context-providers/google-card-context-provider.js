@@ -5,6 +5,9 @@ import { Context } from '../../context-hooks/card-context-hooks';
 
 import buttonImage from '../images/google-logo.svg';
 
+import log from 'loglevel';
+const logger = log.getLogger('Google');
+
 export function CardProvider({children, intl}) {
     const contextValue = useMemo(() => {
         return {
@@ -23,15 +26,13 @@ export function CardProvider({children, intl}) {
         }
     }, [ intl ]);
 
-    if (process.env.NODE_ENV === 'development') {
-        useEffect(() => {
-            console.log('CardProvider mounted');
+    useEffect(() => {
+        logger.debug('GoogleCardProvider mounted');
 
-            return () => {
-                console.log('CardProvider unmounted');
-            }
-        }, []);
-    }
+        return () => {
+            logger.debug('GoogleCardProvider unmounted');
+        }
+    }, []);
 
     return (
         <Context.Provider value={contextValue}>

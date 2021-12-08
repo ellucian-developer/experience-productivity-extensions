@@ -7,6 +7,9 @@ import { useAuth } from '../../context-hooks/auth-context-hooks';
 import { Context } from '../../context-hooks/drive-context-hooks';
 import { getDriveFiles } from '../util/google-drive';
 
+import log from 'loglevel';
+const logger = log.getLogger('Google');
+
 const refreshInterval = 60000;
 
 export function DriveProvider({children}) {
@@ -20,14 +23,10 @@ export function DriveProvider({children}) {
         if (loggedIn) {
             // if not force load and not curent visible, skip it
             if (state === 'refresh' && document.hidden) {
-                if (process.env.NODE_ENV === 'development') {
-                    console.log(`skipping refresh when document is hideen`);
-                }
+                logger.debug(`Drive skipping refresh when document is hideen`);
                 return;
             }
-            if (process.env.NODE_ENV === 'development') {
-                console.log(`${files === undefined ? 'loading' : 'refreshing'} drive files`);
-            }
+            logger.debug(`${files === undefined ? 'loading' : 'refreshing'} Google Drive files`);
             try {
                 const files = await getDriveFiles();
 
@@ -38,10 +37,10 @@ export function DriveProvider({children}) {
             } catch (error) {
                 // did we get logged out or credentials were revoked?
                 if (error && (error.status === 401 || error.status === 403)) {
-                    console.log('getMessageFromThreads failed because status:', error.status);
+                    logger.debug('Drive getMessageFromThreads failed because status:', error.status);
                     setLoggedIn(false);
                 } else {
-                    console.error('gapi failed', error);
+                    logger.error('Drive gapi failed', error);
                     unstable_batchedUpdates(() => {
                         setState(() => ({ error: 'api'}));
                         setError(error);
@@ -68,9 +67,7 @@ export function DriveProvider({children}) {
             stopInteval();
             // only start if document isn't hidden
             if (!document.hidden) {
-                if (process.env.NODE_ENV === 'development') {
-                    console.log('starting interval');
-                }
+                logger.debug('Google drive starting interval');
 
                 timerId = setInterval(() => {
                     setState('refresh');
@@ -80,18 +77,14 @@ export function DriveProvider({children}) {
 
         function stopInteval() {
             if (timerId) {
-                if (process.env.NODE_ENV === 'development') {
-                    console.log('stoping interval');
-                }
+                logger.debug('Google drive stopping interval');
                 clearInterval(timerId)
                 timerId = undefined;
             }
         }
 
         function visibilitychangeListener() {
-            if (process.env.NODE_ENV === 'development') {
-                console.log('visiblity changed');
-            }
+            logger.debug('Google drive visiblity changed');
             if (document.hidden) {
                 stopInteval();
             } else {
@@ -124,15 +117,13 @@ export function DriveProvider({children}) {
         }
     }, [ email, error, files, setState ]);
 
-    if (process.env.NODE_ENV === 'development') {
-        useEffect(() => {
-            console.log('DriveProvider mounted');
+    useEffect(() => {
+        logger.debug('GoogleDriveProvider mounted');
 
-            return () => {
-                console.log('DriveProvider unmounted');
-            }
-        }, []);
-    }
+        return () => {
+            logger.debug('GoogleDriveProvider unmounted');
+        }
+    }, []);
 
     return (
         <Context.Provider value={contextValue}>

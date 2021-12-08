@@ -8,6 +8,9 @@ import { getFileTypeIconUriByExtension } from '@microsoft/mgt-components/dist/es
 import { useAuth } from '../../context-hooks/auth-context-hooks';
 import { Context } from '../../context-hooks/drive-context-hooks';
 
+import log from 'loglevel';
+const logger = log.getLogger('Microsoft');
+
 const refreshInterval = 60000;
 
 export function getFileIcon(file) {
@@ -58,14 +61,10 @@ export function MicrosoftDriveProvider({children}) {
         if (loggedIn) {
             // if not force load and not curent visible, skip it
             if (state === 'refresh' && document.hidden) {
-                if (process.env.NODE_ENV === 'development') {
-                    console.log(`skipping refresh when document is hideen`);
-                }
+                logger.debug(`OneDrive skipping refresh when document is hideen`);
                 return;
             }
-            if (process.env.NODE_ENV === 'development') {
-                console.log(`${files === undefined ? 'loading' : 'refreshing'} drive files`);
-            }
+            logger.debug(`${files === undefined ? 'loading' : 'refreshing'} OneDrive files`);
 
             try {
                 const response = await client.api(
@@ -84,7 +83,7 @@ export function MicrosoftDriveProvider({children}) {
                 if (error && error.status === 401) {
                     setLoggedIn(false);
                 } else {
-                    console.error('gapi failed', error);
+                    logger.error('OneDrive msal failed', error);
                     unstable_batchedUpdates(() => {
                         setState(() => ({ error: 'api'}));
                         setError(error);
@@ -111,9 +110,7 @@ export function MicrosoftDriveProvider({children}) {
             stopInteval();
             // only start if document isn't hidden
             if (!document.hidden) {
-                if (process.env.NODE_ENV === 'development') {
-                    console.log('starting interval');
-                }
+                logger.debug('Microsoft drive starting interval');
 
                 timerId = setInterval(() => {
                     setState('refresh');
@@ -123,18 +120,14 @@ export function MicrosoftDriveProvider({children}) {
 
         function stopInteval() {
             if (timerId) {
-                if (process.env.NODE_ENV === 'development') {
-                    console.log('stoping interval');
-                }
+                logger.debug('Microsoft drive stopping interval');
                 clearInterval(timerId)
                 timerId = undefined;
             }
         }
 
         function visibilitychangeListener() {
-            if (process.env.NODE_ENV === 'development') {
-                console.log('visiblity changed');
-            }
+            logger.debug('Microsoft drive visiblity changed');
             if (document.hidden) {
                 stopInteval();
             } else {
@@ -164,15 +157,13 @@ export function MicrosoftDriveProvider({children}) {
         }
     }, [ error, files, setState ]);
 
-    if (process.env.NODE_ENV === 'development') {
-        useEffect(() => {
-            console.log('MicrosoftDriveProvider mounted');
+    useEffect(() => {
+        logger.debug('MicrosoftDriveProvider mounted');
 
-            return () => {
-                console.log('MicrosoftDriveProvider unmounted');
-            }
-        }, []);
-    }
+        return () => {
+            logger.debug('MicrosoftDriveProvider unmounted');
+        }
+    }, []);
 
     return (
         <Context.Provider value={contextValue}>

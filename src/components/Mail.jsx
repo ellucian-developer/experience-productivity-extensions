@@ -156,12 +156,12 @@ function Mail({ classes }) {
             setDisplayState('loggedOut');
         } else if (mailState === 'load') {
             setDisplayState('loading');
-        } else if (mailState === 'loaded' || mailState === 'refresh') {
+        } else if ((mailState === 'loaded' || mailState === 'refresh') && messages) {
             setDisplayState('loaded');
         } else if (mailState && mailState.error) {
             setDisplayState('error');
         }
-    }, [ authError, authState, loggedIn, mailError, mailState ])
+    }, [ authError, authState, loggedIn, mailError, mailState, messages ])
 
     useEffect(() => {
         setLoadingStatus(displayState === 'loading');
@@ -223,7 +223,7 @@ function Mail({ classes }) {
                                                 noWrap
                                                 variant={'body2'}
                                             >
-                                                <TextLink className={classes.subjectLink} href={messageUrl} target='_blank'>
+                                                <TextLink className={classes.subjectLink} href={messageUrl} target='Mail-Message'>
                                                     {subject}
                                                 </TextLink>
                                             </Typography>

@@ -3,13 +3,20 @@ import PropTypes from 'prop-types';
 // eslint-disable-next-line camelcase
 import { unstable_batchedUpdates } from 'react-dom';
 
+import stringTemplate from 'string-template';
+
 import { useUserInfo } from '@ellucian/experience-extension-hooks';
 
 import { useAuth } from '../../context-hooks/auth-context-hooks';
 import { Context } from '../../context-hooks/mail-context-hooks';
 import { isToday, getInitials } from '../../util/mail';
 
+import log from 'loglevel';
+const logger = log.getLogger('Microsoft');
+
 const refreshInterval = 60000;
+
+const outlookMessageTemplateUrl = process.env.OUTLOOK_MESSAGE_TEMPLATE_URL || 'https://outlook.office.com/mail/inbox/id/{id}';
 
 export function MicrosoftMailProvider({children}) {
     const { locale } = useUserInfo();
@@ -18,7 +25,7 @@ export function MicrosoftMailProvider({children}) {
     const [error, setError] = useState(false);
     const [state, setState] = useState('load');
     const [messages, setMessages] = useState();
-    const [userPhotos] = useState({});
+    const [userPhotos, setUserPhotos] = useState({});
     const [renderCount, setRenderCount] = useState(0);
 
     const dateFormater = useMemo(() => {
@@ -33,14 +40,10 @@ export function MicrosoftMailProvider({children}) {
         if (loggedIn) {
             // if not force load and not curent visible, skip it
             if (state === 'refresh' && document.hidden) {
-                if (process.env.NODE_ENV === 'development') {
-                    console.log(`skipping refresh when document is hideen`);
-                }
+                logger.debug(`Outlook skipping refresh when document is hideen`);
                 return;
             }
-            if (process.env.NODE_ENV === 'development') {
-                console.log(`${messages === undefined ? 'loading' : 'refreshing'} mails`);
-            }
+            logger.debug(`${messages === undefined ? 'loading' : 'refreshing'} outlook messages`);
 
             try {
                 const response = await client
@@ -53,6 +56,7 @@ export function MicrosoftMailProvider({children}) {
                 const transformedMessages = messages.map( message => {
                     const {
                         bodyPreview,
+                        conversationId,
                         from: {
                             emailAddress: {
                                 name: fromName,
@@ -64,13 +68,23 @@ export function MicrosoftMailProvider({children}) {
                         hasAttachments: hasAttachment,
                         receivedDateTime,
                         subject,
-                        webLink: messageUrl
+                        webLink
                     } = message;
 
                     const fromInitials = getInitials(fromName);
 
                     const receivedDate = new Date(receivedDateTime);
                     const received = isToday(receivedDate) ? timeFormater.format(receivedDate) : dateFormater.format(receivedDate);
+
+                    let messageUrl;
+                    if (process.env.OUTLOOK_USE_WEB_LINK === 'true') {
+                        messageUrl = webLink
+                    } else {
+                        let encodedId = encodeURIComponent(conversationId);
+                        encodedId = encodedId.replaceAll('-', '%2F');
+                        encodedId = encodedId.replaceAll('_', '%2B');
+                        messageUrl = stringTemplate(outlookMessageTemplateUrl, {id: encodedId});
+                    }
 
                     return {
                         bodySnippet: bodyPreview.trim(),
@@ -79,7 +93,7 @@ export function MicrosoftMailProvider({children}) {
                         fromInitials,
                         fromName,
                         hasAttachment,
-                        messageUrl: messageUrl.split('?')[0],
+                        messageUrl,
                         received,
                         subject,
                         unread: !isRead,
@@ -92,9 +106,7 @@ export function MicrosoftMailProvider({children}) {
                     setState('loaded');
                 });
 
-                if (process.env.NODE_ENV === 'development') {
-                    console.debug('Inbox emails: ', transformedMessages);
-                }
+                logger.debug('Outlook messages: ', transformedMessages);
 
                 // attempt to load photos
                 for (const message of transformedMessages) {
@@ -151,18 +163,26 @@ export function MicrosoftMailProvider({children}) {
                 if (error && error.status === 401) {
                     setLoggedIn(false);
                 } else {
-                    console.error('mapi failed\n', error);
-                    setState(() => ({ error: 'api'}));
-                    setError(error);
+                    logger.error('Outlook mapi failed\n', error);
+                    unstable_batchedUpdates(() => {
+                        setState(() => ({ error: 'api'}));
+                        setError(error);
+                    });
                 }
             }
-
         }
     }, [loggedIn, state])
 
     useEffect(() => {
         if (loggedIn && (state === 'load' || state === 'refresh')) {
             refresh();
+        }
+
+        if (!loggedIn && state === 'loaded') {
+            setMessages([]);
+            setState('load');
+            setUserPhotos({});
+            setRenderCount(0);
         }
     }, [loggedIn, refresh, state])
 
@@ -173,9 +193,7 @@ export function MicrosoftMailProvider({children}) {
             stopInteval();
             // only start if document isn't hidden
             if (!document.hidden) {
-                if (process.env.NODE_ENV === 'development') {
-                    console.log('starting interval');
-                }
+                logger.debug('Microsoft mail starting interval');
 
                 timerId = setInterval(() => {
                     setState('refresh');
@@ -185,18 +203,14 @@ export function MicrosoftMailProvider({children}) {
 
         function stopInteval() {
             if (timerId) {
-                if (process.env.NODE_ENV === 'development') {
-                    console.log('stoping interval');
-                }
+                logger.debug('Microsoft mail stopping interval');
                 clearInterval(timerId)
                 timerId = undefined;
             }
         }
 
         function visibilitychangeListener() {
-            if (process.env.NODE_ENV === 'development') {
-                console.log('visiblity changed');
-            }
+            logger.debug('Microsoft mail visiblity changed');
             if (document.hidden) {
                 stopInteval();
             } else {
@@ -227,15 +241,13 @@ export function MicrosoftMailProvider({children}) {
         }
     }, [ error, messages, renderCount, state ]);
 
-    if (process.env.NODE_ENV === 'development') {
-        useEffect(() => {
-            console.log('MicrosoftMailProvider mounted');
+    useEffect(() => {
+        logger.debug('MicrosoftMailProvider mounted');
 
-            return () => {
-                console.log('MicrosoftMailProvider unmounted');
-            }
-        }, []);
-    }
+        return () => {
+            logger.debug('MicrosoftMailProvider unmounted');
+        }
+    }, []);
 
     return (
         <Context.Provider value={contextValue}>
