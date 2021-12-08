@@ -11,6 +11,9 @@ import { useAuth } from '../../context-hooks/auth-context-hooks';
 import { Context } from '../../context-hooks/mail-context-hooks';
 import { isToday, getInitials } from '../../util/mail';
 
+import log from 'loglevel';
+const logger = log.getLogger('Microsoft');
+
 const refreshInterval = 60000;
 
 const outlookMessageTemplateUrl = process.env.OUTLOOK_MESSAGE_TEMPLATE_URL || 'https://outlook.office.com/mail/inbox/id/{id}';
@@ -37,14 +40,10 @@ export function MicrosoftMailProvider({children}) {
         if (loggedIn) {
             // if not force load and not curent visible, skip it
             if (state === 'refresh' && document.hidden) {
-                if (process.env.NODE_ENV === 'development') {
-                    console.log(`skipping refresh when document is hideen`);
-                }
+                logger.debug(`Outlook skipping refresh when document is hideen`);
                 return;
             }
-            if (process.env.NODE_ENV === 'development') {
-                console.log(`${messages === undefined ? 'loading' : 'refreshing'} mails`);
-            }
+            logger.debug(`${messages === undefined ? 'loading' : 'refreshing'} outlook messages`);
 
             try {
                 const response = await client
@@ -107,9 +106,7 @@ export function MicrosoftMailProvider({children}) {
                     setState('loaded');
                 });
 
-                if (process.env.NODE_ENV === 'development') {
-                    console.debug('Inbox emails: ', transformedMessages);
-                }
+                logger.debug('Outlook messages: ', transformedMessages);
 
                 // attempt to load photos
                 for (const message of transformedMessages) {
@@ -166,7 +163,7 @@ export function MicrosoftMailProvider({children}) {
                 if (error && error.status === 401) {
                     setLoggedIn(false);
                 } else {
-                    console.error('mapi failed\n', error);
+                    logger.error('Outlook mapi failed\n', error);
                     unstable_batchedUpdates(() => {
                         setState(() => ({ error: 'api'}));
                         setError(error);
@@ -196,9 +193,7 @@ export function MicrosoftMailProvider({children}) {
             stopInteval();
             // only start if document isn't hidden
             if (!document.hidden) {
-                if (process.env.NODE_ENV === 'development') {
-                    console.log('starting interval');
-                }
+                logger.debug('Microsoft mail starting interval');
 
                 timerId = setInterval(() => {
                     setState('refresh');
@@ -208,18 +203,14 @@ export function MicrosoftMailProvider({children}) {
 
         function stopInteval() {
             if (timerId) {
-                if (process.env.NODE_ENV === 'development') {
-                    console.log('stoping interval');
-                }
+                logger.debug('Microsoft mail stopping interval');
                 clearInterval(timerId)
                 timerId = undefined;
             }
         }
 
         function visibilitychangeListener() {
-            if (process.env.NODE_ENV === 'development') {
-                console.log('visiblity changed');
-            }
+            logger.debug('Microsoft mail visiblity changed');
             if (document.hidden) {
                 stopInteval();
             } else {
@@ -250,15 +241,13 @@ export function MicrosoftMailProvider({children}) {
         }
     }, [ error, messages, renderCount, state ]);
 
-    if (process.env.NODE_ENV === 'development') {
-        useEffect(() => {
-            console.log('MicrosoftMailProvider mounted');
+    useEffect(() => {
+        logger.debug('MicrosoftMailProvider mounted');
 
-            return () => {
-                console.log('MicrosoftMailProvider unmounted');
-            }
-        }, []);
-    }
+        return () => {
+            logger.debug('MicrosoftMailProvider unmounted');
+        }
+    }, []);
 
     return (
         <Context.Provider value={contextValue}>

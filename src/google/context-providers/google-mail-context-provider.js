@@ -7,6 +7,9 @@ import { useAuth } from '../../context-hooks/auth-context-hooks';
 import { Context } from '../../context-hooks/mail-context-hooks';
 import { refresh } from '../util/gmail';
 
+import log from 'loglevel';
+const logger = log.getLogger('Google');
+
 const refreshInterval = 60000;
 
 export function MailProvider({children}) {
@@ -38,9 +41,7 @@ export function MailProvider({children}) {
             stopInteval();
             // only start if document isn't hidden
             if (!document.hidden) {
-                if (process.env.NODE_ENV === 'development') {
-                    console.log('starting interval');
-                }
+                logger.debug('Google mail starting interval');
 
                 timerId = setInterval(() => {
                     setState('refresh');
@@ -50,18 +51,14 @@ export function MailProvider({children}) {
 
         function stopInteval() {
             if (timerId) {
-                if (process.env.NODE_ENV === 'development') {
-                    console.log('stoping interval');
-                }
+                logger.debug('Google mail stopping interval');
                 clearInterval(timerId)
                 timerId = undefined;
             }
         }
 
         function visibilitychangeListener() {
-            if (process.env.NODE_ENV === 'development') {
-                console.log('visiblity changed');
-            }
+            logger.debug('Google mail visiblity changed');
             if (document.hidden) {
                 stopInteval();
             } else {
@@ -106,15 +103,13 @@ export function MailProvider({children}) {
         }
     }, [ messages, state ]);
 
-    if (process.env.NODE_ENV === 'development') {
-        useEffect(() => {
-            console.log('MailProvider mounted');
+    useEffect(() => {
+        logger.debug('GoogleMailProvider mounted');
 
-            return () => {
-                console.log('MailProvider unmounted');
-            }
-        }, []);
-    }
+        return () => {
+            logger.debug('GoogleMailProvider unmounted');
+        }
+    }, []);
 
     return (
         <Context.Provider value={contextValue}>

@@ -3,6 +3,9 @@ import { Client } from '@microsoft/microsoft-graph-client';
 import {get as idbGet, set as idbSet} from 'idb-keyval';
 import { v4 as uuidv4 } from 'uuid';
 
+import log from 'loglevel';
+const logger = log.getLogger('Microsoft');
+
 const microsoftScopes = [
     'files.read',
     'files.read.all',
@@ -79,7 +82,7 @@ export async function login({aadClientId, aadRedirectUrl, aadTenantId, cacheStor
             return true;
         }
     } catch(error) {
-        console.log('user bailed out', error);
+        logger.debug('user bailed out', error);
     }
 
     return false;
@@ -129,6 +132,7 @@ export async function acquireToken({aadClientId, aadTenantId, cacheStoreItem, ms
             // if this is the same Experience user, then use the same MS User
             const currentExperienceUserId = getCurrentExperienceUserId({cacheStoreItem});
 
+            logger.debug('attempting ssoSilent for current experience user:', currentExperienceUserId, 'lastExperienceUserId:', lastExperienceUserId);
             if (currentExperienceUserId === lastExperienceUserId) {
                 const acquireRequest = {
                     authority: authorityUrl(aadTenantId),
@@ -141,6 +145,7 @@ export async function acquireToken({aadClientId, aadTenantId, cacheStoreItem, ms
                     const {accessToken, account: responseAccount} = response || {};
                     // eslint-disable-next-line max-depth
                     if (accessToken && responseAccount) {
+                        logger.debug('ssoSilent success for', responseAccount.username);
                         msalClient.setActiveAccount(responseAccount);
                         idbSet(lastLoginKey, {
                             lastExperienceUserId: currentExperienceUserId,
@@ -149,6 +154,7 @@ export async function acquireToken({aadClientId, aadTenantId, cacheStoreItem, ms
                         return accessToken;
                     }
                 } catch (error) {
+                    logger.debug('ssoSilent failed', error);
                     // ignore
                 }
             }

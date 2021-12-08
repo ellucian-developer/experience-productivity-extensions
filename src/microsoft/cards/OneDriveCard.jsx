@@ -11,6 +11,9 @@ import { MicrosoftDriveProvider } from '../context-providers/microsoft-drive-con
 
 import Drive from '../../components/Drive';
 
+import { initializeLogging } from '../../util/log-level';
+initializeLogging('Microsoft');
+
 function OneDriveCard(props) {
     return (
         <ExtensionProvider {...props}>

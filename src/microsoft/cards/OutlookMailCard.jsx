@@ -11,6 +11,9 @@ import { MicrosoftMailProvider } from '../context-providers/microsoft-mail-conte
 
 import Mail from '../../components/Mail';
 
+import { initializeLogging } from '../../util/log-level';
+initializeLogging('Google');
+
 function OutlookMailCard(props) {
     return (
         <ExtensionProvider {...props}>

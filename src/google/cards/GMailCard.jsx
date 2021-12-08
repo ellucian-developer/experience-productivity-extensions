@@ -11,6 +11,9 @@ import { MailProvider } from '../context-providers/google-mail-context-provider'
 
 import Mail from '../../components/Mail';
 
+import { initializeLogging } from '../../util/log-level';
+initializeLogging('Google');
+
 function GmailCard(props) {
     return (
         <ExtensionProvider {...props}>

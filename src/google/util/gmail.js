@@ -1,7 +1,10 @@
 // eslint-disable-next-line camelcase
 import { unstable_batchedUpdates } from 'react-dom';
 
-export async function getMessagesFromThreads({ max = 10 } = {}) {
+import log from 'loglevel';
+const logger = log.getLogger('Google');
+
+async function getMessagesFromThreads({ max = 10 } = {}) {
     const { gapi } = window;
     if (!gapi) {
         throw new Error('gapi not loaded');
@@ -129,13 +132,13 @@ export function transformMessages({dateFormater, email, newMessages, timeFormate
 }
 
 export async function refresh({dateFormater, email, state, setError, setLoggedIn, setMessages, setState, timeFormater}) {
-    if (process.env.NODE_ENV === 'development') {
-        console.log(`${state}ing gmail`);
-    }
+    logger.debug(`${state}ing gmail`);
     try {
         const newMessages = await getMessagesFromThreads();
 
         const transformedMessages = transformMessages({dateFormater, email, newMessages, timeFormater});
+
+        logger.debug('Gmail messages: ', transformedMessages);
 
         unstable_batchedUpdates(() => {
             setMessages(() => transformedMessages);
@@ -144,10 +147,10 @@ export async function refresh({dateFormater, email, state, setError, setLoggedIn
     } catch (error) {
         // did we get logged out or credentials were revoked?
         if (error && (error.status === 401 || error.status === 403)) {
-            console.log('getMessageFromThreads failed because status:', error.status);
+            logger.debug('Gmail getMessageFromThreads failed because status:', error.status);
             setLoggedIn(false);
         } else {
-            console.error('gapi failed', error);
+            logger.error('Gmail gapi failed', error);
             unstable_batchedUpdates(() => {
                 setError(error);
                 setState(() => ({ error: 'api'}));

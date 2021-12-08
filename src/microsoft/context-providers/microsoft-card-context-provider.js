@@ -5,6 +5,9 @@ import { Context } from '../../context-hooks/card-context-hooks';
 
 import buttonImage from '../images/microsoft-logo.svg';
 
+import log from 'loglevel';
+const logger = log.getLogger('Microsoft');
+
 export function MicrosoftCardProvider({children, intl}) {
     const contextValue = useMemo(() => {
         return {
@@ -23,14 +26,12 @@ export function MicrosoftCardProvider({children, intl}) {
         }
     }, [ intl ]);
 
-    if (process.env.NODE_ENV === 'development') {
-        useEffect(() => {
-            console.log('MicrosoftCardProvider mounted');
-            return () => {
-                console.log('MicrosoftCardProvider unmounted');
-            }
-        }, []);
-    }
+    useEffect(() => {
+        logger.debug('MicrosoftCardProvider mounted');
+        return () => {
+            logger.debug('MicrosoftCardProvider unmounted');
+        }
+    }, []);
 
     return (
         <Context.Provider value={contextValue}>
