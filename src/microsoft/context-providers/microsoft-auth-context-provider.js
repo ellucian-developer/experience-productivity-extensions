@@ -49,6 +49,9 @@ export function MicrosoftAuthProvider({ children }) {
                     (async () => {
                         if (await login({aadClientId, aadRedirectUrl, aadTenantId, cacheGetItem, cacheStoreItem, msalClient})) {
                             setState('do-graph-initialize');
+                        } else {
+                            // user likely bailed
+                            setState('ready');
                         }
                     })();
                 }
