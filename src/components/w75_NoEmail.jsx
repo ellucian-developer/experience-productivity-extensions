@@ -19,7 +19,7 @@ function NoEmails() {
             imageName={IMAGES.NO_TASKS}
             title={intl.formatMessage({id: noEmail.titleId})}
             message={intl.formatMessage({id: noEmail.messageId})}
-            url='https://outlook.com/nwc.edu'
+            url='https://outlook.office.com/mail/inbox'
         />
     );
 }
