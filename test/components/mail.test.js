@@ -1,3 +1,5 @@
+// Copyright 2021-2022 Ellucian Company L.P. and its affiliates.
+
 import expect from 'expect';
 import { pickAvatarColor, isToday, getInitials } from '../../src/util/mail';
 

@@ -1,3 +1,5 @@
+// Copyright 2021-2022 Ellucian Company L.P. and its affiliates.
+
 import { prepareFiles } from '../../src/util/drive';
 
 const mockFilteredFiles = require('../mock-data/filteredFiles.json');
@@ -8,6 +10,7 @@ describe('prepareFiles test', () => {
 
     it('should have added expected date-format and modifiedBy in file objects', () => {
         prepareFiles(mockFilteredFiles, dateFormater, dateFormaterWithYear);
+        // eslint-disable-next-line array-callback-return
         mockFilteredFiles.map( (file) => {
             expect(file.modified).not.toBeNull();
             expect(file.modifiedBy).not.toBeNull();

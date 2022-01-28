@@ -1,3 +1,5 @@
+// Copyright 2021-2022 Ellucian Company L.P. and its affiliates.
+
 const dotenv = require('dotenv');
 const packageJson = require('./package.json');
 const extensionConfig = require('./google-extension.js');
