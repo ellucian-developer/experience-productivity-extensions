@@ -160,3 +160,5 @@ The Microsoft Azure Redirect URL, Application ID, and Tenant ID will be configur
 Configure the Microsoft cards using the procedure in [Set up an extension card in an environment](https://resources.elluciancloud.com/bundle/ellucian_experience_acn_use/page/t_set_up_extension_card.html). In the Configure step of the wizard, enter the Redirect URL exactly as it was entered in the Azure AD Application; the Azure AD Application ID; and Tenant ID.
 
 The Configure step values are shared by both Microsoft Cards because it is an extension-level setting.
+
+Copyright 2021–2022 Ellucian Company L.P. and its affiliates.

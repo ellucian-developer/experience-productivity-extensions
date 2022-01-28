@@ -1,3 +1,5 @@
+// Copyright 2021-2022 Ellucian Company L.P. and its affiliates.
+
 import { getFileIcon, getFilteredFiles } from '../src/microsoft/context-providers/microsoft-drive-context-provider.js';
 
 const mockFiles = require('./mock-data/files.json');

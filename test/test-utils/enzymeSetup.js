@@ -1,3 +1,5 @@
+// Copyright 2021-2022 Ellucian Company L.P. and its affiliates.
+
 var enzyme = require('enzyme');
 var Adapter = require('enzyme-adapter-react-16');
 
