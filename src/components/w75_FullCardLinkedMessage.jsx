@@ -2,11 +2,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Illustration, Typography, TextLink } from '@ellucian/react-design-system/core';
+import { Illustration, Typography, TextLink, Tooltip } from '@ellucian/react-design-system/core';
 import { withStyles } from '@ellucian/react-design-system/core/styles';
 import { colorTextNeutral600, fontWeightNormal, spacing30, spacing40, spacing50 } from '@ellucian/react-design-system/core/styles/tokens';
 
 import { useAuth } from '../context-hooks/auth-context-hooks';
+import { useIntl } from '../context-hooks/card-context-hooks';
+
 
 import SignOutButton from './SignOutButton.jsx';
 
@@ -43,6 +45,7 @@ const styles = () => ({
 });
 
 function FullCardLinkedMessage({ classes, imageName, title, message, url }) {
+    const { intl } = useIntl();
     const { logout } = useAuth();
 
     return (
@@ -52,11 +55,13 @@ function FullCardLinkedMessage({ classes, imageName, title, message, url }) {
                 <Typography className={classes.title} component='div' variant={'h3'}>
                     {title}
                 </Typography>
+                <Tooltip title={intl.formatMessage({id: 'outlookLinkMsg'})}>
                 <TextLink href={url} target='_blank'>
                     <Typography className={classes.message} component='div' align='center' variant={'body2'}>
                         {message}
                     </Typography>
                 </TextLink>
+                </Tooltip>
                 <SignOutButton className={classes.signout} onClick={logout}/>
             </div>
         </div>

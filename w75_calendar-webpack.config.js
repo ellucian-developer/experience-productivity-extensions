@@ -1,8 +1,6 @@
-// Copyright 2021-2022 Ellucian Company L.P. and its affiliates.
-
 const dotenv = require('dotenv');
 const packageJson = require('./w75_package.json');
-const extensionConfig = require('./w75_microsoft-extension.js');
+const extensionConfig = require('./w75_calendar-extension.js');
 const Dotenv = require('dotenv-webpack');
 
 dotenv.config();

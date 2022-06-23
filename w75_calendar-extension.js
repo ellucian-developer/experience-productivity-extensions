@@ -1,6 +1,6 @@
 module.exports = {
-    name: 'NWC Microsoft Cards',
-    publisher: 'Northwest College',
+    name: 'Microsoft Outlook Calendar Card',
+    publisher: 'NorthwestCollege',
     configuration: {
         client: [{
             key: 'aadRedirectUrl',
@@ -32,24 +32,10 @@ module.exports = {
         }, ]
 	},
     cards: [{
-        type: 'W75_OutlookCard',
-        source: './src/microsoft/cards/w75_OutlookMailCard',
-        title: 'NWC Outlook',
-        displayCardType: 'NWC Outlook',
-        description: 'This card displays Office 365 Mail.'
-    },
-    {
-        type: 'W75_OneDriveCard',
-        source: './src/microsoft/cards/w75_OneDriveCard',
-        title: 'NWC OneDrive',
-        displayCardType: 'NWC OneDrive',
-        description: 'This card displays OneDrive.'
-    },
-    {
         type: 'W75_OutlookCalendarCard',
         source: './src/microsoft/cards/w75_OutlookCalendarCard',
         title: 'NWC Outlook Calendar',
         displayCardType: 'NWC Outlook Calendar',
-        description: 'This card displays your Outlook Calendar.'
+        description: 'This card displays Office 365 Calendar.'
     }]
-};
+}

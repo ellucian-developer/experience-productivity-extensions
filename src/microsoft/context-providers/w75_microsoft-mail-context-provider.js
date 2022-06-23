@@ -21,7 +21,6 @@ const outlookMessageTemplateUrl = process.env.OUTLOOK_MESSAGE_TEMPLATE_URL || 'h
 const defaultMaxMessageCount = process.env.OUTLOOK_MAX_MESSAGE_COUNT || 10;
 // get fetchUnreadOnly value from .env
 const defaultFetchUnreadOnlyMessageCount = (process.env.OUTLOOK_FETCH_UNREAD_ONLY === "true" || process.env.OUTLOOK_FETCH_UNREAD_ONLY === "True" || process.env.OUTLOOK_FETCH_UNREAD_ONLY === "TRUE");
-const outlookUrl = 'https://outlook.office.com/mail/inbox';
 
 export function MicrosoftMailProvider({children}) {
     const { locale } = useUserInfo();
@@ -37,7 +36,6 @@ export function MicrosoftMailProvider({children}) {
     const [unreadMessageCount, setUnreadMessageCount] = useState(0);
     const [fetchUnreadOnly, setFetchUnreadOnly] = useState(defaultFetchUnreadOnlyMessageCount);
     const [fetchUnreadOnlyLabel, setFetchUnreadOnlyLabel] = useState('');
-    const [inboxUrl, setInboxUrl] = useState('https://outlook.office.com/mail/inbox');
 
     const dateFormater = useMemo(() => {
         return new Intl.DateTimeFormat(locale, { dateStyle: 'short'})
@@ -210,7 +208,6 @@ export function MicrosoftMailProvider({children}) {
 
         if (!loggedIn && state === 'loaded') {
             setFetchUnreadOnly(process.env.OUTLOOK_FETCH_UNREAD_ONLY.toLowerCase() === "true");
-            setInboxUrl(outlookUrl)
             setMessages([]);
             setState('load');
             setUserPhotos({});
@@ -267,7 +264,6 @@ export function MicrosoftMailProvider({children}) {
     const contextValue = useMemo(() => {
         return {
             error,
-            setInboxUrl,
             fetchUnreadOnlyLabel,
             messageCount,
             unreadMessageCount,
@@ -275,7 +271,7 @@ export function MicrosoftMailProvider({children}) {
             refresh: () => { setState('refresh') },
             state
         }
-    }, [ error, inboxUrl, fetchUnreadOnlyLabel, messageCount, unreadMessageCount, messages, renderCount, state ]);
+    }, [ error, fetchUnreadOnlyLabel, messageCount, unreadMessageCount, messages, renderCount, state ]);
 
     useEffect(() => {
         logger.debug('MicrosoftMailProvider mounted');

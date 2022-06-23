@@ -2,7 +2,7 @@
 
 const dotenv = require('dotenv');
 const packageJson = require('./w75_package.json');
-const extensionConfig = require('./w75_microsoft-extension.js');
+const extensionConfig = require('./w75_onedrive-extension.js');
 const Dotenv = require('dotenv-webpack');
 
 dotenv.config();
@@ -23,9 +23,7 @@ module.exports = async (env, options) => {
         verbose: env.verbose || process.env.EXPERIENCE_EXTENSION_VERBOSE || false,
         upload: env.upload || process.env.EXPERIENCE_EXTENSION_UPLOAD || false,
         forceUpload: env.forceUpload || process.env.EXPERIENCE_EXTENSION_FORCE_UPLOAD || false,
-        uploadToken: process.env.EXPERIENCE_EXTENSION_UPLOAD_TOKEN,
-        maxMessageCount: env.maxMessageCount || process.env.MAX_MESSAGE_COUNT || '10',
-        fetchUnreadOnly: env.fetchUnreadOnly || process.env.OUTLOOK_FETCH_UNREAD_ONLY || false
+        uploadToken: process.env.EXPERIENCE_EXTENSION_UPLOAD_TOKEN
     });
 
     // For advanced scenarios, dynamically modify webpackConfig here.
