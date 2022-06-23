@@ -88,7 +88,7 @@ function loadGapi(clientId, setApiState, setLoggedIn, setError, cacheGetItem) {
             if (setError) {
                 setError(error);
             }
-            error('gapi failed', error);
+            logger.error('gapi failed', error);
         }
     });
 }
