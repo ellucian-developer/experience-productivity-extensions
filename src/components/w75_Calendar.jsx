@@ -29,7 +29,6 @@ import SignOutButton from './SignOutButton';
 import NoEvents from './w75_NoEvents';
 
 import { pickAvatarColor } from '../util/mail.js';
-import { isAbsoluteURL } from 'webpack-dev-server';
 
 const styles = () => ({
     card: {
