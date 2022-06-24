@@ -74,7 +74,7 @@ export function MicrosoftCalendarProvider({children}) {
     });
 
     const refresh = useCallback(async () => {
-        console.log(locale);
+        // console.log(locale);
         if (loggedIn) {
             // if not force load and not curent visible, skip it
             if (state === 'refresh' && document.hidden) {
@@ -180,7 +180,7 @@ export function MicrosoftCalendarProvider({children}) {
                         allDay: isAllDay,
                         unread: !isRead,
                         cancelled: isCancelled,
-                        resource: eventUrl,
+                        calendarEventLink: eventUrl,
                         color,
                         eventId,
                         bodySnippet: bodyPreview.trim(),
@@ -192,7 +192,8 @@ export function MicrosoftCalendarProvider({children}) {
                         hasAttachment,
                         location: locationName,
                         status: myResponse,
-                        userPhotoUrl: userPhotos[fromEmail]
+                        userPhotoUrl: userPhotos[fromEmail],
+                        onlineMeetingLink: (isOnlineMeeting ? onlineMeetingUrl : 'noLink')
                     }
                 });
 
