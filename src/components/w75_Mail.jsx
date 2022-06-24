@@ -139,7 +139,7 @@ function Mail({ classes }) {
 
     const { intl } = useIntl();
     const { error: authError, login, loggedIn, logout, state: authState } = useAuth();
-    const { error: mailError, inboxUrl, fetchUnreadOnlyLabel, messageCount, unreadMessageCount, messages, state: mailState } = useMail();
+    const { error: mailError, fetchUnreadOnlyLabel, messageCount, unreadMessageCount, messages, state: mailState } = useMail();
 
     const [colorsContext] = useState({ colorsUsed: [], colorsByUser: {}});
 
@@ -172,7 +172,7 @@ function Mail({ classes }) {
             return (
                 <div className={classes.content}>
                     <Typography className='row' component='div' variant='body2'>
-                        <TextLink className='unread' href={inboxUrl} target='_blank'>
+                        <TextLink className='unread' href={intl.formatMessage({id: 'outlookURL'})} target='_blank'>
                             {intl.formatMessage({id: fetchUnreadOnlyLabel}, {unread: unreadMessageCount, count: messageCount})}
                         </TextLink>
                     </Typography>
@@ -252,17 +252,27 @@ function Mail({ classes }) {
                     </div>
                 </div>
             );
-        // } else if (messages && inboxUrl) {
-        //     return <NoEmail url={inboxUrl}/>;
         } else if (messages) {
             return <NoEmail />
         }
     } else if (displayState === 'loggedOut') {
         return (
             <div className={classes.card}>
+                <Tooltip title={intl.formatMessage({id: 'outlookLinkMsg'})}>
+                <TextLink className={classes.href} href={intl.formatMessage({id: 'outlookURL'})} target='_blank' rel='noreferrer' alt={intl.formatMessage({id: 'outlookLinkMsg'})}>
+                    <Typography className={classes.fontWeightNormal} variant={'h6'}>
+                    {intl.formatMessage({id: 'outlookLinkTxt'})}
+                    </Typography>
+                </TextLink>
+                </Tooltip>
+                <Tooltip title={intl.formatMessage({id: 'allowPopups'})}>
                 <Illustration name={IMAGES.ID_BADGE} />
-                <Typography className={classes.fontWeightNormal} variant={'h3'} component='div'>
+                </Tooltip>
+                <Typography className={classes.fontWeightNormal} variant={'h4'} component='div'>
                     {intl.formatMessage({id: 'google.permissionsRequested'})}
+                </Typography>
+                <Typography className={classes.fontWeightNormal} variant={'h6'} component='div'>
+                    {intl.formatMessage({id: 'allowPopups'})}
                 </Typography>
                 <SignInButton onClick={login}/>
             </div>

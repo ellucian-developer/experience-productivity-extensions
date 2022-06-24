@@ -6,22 +6,22 @@ import { useComponents, useIntl } from '../context-hooks/card-context-hooks';
 
 import FullCardLinkedMessage from './w75_FullCardLinkedMessage';
 
-function NoEmails() {
+function NoEvents() {
     const { intl } = useIntl();
-    const { noEmail } = useComponents();
+    const { noEvents } = useComponents();
 
-    if (!noEmail) {
+    if (!noEvents) {
         return null;
     }
 
     return (
         <FullCardLinkedMessage
             imageName={IMAGES.NO_TASKS}
-            title={intl.formatMessage({id: noEmail.titleId})}
-            message={intl.formatMessage({id: noEmail.messageId})}
-            url={intl.formatMessage({id: 'outlookURL'})}
+            title={intl.formatMessage({id: noEvents.titleId})}
+            message={intl.formatMessage({id: noEvents.messageId})}
+            url={intl.formatMessage({id: 'outlookCalendarURL'})}
         />
     );
 }
 
-export default NoEmails;
+export default NoEvents;

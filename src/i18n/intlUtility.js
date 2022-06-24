@@ -1,7 +1,7 @@
 // Copyright 2021-2022 Ellucian Company L.P. and its affiliates.
 
 /* eslint-disable global-require */
-import ENGLISH_TRANSLATION from '../i18n/en.json';
+import ENGLISH_TRANSLATION from './en.json';
 
 export const getMessages = (userLocale) => {
     const {messages: baseMessages } = ENGLISH_TRANSLATION;
@@ -24,7 +24,7 @@ export const getMessages = (userLocale) => {
             return Object.assign({}, baseMessages, localeMessages);
         } catch (e) {
             // This userLocale is not supported.
-            return null;
+            return baseMessages;
         }
     }
 }
