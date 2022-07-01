@@ -1,6 +1,6 @@
 module.exports = {
-    name: 'NWC-Microsoft-Cards',
-    publisher: 'NorthwestCollege',
+    name: 'NWC Microsoft Cards',
+    publisher: 'Northwest College',
     configuration: {
         client: [{
             key: 'aadRedirectUrl',
@@ -50,6 +50,6 @@ module.exports = {
         source: './src/microsoft/cards/w75_OutlookCalendarCard',
         title: 'NWC Outlook Calendar',
         displayCardType: 'NWC Outlook Calendar',
-        description: 'This card displays your Outlook Calendar.'
+        description: 'This card displays your next weeks Agenda from your Outlook Calendar.'
     }]
 };
