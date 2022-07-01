@@ -1,5 +1,5 @@
-import React, { Component, useCallback, useEffect, useMemo, useState } from 'react';
-import { saffron600, safron400, saffron200, purple600, purple400, purple200, iris600, iris400, iris200, fountain600, fountain400, fountain200, meadow600, meadow400, meadow200, kiwi600, kiwi400, kiwi200, tangerine600, tangerine400, tangerine200 } from '@ellucian/react-design-system/core/styles/tokens';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+// import { saffron600, safron400, saffron200, purple600, purple400, purple200, iris600, iris400, iris200, fountain600, fountain400, fountain200, meadow600, meadow400, meadow200, kiwi600, kiwi400, kiwi200, tangerine600, tangerine400, tangerine200 } from '@ellucian/react-design-system/core/styles/tokens';
 import PropTypes from 'prop-types';
 // eslint-disable-next-line camelcase
 import { unstable_batchedUpdates } from 'react-dom';
@@ -11,7 +11,7 @@ import { useUserInfo } from '@ellucian/experience-extension-hooks';
 
 import { useAuth } from '../../context-hooks/auth-context-hooks';
 import { Context } from '../../context-hooks/calendar-context-hooks';
-import { isToday, getInitials } from '../../util/mail';
+import { getInitials } from '../../util/mail';
 
 import log from 'loglevel';
 const logger = log.getLogger('Microsoft');
@@ -20,20 +20,21 @@ const refreshInterval = 60000;
 const outlookCalendarTemplateUrl = process.env.OUTLOOK_CALENDAR_TEMPLATE_URL || 'https://outlook.office.com/calendar/item/{id}';
 
 export function MicrosoftCalendarProvider({children}) {
-    const { locale } = useUserInfo();
+    // const { locale } = useUserInfo();
     const { client, loggedIn, setLoggedIn } = useAuth();
 
     const [error, setError] = useState(false);
     const [state, setState] = useState('load');
     const [events, setEvents] = useState();
-    const [calEvents, setCalEvents ] = useState();
+    // const [calEvents, setCalEvents ] = useState();
     const [userPhotos, setUserPhotos] = useState({});
     const [renderCount, setRenderCount] = useState(0);
-    const [startDate, setStartDate] = useState();
+    // const [startDate, setStartDate] = useState();
 
     // maybe use if support for multiple calendars becomes a requirement (this will need refactored heavily in that case)
     // const [ calendars, setCalendars ] = useState();
 
+    /* removed unneeded formatters
     const dateFormatter = useMemo(() => {
         return new Intl.DateTimeFormat(locale, { dateStyle: 'short'})
     }, [locale]);
@@ -44,7 +45,7 @@ export function MicrosoftCalendarProvider({children}) {
 
     const timeFormatter = useMemo(() => {
         return new Intl.DateTimeFormat(locale, { timeStyle: 'short'})
-    }, [locale]);
+    }, [locale]);*/
 
     // valid values of b are: (empty or 'nwcred'), 'fountain', 'iris', 'kiwi', 'meadow', 'purple', 'saffron', 'tangerine'
     const getColor = ((s, b = 'nwcred') => {
@@ -63,18 +64,10 @@ export function MicrosoftCalendarProvider({children}) {
             case 'tentativelyAccepted': retval = (bC == 'nwcred' ? '#c7665c' : b+'400'); break;
             default:  retval = (bC == 'nwcred' ? '#e6bcb8' : b+'200');
         }
-        // console.log(`color: ${retval}`);
         return retval;
     });
 
-    const setTZTime = ((d) => {
-        const offsetHours = d.getTimezoneOffset();
-        d.setTime(d.getTime() - offsetHours * 60 * 1000);
-        return d;
-    });
-
     const refresh = useCallback(async () => {
-        console.log(locale);
         if (loggedIn) {
             // if not force load and not curent visible, skip it
             if (state === 'refresh' && document.hidden) {
@@ -83,33 +76,24 @@ export function MicrosoftCalendarProvider({children}) {
             }
             logger.debug(`${events === undefined ? 'loading' : 'refreshing'} outlook calendar events`);
 
-            const startDt = moment('2022-06-15');
+            const startDt = moment();
             const startDtParam = startDt.clone().startOf('day');
             const endDtParam = startDt.clone().add(7, 'day').endOf('day');
-            // console.log("startDate: ", startDtParam.format('YYYY-MM-DD HH:mm:ss'), "endDt: ", endDtParam.format('YYYY-MM-DD HH:mm:ss'));
-            const queryParameters = `startdatetime=${startDtParam.format('YYYY-MM-DDTHH:mm:ss.0')}&enddatetime=${endDtParam.format('YYYY-MM-DDTHH:mm:ss.999')}&top=250`;
-            // console.log("Query Parameters: ", queryParameters);
+            // query parameters include an orderby on start.dateTime to properly order results and top=250 to avoid paging
+            const orderByParam = "$orderby=start/dateTime";
+            const topParam = "top=250"
+            const queryParameters = `startdatetime=${startDtParam.format('YYYY-MM-DDTHH:mm:ss.0')}&enddatetime=${endDtParam.format('YYYY-MM-DDTHH:mm:ss.999')}&${topParam}&${orderByParam}`;
 
             try {
-                // Maybe use this later for supporting multiple calendars
-                // const calendarsListApiCall = `/me/calendars`;
-                // const calendarsListApiResponse = await client
-                // .api(calendarsListApiCall)
-                // .get();
-                // const { value: calendars } = calendarsListApiResponse;
-
                 const apiCall = `/me/calendarview?${queryParameters}`;
                 const response = await client
                 .api(apiCall)
                 .get();
 
-                // ToDo: implement getCalendarEventBaseColor() to get the settings cookie value associated with the Calendar Event Base Color
-                // const baseColor = getCalendarEventBaseColor();
                 const { value: events} = response;
                 const acceptedColor = getColor('accepted');
                 const tentativeColor = getColor('tentativelyAccepted');
                 const defaultColor = getColor('default');
-
 
                 // transform to what the UI needs
                 // https://docs.microsoft.com/en-us/graph/api/resources/event?view=graph-rest-1.0
@@ -123,32 +107,20 @@ export function MicrosoftCalendarProvider({children}) {
                             }
                         },
                         id: eventId,
-                        isRead,
-                        isDraft,
                         isCancelled,
-                        recurrence,
                         hasAttachments: hasAttachment,
-                        importance,
                         isAllDay,
-                        showAs,
-                        onlineMeetingUrl,
-                        isOnlineMeeting,
                         responseStatus: {
                             response: myResponse
                         },
                         start: {
-                            dateTime: startDateTime,
-                            timeZone: startTZ
+                            dateTime: startDateTime
                         },
                         end: {
-                            dateTime: endDateTime,
-                            timeZone: endTZ
+                            dateTime: endDateTime
                         },
                         location: {
-                            displayName: locationName,
-                            locationType,
-                            uniqueId,
-                            uniqueIdType
+                            displayName: locationName
                         },
                         subject,
                         webLink
@@ -161,7 +133,6 @@ export function MicrosoftCalendarProvider({children}) {
                     let color = defaultColor;
                     if (myResponse === 'accepted' || myResponse === 'organizer') { color = acceptedColor; }
                     if (myResponse === 'tentativelyAccepted') { color = tentativeColor; }
-                    // console.log("My Response Status: ", myResponse, color);
 
                     let eventUrl;
                     if (process.env.OUTLOOK_USE_WEB_LINK === 'true') {
@@ -178,9 +149,8 @@ export function MicrosoftCalendarProvider({children}) {
                         start: startDate,
                         end: endDate,
                         allDay: isAllDay,
-                        unread: !isRead,
                         cancelled: isCancelled,
-                        resource: eventUrl,
+                        calendarEventLink: eventUrl,
                         color,
                         eventId,
                         bodySnippet: bodyPreview.trim(),
@@ -191,8 +161,7 @@ export function MicrosoftCalendarProvider({children}) {
                         fromName,
                         hasAttachment,
                         location: locationName,
-                        status: myResponse,
-                        userPhotoUrl: userPhotos[fromEmail]
+                        status: myResponse
                     }
                 });
 
@@ -203,56 +172,6 @@ export function MicrosoftCalendarProvider({children}) {
 
                 logger.debug('Outlook calendar events: ', transformedEvents);
 
-                // attempt to load photos
-                for (const event of transformedEvents) {
-                    const {
-                        fromEmail
-                    } = event;
-
-                    (async () => {
-                        // check if we already have this user's photo
-                        const userPhotoUrl = userPhotos[fromEmail];
-                        if (event.userPhotoUrl) {
-                            // already read from cache
-                            return undefined;
-                        } else if (userPhotoUrl) {
-                            event.userPhotoUrl = userPhotoUrl;
-                            // triggers a context update
-                            setRenderCount(count => count + 1);
-                        } else {
-                            const responseUserId = await client
-                            .api(`/users`)
-                            .filter(`mail eq '${fromEmail}'`)
-                            .select('id')
-                            .get();
-
-                            const [{id: userId} = {}] = responseUserId.value;
-
-                            if (userId) {
-                                try {
-                                    const responsePhoto = await client
-                                    .api(`/users/${userId}/photo/$value`)
-                                    .get();
-
-                                    if (responsePhoto) {
-                                        // add it to the event
-                                        event.userPhotoUrl = URL.createObjectURL(responsePhoto);
-                                        userPhotos[fromEmail] = event.userPhotoUrl;
-                                    }
-                                    // triggers a context update
-                                    setRenderCount(count => count + 1);
-                                } catch (error) {
-                                    // did we get logged out or credentials were revoked?
-                                    if (error && error.status === 401) {
-                                        setLoggedIn(false);
-                                    } else {
-                                        userPhotos[fromEmail] = '';
-                                    }
-                                }
-                            }
-                        }
-                    })();
-                }
             } catch (error) {
                 // did we get logged out or credentials were revoked?
                 if (error && error.status === 401) {
@@ -274,7 +193,6 @@ export function MicrosoftCalendarProvider({children}) {
         }
 
         if (!loggedIn && state === 'loaded') {
-            // setCalendars([]);
             setEvents([]);
             setState('load');
             setUserPhotos({});
