@@ -12,8 +12,6 @@
         "google.noFilesMessage": "Go to Google Drive to start adding files",
         "google.noEmailTitle": "No Emails in Gmail",
         "google.noEmailMessage": "Your inbox is empty, go to Gmail to start sending and receiving email",
-        "google.noEventsTitle": "No Events in Calendar",
-        "google.noEventsMessage": "You have no events on your Calendar.",
         "mail.attachment": "Attachment",
         "mail.clickToInbox": "Click here to go to your inbox.",
         "mail.noMessages": "You have no email yet",
@@ -25,8 +23,6 @@
         "microsoft.noEmailMessage2": "Your inbox is empty.",
         "microsoft.unreadCountMessage": "You have {unread} unread messages.",
         "microsoft.unreadCountMessage2": "You have {unread}/{count} unread messages.",
-        "microsoft.noEventsTitle": "No Events in Calendar",
-        "microsoft.noEventsMessage": "You have no events on your Calendar.",
         "signIn": "Sign in",
         "signOut": "Sign out",
         "allowPopups": "To sign into your nwc.edu account, allow popups for experience.elluciancloud.com to enable Microsoft Sign In popups or use Ctrl+Click on the Sign In button to popup the Sign In.",
@@ -35,13 +31,6 @@
         "oneDriveURL": "https://nwc0-my.sharepoint.com/_layouts/15/MySite.aspx?MySiteRedirect=AllDocuments",
         "outlookLinkMsg": "Click here to open your NWC Outlook Inbox.  Please remember to sign-out of your e-mail when using public computers to prevent other people from accessing your email account.",
         "outlookLinkTxt": "Open NWC Outlook",
-        "outlookURL": "https://outlook.com/nwc.edu",
-        "outlookCalendarLinkMsg": "Click here to open your NWC Outlook Calendar.  Please rememver to sign-out of your Outlook account when using public computers to prevent other people from accessing your account.",
-        "outlookCalendarLinkTxt": "Open NWC Outlook Calendar",
-        "outlookCalendarURL": "https://outlook.office365.com/calendar",
-        "noEventsTitle": "No Events in Calendar",
-        "noEventsMessage": "You have no events on your calendar.",
-        "eventOrganizerLabel": "Organizer: ",
-        "eventLocationLabel": "Location: "
+        "outlookURL": "https://outlook.com/nwc.edu"
     }
 }

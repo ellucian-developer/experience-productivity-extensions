@@ -14,7 +14,9 @@ const microsoftScopes = [
     'mail.read',
     'mail.read.shared',
     'user.read',
-    'user.readbasic.all'
+    'user.readbasic.all',
+    'calendars.read',
+    'calendars.read.shared'
 ];
 
 export function authorityUrl(tenantId) {

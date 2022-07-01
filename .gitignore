@@ -19,3 +19,7 @@ tmp
 .env.*
 .webpack
 .serverless
+*package-lock*.json
+package.bad.json
+*package.old.json
+.eslintcache
