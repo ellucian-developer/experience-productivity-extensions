@@ -1,12 +1,12 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import sanitizeHtml from 'sanitize-html';
-import classnames from 'classnames';
+// import sanitizeHtml from 'sanitize-html';
+// import classnames from 'classnames';
 import moment from 'moment';
 
-import { Avatar, Divider, Illustration, IMAGES, List, ListItem, ListItemText, TextLink, Tooltip, Typography} from '@ellucian/react-design-system/core';
-import { Icon } from '@ellucian/ds-icons/lib';
+import { Illustration, IMAGES, List, ListItem, ListItemText, TextLink, Tooltip, Typography } from '@ellucian/react-design-system/core';
+// import { Icon } from '@ellucian/ds-icons/lib';
 import { withStyles } from '@ellucian/react-design-system/core/styles';
 import {
     colorBrandNeutral250,
@@ -196,8 +196,8 @@ function Agenda({ classes }) {
         setLoadingStatus(displayState === 'loading');
     }, [displayState, eventState])
 
-    const scrollToTime = new Date();
-    scrollToTime.setHours(7);
+    // const scrollToTime = new Date();
+    // scrollToTime.setHours(7);
 
     if (displayState === 'loaded') {
         if (events && events.length > 0) {
@@ -205,7 +205,7 @@ function Agenda({ classes }) {
             let curHeader = 'junk';
             return (
                 <div id={`myCalendar_Container`}>
-                    <List key={`agendaItemsList`} dense style={{border: '1px solid #ddd' }}>
+                    <List component="nav" key={`agendaItemsList`} dense style={{border: '1px solid #ddd' }}>
                         {events && events.map((item) => {
                             const {
                                     title,
@@ -222,17 +222,16 @@ function Agenda({ classes }) {
                                     fromInitials,
                                     fromName,
                                     hasAttachment,
-                                    status,
-                                    userPhotoUrl,
-                                    onlineMeetingLink
+                                    location,
+                                    status
                             } = item;
                             // All day items are in UTC and should not be localized (or you may move the day)
-                            const header = allDay ? moment(item.start).utc().format("dddd, MMMM Do, YYYY") : moment(item.start).format("dddd, MMMM Do, YYYY");
-                            // console.log("Start Date: ", item.start, header);
+                            const header = allDay ? moment(start).utc().format("dddd, MMMM Do, YYYY") : moment(start).format("dddd, MMMM Do, YYYY");
+                            // console.log("Start Date: ", start, header);
                             const printHeader = (header !== curHeader);
                             let itemStatus = "not accepted";
                             if (isTentative) { itemStatus = "tentative"; }
-                            // console.log(isAccepted, item.status);
+                            // console.log(isAccepted, status);
                             if (isAccepted) {
                                 itemStatus = status;
                             }
@@ -242,15 +241,15 @@ function Agenda({ classes }) {
                             const startDateShort = shortDateFormat(start, allDay);
                             const endDateShort = shortDateFormat(end, allDay, -1);
                             // const dateRange = startDateShort == endDateShort ? startDateShort : startDateShort + " - " + endDateShort;
-                            // const startOffset = moment(item.start).utcOffset();
+                            // const startOffset = moment(start).utcOffset();
                             let timeRange = (allDay ? "All Day" : startTime + " - " + endTime);
                             if (startTime == endTime) { timeRange = startTime; }
                             let eventDetails = startDateShort == endDateShort ? startDateShort + " from " + timeRange : startDateShort + " to " + endDateShort + " from " + timeRange;
-                            if (item.allDay) {
+                            if (allDay) {
                                 eventDetails = startDateShort == endDateShort ? "All Day on " + startDateShort : "All Day from " + startDateShort + " to " + endDateShort;
                             }
-                            const itemLink = isUrl(location) ? location : onlineMeetingLink;
-                            console.log(location, onlineMeetingLink);
+                            const itemLink = isUrl(location) ? location : calendarEventLink;
+                            // console.log(location, calendarEventLink);
                             const avatarColor = pickAvatarColor(fromEmail, colorsContext);
                             return (<Fragment key={id}>
                                 {printHeader && (
@@ -260,38 +259,43 @@ function Agenda({ classes }) {
                                     </ListItemText>
                                 </ListItem>
                                 )}
-                                <ListItem divider disableGutters key={`event_${id}`} style={{ paddingLeft: '.25rem' }}>
-                                    <ListItemText key={`eventTimeStatus_${id}`} component='a' href={calendarEventLink} style={{ borderRight: '.25rem solid ' + color, textAlign: 'center', minWidth: '70px', maxWidth: '70px' }}>
-                                        <Typography key={`eventTimeStatus_${id}_startTime`} variant={"body2"}>{startTime}</Typography>
-                                        <Typography key={`eventTimeStatus_${id}_endTime`} variant={"body2"}>{endTime}</Typography>
-                                        <Tooltip key={`eventTimeStatus_${id}_itemStatustooltip`} title={itemStatus}>
-                                            <Typography key={`eventTimeStatus_${id}_itemStatus`}  noWrap variant={"body3"}>{itemStatus}</Typography>
-                                        </Tooltip>
+                                <ListItem divider button disableGutters key={`event_${id}`} style={{ paddingLeft: '.25rem' }}
+                                        component='a' href={calendarEventLink} >
+                                    <ListItemText key={`eventTimeStatus_${id}`} button style={{ borderRight: '.25rem solid ' + color, textAlign: 'center', minWidth: '70px', maxWidth: '70px' }}>
+                                        <Typography key={`eventTimeStatus_${id}_startTime`} id={`eventTimeStatus_${id}_startTime`} variant={"body2"}>
+                                            {startTime}
+                                        </Typography>
+                                        <Typography key={`eventTimeStatus_${id}_endTime`} id={`eventTimeStatus_${id}_endTime`} variant={"body2"}>
+                                            {endTime}
+                                        </Typography>
+                                        <Typography key={`eventTimeStatus_${id}_itemStatus`}  noWrap variant={"body3"} title={itemStatus}>
+                                            {itemStatus}
+                                        </Typography>
                                     </ListItemText>
-                                    <ListItemText key={`eventOrgTitleLoc_${id}`} style={{ paddingLeft: '.5rem', maxWidth: '209xxx' }}>
-                                        <Tooltip key={`eventOrgTitleLoc_${id}_orgtooltip`} title={`Organizer: ${fromName}  | Status: ${itemStatus}`}>
-                                            <Typography key={`eventOrgTitleLoc_${id}_orgtypography`} noWrap variant={"body3"} style={{textAlign: 'justify', backgroundColor: avatarColor}}>Organizer: {fromName}</Typography>
-                                        </Tooltip>
-                                        <Tooltip key={`eventOrgTitleLoc_${id}_titletooltip`} title={`${title} | ${eventDetails}`}>
-                                            <Typography key={`eventOrgTitleLoc_${id}_titletypography`} noWrap variant={"body2"}>{title} | {eventDetails}</Typography>
-                                        </Tooltip>
-                                        <Tooltip key={`eventOrgTitleLoc_${id}_locationtooltip`} title={`Location: ${location}`}>
-                                            {isUrl(itemLink) && (
-                                                <Typography key={`eventOrgTitleLoc_${id}_locationtypography`} noWrap variant={"body3"} style={{textAlign: 'left'}}>
-                                                    <span>Location:</span>
-                                                    <TextLink key={`meeting_link_${id}`} id={`meeting_link_${id}`} className={classes.subjectLink} href={itemLink}>
-                                                        {location}
-                                                    </TextLink>
-                                                </Typography>
-                                            )}
-                                            {!isUrl(itemLink) && (
-                                                <Typography key={`eventOrgTitleLoc_${id}_locationtypography`} 
-                                                    noWrap variant={"body3"} 
-                                                    style={{textAlign: 'left'}}>
-                                                    {`Location: ${location}`}
-                                                </Typography>
-                                            )}
-                                        </Tooltip>
+                                    <ListItemText key={`eventOrgTitleLoc_${id}`} style={{ paddingLeft: '.5rem', maxWidth: '209xxx'}}>
+                                        <Typography key={`eventOrgTitleLoc_${id}_orgtypography`} noWrap variant={"body3"}
+                                                    style={{textAlign: 'justify', backgroundColor: avatarColor}}>
+                                            {intl.formatMessage({id: 'eventOrganizerLabel'})} {fromName}
+                                        </Typography>
+                                        <Typography key={`eventOrgTitleLoc_${id}_titletypography`} id={`eventOrgTitleLoc_${id}_titletypography`}
+                                                    noWrap variant={"body2"} title={`${title} | ${eventDetails}`}>
+                                            {title} | {eventDetails}
+                                        </Typography>
+                                        {isUrl(itemLink) && (
+                                            <Typography key={`eventOrgTitleLoc_${id}_locationtypography`} noWrap variant={"body3"} style={{textAlign: 'left'}}
+                                                        title={`${intl.formatMessage({id: 'eventLocationLabel'})} ${location}`}>
+                                                <span>{intl.formatMessage({id: 'eventLocationLabel'})} </span>
+                                                <TextLink key={`meeting_link_${id}`} id={`meeting_link_${id}`} className={classes.subjectLink} href={itemLink}>
+                                                    {location}
+                                                </TextLink>
+                                            </Typography>
+                                        )}
+                                        {!isUrl(itemLink) && (
+                                            <Typography key={`eventOrgTitleLoc_${id}_locationtypography`} noWrap variant={"body3"}  style={{textAlign: 'left'}}
+                                                        title={`${intl.formatMessage({id: 'eventLocationLabel'})} ${location}`}>
+                                                {intl.formatMessage({id: 'eventLocationLabel'})} {location}
+                                            </Typography>
+                                        )}
                                     </ListItemText>
                                 </ListItem>
                             </Fragment>

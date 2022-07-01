@@ -40,6 +40,8 @@
         "outlookCalendarLinkTxt": "Open NWC Outlook Calendar",
         "outlookCalendarURL": "https://outlook.office365.com/calendar",
         "noEventsTitle": "No Events in Calendar",
-        "noEventsMessage": "You have no events on your calendar."
+        "noEventsMessage": "You have no events on your calendar.",
+        "eventOrganizerLabel": "Organizer: ",
+        "eventLocationLabel": "Location: "
     }
 }
