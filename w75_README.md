@@ -86,9 +86,16 @@ Once the above changes are in place, make sure your `.env` file is configured co
 
 
 # <a name="w75-microsoft-outlook-calendar-card"></a>W75 Microsoft Outlook Calendar Card Notes
-This fork includes a prototype Calendar element that uses the Microsoft Graph API (using the same codebase as the Microsoft Outlook Card) to retrieve calendar events from the user's calendar for the next 7 days starting at midnight of the current day and display them in a list format.  Each event is linked to the URL of the event on the Outlook Calendar so the user may read the full body of the event and click any embedded links to online meetings.  The link makes use of the OUTLOOK_USE_WEB_LINK parameter The color scheme is based on the NWC Red color (HTML Color #A71000), where Accepted events (accepted or events where the user is the orgainizer) are highlighted in NWC Red, and Tentatively Accepted Events are highlighted in 18% lighter version of NWC Red (HTML Color #C7665C), while events that have not been accepted or are in a different status than Accepted (or Organizer) or Tentatively Accepted are highlighted with 36% lighter version of NWC Red (HTML Color #E6BCB8).  The 18% color difference stems from the observation that the 600 and 500 versions of the colors in the Ellucian Path Design System are 18% lighter (e.g. using [ShadowLord](https://noeldelgado.github.io/shadowlord/#a71000) with 18% differential).
+This fork includes a prototype Calendar element that uses the Microsoft Graph API (using a similar codebase as the Microsoft Outlook Card) to retrieve calendar events from the user's calendar for the next 7 days starting at midnight of the current day and display them in a list format.  Each event is linked to the URL of the event on the Outlook Calendar so the user may read the full body of the event and click any embedded links to online meetings.  The link makes use of the OUTLOOK_USE_WEB_LINK parameter The color scheme is based on the NWC Red color (HTML Color #A71000), where Accepted events (accepted or events where the user is the orgainizer) are highlighted in NWC Red, and Tentatively Accepted Events are highlighted in 18% lighter version of NWC Red (HTML Color #C7665C), while events that have not been accepted or are in a different status than Accepted (or Organizer) or Tentatively Accepted are highlighted with 36% lighter version of NWC Red (HTML Color #E6BCB8).  The 18% color difference stems from the observation that the 600 and 500 versions of the colors in the Ellucian Path Design System are 18% lighter (e.g. using [ShadowLord](https://noeldelgado.github.io/shadowlord/#a71000) with 18% differential).
 ![](docs/images/w75_microsoft-calendar-card-preview.png)
 
+## Additional Azure AD Application API Permissions Required
+The following permissions must be added to the Azure API Application Permissions to enable the W75 Calendar Card to gather your agenda.
+
+- Calendar.Read
+- Calendar.Read.Shared
+
+Add these in addition to the ones specified in the [README.md](README.md).
 
 
 ## Building the W75 Version of the Microsoft Outlook Calendar Card
