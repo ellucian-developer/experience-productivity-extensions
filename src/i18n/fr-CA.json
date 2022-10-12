@@ -4,6 +4,10 @@
     "error.contactYourAdministrator": "Contactez votre administrateur",
     "drive.modified": "Modifié par: {name}"
     "drive.modifiedBy": "Modifié le {date} par {name}",
+    "drive.modified": "Modifié le {date}",
+    "google.signIn": "Se connecter avec Google",
+    "google.openDrive": "Ouvrir Drive",
+    "google.openGmail": "Ouvrir Gmail",
     "google.permissionsRequested": "Permissions demandées",
     "google.noFilesTitle": "Aucun fichier dans Google Drive",
     "google.noFilesMessage": "Accédez à Google Drive pour commencer à ajouter des fichiers",
