@@ -2,9 +2,11 @@
 // Copyright 2021-2022 Ellucian Company L.P. and its affiliates.
 import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
+import { unstable_batchedUpdates } from 'react-dom';
 
 import { useCache, useCardInfo } from '@ellucian/experience-extension-hooks';
 import { Context } from '../../context-hooks/auth-context-hooks';
+import { subscribe, unsubscribe, dispatch } from '../util/events';
 
 import log from 'loglevel';
 const logger = log.getLogger('Google');
@@ -72,13 +74,11 @@ export function AuthProvider({ children }) {
                     client_id: clientId,
                     scope,
                     callback: (tokenResponse) => {
-                        console.log(tokenResponse);
                         if (tokenResponse && tokenResponse.access_token) {
-                            authenticateUser(
-                                tokenResponse.authuser,
-                                tokenResponse.access_token,
-                                true
-                            );
+                            dispatch('userAuthenticated', {
+                                authUser: tokenResponse.authuser,
+                                accessToken: tokenResponse.access_token
+                            });
                         }
                     }
                 });
@@ -91,6 +91,7 @@ export function AuthProvider({ children }) {
 
     function login() {
         const { gapi } = window;
+
         if (gapi.client.getToken() === null) {
             // Prompt the user to select a Google Account and ask for consent to share their data
             // when establishing a new session.
@@ -106,30 +107,26 @@ export function AuthProvider({ children }) {
         accessToken,
         updateCache = false
     ) {
-        setEmail(authUser);
-        setLoggedIn(true);
-        setApiState('ready');
+        unstable_batchedUpdates(() => {
+            setLoggedIn(true);
+            setEmail(authUser);
+            setApiState('ready');
 
-        if (updateCache) {
-            cacheStoreItem({
-                ...cacheOptions,
-                data: {
-                    authUser,
-                    accessToken
-                }
-            });
-        } else {
+            if (updateCache) {
+                cacheStoreItem({
+                    ...cacheOptions,
+                    data: {
+                        authUser,
+                        accessToken
+                    }
+                });
+            }
 
-            /**
-             * If updateCache was false, then it probably means page has
-             * been refreshed by user and we need to fetch data
-             * automatically with user token we have.
-             */
             const { gapi } = window;
             gapi.client.setToken({
                 access_token: accessToken
             });
-        }
+        });
     }
 
     function prepareForLogin() {
@@ -141,14 +138,40 @@ export function AuthProvider({ children }) {
             cacheStoreItem({ ...cacheOptions, data: {} });
         }
 
-        setLoggedIn(false);
-        setEmail('');
-        setApiState('ready');
-        gapi.client.setToken('');
+        unstable_batchedUpdates(() => {
+            setLoggedIn(false);
+            setEmail('');
+            setApiState('ready');
+            gapi.client.setToken('');
+        });
     }
 
+    useEffect(() => {
+        subscribe("userAuthenticated", (data) => {
+            authenticateUser(
+                data.detail.authUser,
+                data.detail.accessToken,
+                true
+            );
+        });
+
+        return () => {
+            unsubscribe("userAuthenticated");
+        }
+    }, []);
+
+    useEffect(() => {
+        subscribe("userLoggedOut", () => {
+            prepareForLogin();
+        });
+
+        return () => {
+            unsubscribe("userLoggedOut");
+        }
+    }, []);
+
     function logout() {
-        prepareForLogin();
+        dispatch('userLoggedOut');
     }
 
     useEffect(() => {
