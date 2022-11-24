@@ -38,7 +38,7 @@ export function AuthProvider({ children }) {
     const { getItem: cacheGetItem, storeItem: cacheStoreItem } = useCache();
     const { configuration: { googleOAuthClientId } } = useCardInfo();
 
-    const [email, setEmail] = useState();
+    const [user, setUser] = useState({});
     const [error, setError] = useState(false);
     const [loggedIn, setLoggedIn] = useState();
 
@@ -109,7 +109,7 @@ export function AuthProvider({ children }) {
     ) {
         unstable_batchedUpdates(() => {
             setLoggedIn(true);
-            setEmail(authUser);
+            setUser({ authUser });
             setApiState('ready');
 
             if (updateCache) {
@@ -140,7 +140,7 @@ export function AuthProvider({ children }) {
 
         unstable_batchedUpdates(() => {
             setLoggedIn(false);
-            setEmail('');
+            setUser({});
             setApiState('ready');
             gapi.client.setToken('');
         });
@@ -213,7 +213,7 @@ export function AuthProvider({ children }) {
 
     const contextValue = useMemo(() => {
         return {
-            email,
+            user,
             error,
             login,
             logout,
@@ -221,7 +221,7 @@ export function AuthProvider({ children }) {
             setLoggedIn,
             state
         }
-    }, [email, error, loggedIn, login, state]);
+    }, [user, error, loggedIn, login, state]);
 
     useEffect(() => {
         logger.debug('GoogleAuthProvider mounted');
