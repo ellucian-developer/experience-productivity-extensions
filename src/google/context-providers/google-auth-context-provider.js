@@ -2,11 +2,10 @@
 // Copyright 2021-2022 Ellucian Company L.P. and its affiliates.
 import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { unstable_batchedUpdates } from 'react-dom';
 
-import { useCache, useCardInfo } from '@ellucian/experience-extension-hooks';
 import { Context } from '../../context-hooks/auth-context-hooks';
 import { subscribe, unsubscribe, dispatch } from '../util/events';
+import { useCache, useCardInfo } from '@ellucian/experience-extension-hooks';
 
 import log from 'loglevel';
 const logger = log.getLogger('Google');
@@ -35,15 +34,15 @@ function loadScript({ src, identifier }) {
 }
 
 export function AuthProvider({ children }) {
-    const { getItem: cacheGetItem, storeItem: cacheStoreItem } = useCache();
     const { configuration: { googleOAuthClientId } } = useCardInfo();
+    const { getItem: cacheGetItem, storeItem: cacheStoreItem } = useCache();
 
     const [user, setUser] = useState({});
     const [error, setError] = useState(false);
     const [loggedIn, setLoggedIn] = useState();
 
-    const [state, setState] = useState('initializing');
     const [apiState, setApiState] = useState('init');
+    const [state, setState] = useState('initializing');
 
     function loadGapi(clientId) {
         const { gapi, google } = window;
@@ -63,6 +62,13 @@ export function AuthProvider({ children }) {
                     });
 
                     if (Object.keys(data).length) {
+
+                        /**
+                         * If we have a cached token it means user might have
+                         * probably refreshed the page, we can use it
+                         * to reinitialize the authentication and
+                         * load the user data automatically.
+                         */
                         authenticateUser(data.authUser, data.accessToken);
                     } else {
                         prepareForLogin();
@@ -102,33 +108,51 @@ export function AuthProvider({ children }) {
         }
     }
 
+    function logout() {
+        dispatch('userLoggedOut');
+    }
+
+    /**
+     *
+     * Updates the user state with the authenticated Google API response
+     *
+     * @param {*} authUser    The user login id
+     * @param {*} accessToken The access token
+     * @param {*} updateCache Whether to update the cache
+     *
+     * @returns {void}
+     */
     function authenticateUser(
         authUser,
         accessToken,
         updateCache = false
     ) {
-        unstable_batchedUpdates(() => {
-            setLoggedIn(true);
-            setUser({ authUser });
-            setApiState('ready');
+        setLoggedIn(true);
+        setUser({ authUser });
+        setApiState('ready');
 
-            if (updateCache) {
-                cacheStoreItem({
-                    ...cacheOptions,
-                    data: {
-                        authUser,
-                        accessToken
-                    }
-                });
-            }
-
-            const { gapi } = window;
-            gapi.client.setToken({
-                access_token: accessToken
+        if (updateCache) {
+            cacheStoreItem({
+                ...cacheOptions,
+                data: {
+                    authUser,
+                    accessToken
+                }
             });
+        }
+
+        const { gapi } = window;
+        gapi.client.setToken({
+            access_token: accessToken
         });
     }
 
+    /**
+     * Basically this function logs out the user from
+     * the google account and clears the cache.
+     *
+     * @returns {void}
+     */
     function prepareForLogin() {
         const { gapi, google } = window;
         const { data = {} } = cacheGetItem(cacheOptions);
@@ -138,12 +162,10 @@ export function AuthProvider({ children }) {
             cacheStoreItem({ ...cacheOptions, data: {} });
         }
 
-        unstable_batchedUpdates(() => {
-            setLoggedIn(false);
-            setUser({});
-            setApiState('ready');
-            gapi.client.setToken('');
-        });
+        setLoggedIn(false);
+        setUser({});
+        setApiState('ready');
+        gapi.client.setToken('');
     }
 
     useEffect(() => {
@@ -169,10 +191,6 @@ export function AuthProvider({ children }) {
             unsubscribe("userLoggedOut");
         }
     }, []);
-
-    function logout() {
-        dispatch('userLoggedOut');
-    }
 
     useEffect(() => {
         const { google, gapi } = window;
