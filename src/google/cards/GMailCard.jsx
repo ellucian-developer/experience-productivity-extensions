@@ -20,7 +20,7 @@ function GmailCard(props) {
     return (
         <ExtensionProvider {...props}>
             <CardProvider {...props}>
-                <AuthProvider>
+                <AuthProvider id="GMail">
                     <MailProvider>
                         <Mail/>
                     </MailProvider>

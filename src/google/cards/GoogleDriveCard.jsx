@@ -20,7 +20,7 @@ function GoogleDriveCard(props) {
     return (
         <ExtensionProvider {...props}>
             <CardProvider {...props}>
-                <AuthProvider>
+                <AuthProvider id="Drive">
                     <DriveProvider>
                         <Drive/>
                     </DriveProvider>
