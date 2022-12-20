@@ -52,6 +52,7 @@ export function AuthProvider({ children, id = 'default'}) {
      *
      * @param {*} authUser    The user login id
      * @param {*} accessToken The access token
+     * @param {*} expiresIn Seconds until the token expires
      * @param {*} updateCache Whether to update the cache
      *
      * @returns {void}
@@ -59,6 +60,7 @@ export function AuthProvider({ children, id = 'default'}) {
     function authenticateUser(
         authUser,
         accessToken,
+        expiresIn,
         updateCache = false
     ) {
         setLoggedIn(true);
@@ -69,7 +71,8 @@ export function AuthProvider({ children, id = 'default'}) {
                 ...cacheOptions,
                 data: {
                     authUser,
-                    accessToken
+                    accessToken,
+                    expiresIn
                 }
             });
         }
@@ -111,8 +114,8 @@ export function AuthProvider({ children, id = 'default'}) {
             if (reason === 'ready') {
                 setState('ready');
             } else if (reason === 'user-authenticated') {
-                const { accessToken, authUser } = data;
-                authenticateUser( authUser, accessToken, true);
+                const { accessToken, authUser, expiresIn } = data;
+                authenticateUser( authUser, accessToken, expiresIn, true);
             } else if (reason === 'user-logout') {
                 prepareForLogin();
             } else if (reason === 'error') {
@@ -129,12 +132,13 @@ export function AuthProvider({ children, id = 'default'}) {
         const { google, gapi } = window;
         logger.debug(`AuthProvider ${id}, apiState: ${state}, google: ${google}, gapi: ${gapi}`);
 
+        const now = new Date();
         if (state === 'init') {
             setState(initialize({ clientId: googleOAuthClientId, providerId: id }));
         } else if (state === 'ready') {
             logger.debug(`AuthProvider ${id} state: ready`);
-            if (cachedUser && cachedUser.authUser) {
-                authenticateUser(cachedUser.authUser, cachedUser.accessToken);
+            if (cachedUser && cachedUser.authUser && cachedUser.expiresIn > now.getTime()) {
+                authenticateUser(cachedUser.authUser, cachedUser.accessToken, cachedUser.expiresIn);
             } else {
                 prepareForLogin();
             }

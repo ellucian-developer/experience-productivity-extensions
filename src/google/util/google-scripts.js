@@ -72,6 +72,7 @@ function initAuth2TokenClient({ clientId, providerId }){
 
     if ( google && !tokenClient ) {
         logger.debug(`google-scripts ${providerId} initializaing TokenClient`);
+        const now = new Date();
         const newTokenClient = google.accounts.oauth2.initTokenClient({
             'client_id': clientId,
             scope: googleScope,
@@ -81,7 +82,8 @@ function initAuth2TokenClient({ clientId, providerId }){
                     dispatch('google-event', {
                         reason: 'user-authenticated',
                         authUser: tokenResponse.authuser,
-                        accessToken: tokenResponse.access_token
+                        accessToken: tokenResponse.access_token,
+                        expiresIn: now.setSeconds(now.getSeconds() + tokenResponse.expires_in)
                     });
                 }
             }
