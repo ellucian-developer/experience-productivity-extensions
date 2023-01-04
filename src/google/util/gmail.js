@@ -74,7 +74,7 @@ function isToday(dateToCheck) {
         today.getDate() === dateToCheck.getDate()
 }
 
-export function transformMessages({dateFormater, email, newMessages, timeFormater}) {
+export function transformMessages({dateFormater, user, newMessages, timeFormater}) {
     // transform to what UI needs
     const transformedMessages = newMessages.map( message => {
         const {
@@ -106,7 +106,7 @@ export function transformMessages({dateFormater, email, newMessages, timeFormate
 
         const subject = getValueFromArray(headers, 'Subject', 'No Subject');
 
-        const messageUrl = `https://mail.google.com/mail/?authuser=${email}#all/${id}`;
+        const messageUrl = `https://mail.google.com/mail/?authuser=${user?.authUser}#all/${id}`;
 
         const hasAttachment = parts && parts.some(part => part.filename !== '');
 
@@ -133,12 +133,12 @@ export function transformMessages({dateFormater, email, newMessages, timeFormate
     return transformedMessages;
 }
 
-export async function refresh({dateFormater, email, state, setError, setLoggedIn, setMessages, setState, timeFormater}) {
+export async function refresh({dateFormater, user, state, setError, setLoggedIn, setMessages, setState, timeFormater}) {
     logger.debug(`${state}ing gmail`);
     try {
         const newMessages = await getMessagesFromThreads();
 
-        const transformedMessages = transformMessages({dateFormater, email, newMessages, timeFormater});
+        const transformedMessages = transformMessages({dateFormater, user, newMessages, timeFormater});
 
         logger.debug('Gmail messages: ', transformedMessages);
 

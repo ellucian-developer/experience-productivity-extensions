@@ -2,7 +2,7 @@
   "messages": {
     "error.contentNotAvailable": "Contenu non disponible",
     "error.contactYourAdministrator": "Contactez votre administrateur",
-    "drive.modified": "Modifié par: {name}"
+    "drive.modified": "Modifié par: {name}",
     "drive.modifiedBy": "Modifié le {date} par {name}",
     "google.permissionsRequested": "Permissions demandées",
     "google.noFilesTitle": "Aucun fichier dans Google Drive",
