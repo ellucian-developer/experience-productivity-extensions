@@ -1,4 +1,4 @@
-// Copyright 2021-2022 Ellucian Company L.P. and its affiliates.
+// Copyright 2021-2023 Ellucian Company L.P. and its affiliates.
 
 const dotenv = require('dotenv');
 const packageJson = require('./package.json');
@@ -27,15 +27,7 @@ module.exports = async (env, options) => {
     });
 
     // For advanced scenarios, dynamically modify webpackConfig here.
-
     webpackConfig.plugins.push(new Dotenv());
-
-    // this is needed for @ellucian/experience-extension-hooks
-    webpackConfig.module.rules.forEach( rule => {
-        if (rule.loader === 'babel-loader') {
-            rule.exclude = /node_modules\/(?!(@ellucian)\/)/
-        }
-    })
 
     return webpackConfig;
 };
