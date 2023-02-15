@@ -1,4 +1,4 @@
-// Copyright 2021-2022 Ellucian Company L.P. and its affiliates.
+// Copyright 2021-2023 Ellucian Company L.P. and its affiliates.
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
@@ -7,7 +7,7 @@ import { unstable_batchedUpdates } from 'react-dom';
 
 import stringTemplate from 'string-template';
 
-import { useUserInfo } from '@ellucian/experience-extension-hooks';
+import { useUserInfo } from '@ellucian/experience-extension/extension-utilities';
 
 import { useAuth } from '../../context-hooks/auth-context-hooks';
 import { Context } from '../../context-hooks/mail-context-hooks';

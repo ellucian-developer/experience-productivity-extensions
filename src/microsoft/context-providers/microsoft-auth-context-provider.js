@@ -1,9 +1,9 @@
-// Copyright 2021-2022 Ellucian Company L.P. and its affiliates.
+// Copyright 2021-2023 Ellucian Company L.P. and its affiliates.
 
 import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 
-import { useCache, useCardInfo } from '@ellucian/experience-extension-hooks';
+import { useCache, useCardInfo } from '@ellucian/experience-extension/extension-utilities';
 import { Context } from '../../context-hooks/auth-context-hooks';
 
 import { acquireToken, initializeAuthEvents, initializeMicrosoft, initializeGraphClient, login, logout } from '../util/auth';

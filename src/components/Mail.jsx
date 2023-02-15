@@ -1,4 +1,4 @@
-// Copyright 2021-2022 Ellucian Company L.P. and its affiliates.
+// Copyright 2021-2023 Ellucian Company L.P. and its affiliates.
 
 /* eslint-disable jsx-a11y/alt-text */
 import React, { Fragment, useEffect, useState } from 'react';
@@ -19,7 +19,7 @@ import {
     spacing40
 } from '@ellucian/react-design-system/core/styles/tokens';
 
-import { useExtensionControl } from '@ellucian/experience-extension-hooks';
+import { useExtensionControl } from '@ellucian/experience-extension/extension-utilities';
 
 import { useIntl } from '../context-hooks/card-context-hooks.js';
 import { useAuth } from '../context-hooks/auth-context-hooks';

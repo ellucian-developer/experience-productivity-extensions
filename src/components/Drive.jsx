@@ -1,4 +1,4 @@
-// Copyright 2021-2022 Ellucian Company L.P. and its affiliates.
+// Copyright 2021-2023 Ellucian Company L.P. and its affiliates.
 
 /* eslint-disable jsx-a11y/alt-text */
 import React, { useState, useEffect, useMemo, Fragment } from 'react';
@@ -9,7 +9,7 @@ import { Divider, Illustration, IMAGES, Popper, Typography } from '@ellucian/rea
 import { withStyles } from '@ellucian/react-design-system/core/styles';
 import { colorBrandNeutral250, colorBrandNeutral300, fontWeightBold, fontWeightNormal, spacing30, spacing40, spacing50 } from '@ellucian/react-design-system/core/styles/tokens';
 
-import { useExtensionControl, useUserInfo } from '@ellucian/experience-extension-hooks';
+import { useExtensionControl, useUserInfo } from '@ellucian/experience-extension/extension-utilities';
 import { useIntl } from '../context-hooks/card-context-hooks';
 import { useAuth } from '../context-hooks/auth-context-hooks';
 import { useDrive } from '../context-hooks/drive-context-hooks';
