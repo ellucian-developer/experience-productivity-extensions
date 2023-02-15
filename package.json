@@ -1,6 +1,6 @@
 {
   "name": "productivity-tools-extensions",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Productivity Tools extensions",
   "main": "index.js",
   "license": "UNLICENSED",
@@ -15,7 +15,7 @@
     "google-build-prod": "webpack  --config google-webpack.config.js --progress --mode production --env verbose",
     "google-deploy-dev": "webpack --config google-webpack.config.js --progress --mode development --env verbose --env upload",
     "google-deploy-prod": "webpack --config google-webpack.config.js --progress --mode production --env verbose --env upload",
-    "google-watch-and-upload": "webpack --config microsoft-webpack.config.js --hot --watch --mode development --env verbose --env upload --env forceUpload",
+    "google-watch-and-upload": "webpack --config google-webpack.config.js --hot --watch --mode development --env verbose --env upload --env forceUpload",
     "google-start": "webpack --config google-webpack.config.js serve --mode development --env verbose --env liveReload",
     "microsoft-build-dev": "webpack --config microsoft-webpack.config.js --progress --mode development --env verbose",
     "microsoft-build-prod": "webpack --config microsoft-webpack.config.js --progress --mode production --env verbose",
