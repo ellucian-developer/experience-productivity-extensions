@@ -1,6 +1,6 @@
 {
   "name": "productivity-tools-extensions",
-  "version": "1.2.3",
+  "version": "1.3.0",
   "description": "Productivity Tools extensions",
   "main": "index.js",
   "license": "UNLICENSED",
@@ -26,6 +26,9 @@
   },
   "dependencies": {
     "@azure/msal-browser": "2.14.2",
+    "@ellucian/ds-icons": "https://cdn.elluciancloud.com/assets/EDS2/7.1.1/umd/path_design_system_icons.tgz",
+    "@ellucian/experience-extension-utils": "https://cdn.elluciancloud.com/assets/SDK/utils/1.0.0/ellucian-experience-extension-utils-1.0.0.tgz",
+    "@ellucian/react-design-system": "https://cdn.elluciancloud.com/assets/EDS2/7.1.1/umd/path_design_system.tgz",
     "@microsoft/mgt-components": "2.2.0",
     "@microsoft/microsoft-graph-client": "2.2.1",
     "classnames": "2.3.2",
@@ -46,9 +49,7 @@
     "@babel/preset-env": "7.12.1",
     "@babel/preset-react": "7.12.1",
     "@calm/eslint-plugin-react-intl": "1.4.1",
-    "@ellucian/ds-icons": "https://cdn.elluciancloud.com/assets/EDS2/6.8.0/umd/path_design_system_icons.tgz",
-    "@ellucian/experience-extension": "https://cdn.elluciancloud.com/assets/SDK/6.0.0/ellucian-experience-extension-6.0.0.tgz",
-    "@ellucian/react-design-system": "https://cdn.elluciancloud.com/assets/EDS2/6.8.0/umd/path_design_system.tgz",
+    "@ellucian/experience-extension": "https://cdn.elluciancloud.com/assets/SDK/7.0.0/ellucian-experience-extension-7.0.0.tgz",
     "babel-plugin-rewire": "1.2.0",
     "cross-env": "7.0.2",
     "dotenv": "8.6.0",
@@ -57,7 +58,6 @@
     "eslint-plugin-import": "2.25.4",
     "eslint-plugin-jsx-a11y": "6.5.1",
     "eslint-plugin-react": "7.28.0",
-    "expect": "26.6.2",
     "webpack": "5.69.1",
     "webpack-cli": "4.10.0",
     "webpack-dev-server": "4.7.4"

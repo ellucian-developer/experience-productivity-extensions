@@ -19,7 +19,7 @@ import {
     spacing40
 } from '@ellucian/react-design-system/core/styles/tokens';
 
-import { useExtensionControl } from '@ellucian/experience-extension/extension-utilities';
+import { useExtensionControl } from '@ellucian/experience-extension-utils';
 
 import { useIntl } from '../context-hooks/card-context-hooks.js';
 import { useAuth } from '../context-hooks/auth-context-hooks';

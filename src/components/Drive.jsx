@@ -9,7 +9,7 @@ import { Divider, Illustration, IMAGES, Popper, Typography } from '@ellucian/rea
 import { withStyles } from '@ellucian/react-design-system/core/styles';
 import { colorBrandNeutral250, colorBrandNeutral300, fontWeightBold, fontWeightNormal, spacing30, spacing40, spacing50 } from '@ellucian/react-design-system/core/styles/tokens';
 
-import { useExtensionControl, useUserInfo } from '@ellucian/experience-extension/extension-utilities';
+import { useExtensionControl, useUserInfo } from '@ellucian/experience-extension-utils';
 import { useIntl } from '../context-hooks/card-context-hooks';
 import { useAuth } from '../context-hooks/auth-context-hooks';
 import { useDrive } from '../context-hooks/drive-context-hooks';

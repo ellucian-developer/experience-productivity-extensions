@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 
-import { useCache, useCardInfo } from '@ellucian/experience-extension/extension-utilities';
+import { useCache, useCardInfo } from '@ellucian/experience-extension-utils';
 import { Context } from '../../context-hooks/auth-context-hooks';
 
 import { acquireToken, initializeAuthEvents, initializeMicrosoft, initializeGraphClient, login, logout } from '../util/auth';
