@@ -7,7 +7,7 @@ import { unstable_batchedUpdates } from 'react-dom';
 
 import stringTemplate from 'string-template';
 
-import { useUserInfo } from '@ellucian/experience-extension/extension-utilities';
+import { useUserInfo } from '@ellucian/experience-extension-utils';
 
 import { useAuth } from '../../context-hooks/auth-context-hooks';
 import { Context } from '../../context-hooks/mail-context-hooks';

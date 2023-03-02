@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 
-import { useUserInfo } from '@ellucian/experience-extension/extension-utilities';
+import { useUserInfo } from '@ellucian/experience-extension-utils';
 
 import { useAuth } from '../../context-hooks/auth-context-hooks';
 import { Context } from '../../context-hooks/mail-context-hooks';

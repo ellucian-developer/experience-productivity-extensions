@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import { Context } from '../../context-hooks/auth-context-hooks';
 import { subscribe, unsubscribe, dispatch } from '../util/events';
-import { useCache, useCardInfo } from '@ellucian/experience-extension/extension-utilities';
+import { useCache, useCardInfo } from '@ellucian/experience-extension-utils';
 import { getTokenClient, initialize } from '../util/google-scripts';
 
 import log from 'loglevel';
