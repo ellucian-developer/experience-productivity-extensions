@@ -1,7 +1,7 @@
 // Copyright 2021-2023 Ellucian Company L.P. and its affiliates.
 
 module.exports = {
-    name: 'Microsoft Productivity Tools',
+    name: 'microsoft-productivity-tools',
     publisher: '',
     configuration: {
         client: [{
