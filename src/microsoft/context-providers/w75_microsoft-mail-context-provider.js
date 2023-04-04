@@ -5,7 +5,7 @@ import { unstable_batchedUpdates } from 'react-dom';
 
 import stringTemplate from 'string-template';
 
-import { useUserInfo } from '@ellucian/experience-extension-hooks';
+import { useUserInfo } from '@ellucian/experience-extension-utils';
 
 import { useAuth } from '../../context-hooks/auth-context-hooks';
 import { Context } from '../../context-hooks/mail-context-hooks';
@@ -21,6 +21,7 @@ const outlookMessageTemplateUrl = process.env.OUTLOOK_MESSAGE_TEMPLATE_URL || 'h
 const defaultMaxMessageCount = process.env.OUTLOOK_MAX_MESSAGE_COUNT || 10;
 // get fetchUnreadOnly value from .env
 const defaultFetchUnreadOnlyMessageCount = (process.env.OUTLOOK_FETCH_UNREAD_ONLY === "true" || process.env.OUTLOOK_FETCH_UNREAD_ONLY === "True" || process.env.OUTLOOK_FETCH_UNREAD_ONLY === "TRUE");
+
 
 export function MicrosoftMailProvider({children}) {
     const { locale } = useUserInfo();
@@ -66,11 +67,12 @@ export function MicrosoftMailProvider({children}) {
 
                 const {unreadItemCount: unreadCount,
                     totalItemCount: count} = msgCountApiResponse;
-                console.log(`Your Inbox contains ${count} total messages (${unreadCount} unread).`);
+                // console.log(`Your Inbox contains ${count} total messages (${unreadCount} unread).`);
 
                 const apiCall = `/me/mailFolders/Inbox/messages?${queryParameters}`;
                 const response = await client
                 .api(apiCall)
+                .header('Prefer', 'IdType="ImmutableId"')
                 .filter(filterParameter)
                 .get();
 

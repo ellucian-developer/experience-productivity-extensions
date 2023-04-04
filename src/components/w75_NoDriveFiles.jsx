@@ -6,7 +6,7 @@ import { IMAGES } from '@ellucian/react-design-system/core';
 
 import { useComponents, useIntl } from '../context-hooks/card-context-hooks';
 
-import FullCardMessage from './FullCardMessage';
+import FullCardMessage from './w75_FullCardLinkedMessage';
 
 function NoDriveFiles() {
     const { intl } = useIntl();
@@ -21,6 +21,8 @@ function NoDriveFiles() {
             imageName={IMAGES.NO_TASKS}
             title={intl.formatMessage({id: noFiles.titleId})}
             message={intl.formatMessage({id: noFiles.messageId})}
+            url={intl.formatMessage({id: 'oneDriveURL'})}
+            urlTooltip={intl.formatMessage({id: 'oneDriveLinkMsg'})}
         />
     );
 }

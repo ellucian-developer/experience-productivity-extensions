@@ -1,24 +1,17 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-// import sanitizeHtml from 'sanitize-html';
-// import classnames from 'classnames';
-import moment from 'moment';
 
-import { Illustration, IMAGES, List, ListItem, ListItemText, TextLink, Tooltip, Typography } from '@ellucian/react-design-system/core';
-// import { Icon } from '@ellucian/ds-icons/lib';
+import { Illustration, IMAGES, List, ListItem, ListItemText, TextLink, Tooltip, Typography} from '@ellucian/react-design-system/core';
 import { withStyles } from '@ellucian/react-design-system/core/styles';
 import {
-    colorBrandNeutral250,
-    colorBrandNeutral300,
-    colorTextNeutral600,
-    fontWeightBold,
-    fontWeightNormal,
-    spacing30,
-    spacing40
+    colorBrandNeutral250, colorBrandNeutral300, colorTextNeutral600,
+    fontWeightBold, fontWeightNormal,
+    spacing30, spacing40
 } from '@ellucian/react-design-system/core/styles/tokens';
+import { Icon } from '@ellucian/ds-icons/lib';
 
-import { useExtensionControl } from '@ellucian/experience-extension-hooks';
+import { useExtensionControl } from '@ellucian/experience-extension-utils';
 
 import { useIntl } from '../context-hooks/card-context-hooks.js';
 import { useAuth } from '../context-hooks/auth-context-hooks';
@@ -29,6 +22,16 @@ import SignOutButton from './SignOutButton';
 import NoEvents from './w75_NoEvents';
 
 import { pickAvatarColor } from '../util/mail.js';
+import { format, parseJSON, addMinutes, startOfDay } from 'date-fns';
+import { utcToZonedTime } from 'date-fns-tz';
+
+const parseUTC = (dateStr) => parseJSON(dateStr);
+const dateInTimeZone = (dateStr, tz) => utcToZonedTime(dateStr, tz);
+const headerFmt = "EEEE, MMMM do, uuuu";
+const timeFmt = "hh:mm a";
+const shortDtFmt = "MMM do";
+const idDtFmt = "yyyyMMdd";
+
 
 const styles = () => ({
     card: {
@@ -143,13 +146,27 @@ const styles = () => ({
     }
 });
 
-const shortDateFormat = (d, allDay, allDayOffsetMinutes = 0) => {
-    return allDay ? moment(d).utc().add(allDayOffsetMinutes, 'Minutes').format("MMM Do") : moment(d).local().format("MMM Do");
+// All day items end on midnight of the following day, so we need to subtract a day from the date
+const shortDateFormat = (d, tz, allDay, allDayOffsetMinutes = 0) => {
+    return allDay ? format(addMinutes(startOfDay(dateInTimeZone(d, tz)), allDayOffsetMinutes), shortDtFmt) : format(parseJSON(d), shortDtFmt);
+}
+
+const headerDateFormat = (d, tz, allDay, allDayOffsetMinutes = 0) => {
+    return allDay ? format(addMinutes(startOfDay(dateInTimeZone(d, tz)), allDayOffsetMinutes), headerFmt) : format(parseJSON(d), headerFmt);
+}
+const idDateFormat = (d, tz, allDay, allDayOffsetMinutes = 0) => {
+    const utcParsedDt = parseUTC(d);
+    const utcParseOffsetDt = addMinutes(startOfDay(parseUTC(d)), allDayOffsetMinutes);
+    const utcParseTZOffsetDt = addMinutes(startOfDay(dateInTimeZone(d, tz)), allDayOffsetMinutes);
+    // return allDay ? format(utcParseOffsetDt, idDtFmt) : format(utcParsedDt, idDtFmt);
+    return allDay ? format(addMinutes(startOfDay(dateInTimeZone(d, tz)), allDayOffsetMinutes), idDtFmt) : format(parseJSON(d));
 }
 
 // All day items end on midnight of the following day, so we need to subtract a day from the date
 const timeFormat = (d, allDay, allDayReplacementStr) => {
-    return allDay ? allDayReplacementStr : moment(d).local().format("hh:mm A");
+    const retval = allDay ? allDayReplacementStr : format(parseJSON(d), timeFmt);
+    // console.log('timeFormat('+d+', '+allDay+', '+allDayReplacementStr+'): '+retval);
+    return retval;
 }
 
 const isUrl = (s) => {
@@ -169,6 +186,8 @@ function Agenda({ classes }) {
     const { intl } = useIntl();
     const { error: authError, login, loggedIn, logout, state: authState } = useAuth();
     const { error: eventError, events, state: eventState } = useCalendar();
+    // get Outlook Allow Compose setting from .env
+    const defaultAllowCompose  = (process.env.ALLOW_COMPOSE === "true" || process.env.ALLOW_COMPOSE === "True" || process.env.ALLOW_COMPOSE === "TRUE");
 
     const [colorsContext] = useState({ colorsUsed: [], colorsByUser: {}});
 
@@ -196,8 +215,8 @@ function Agenda({ classes }) {
         setLoadingStatus(displayState === 'loading');
     }, [displayState, eventState])
 
-    // const scrollToTime = new Date();
-    // scrollToTime.setHours(7);
+    const scrollToTime = new Date();
+    scrollToTime.setHours(7);
 
     if (displayState === 'loaded') {
         if (events && events.length > 0) {
@@ -210,7 +229,9 @@ function Agenda({ classes }) {
                             const {
                                     title,
                                     start,
+                                    startTZ,
                                     end,
+                                    endTZ,
                                     allDay,
                                     calendarEventLink,
                                     color,
@@ -226,7 +247,8 @@ function Agenda({ classes }) {
                                     status
                             } = item;
                             // All day items are in UTC and should not be localized (or you may move the day)
-                            const header = allDay ? moment(start).utc().format("dddd, MMMM Do, YYYY") : moment(start).format("dddd, MMMM Do, YYYY");
+                            // console.log("In Render EventList: start: '"+start+"', startTZ: '"+startTZ, item);
+                            const header = headerDateFormat(start, startTZ, allDay);
                             // console.log("Start Date: ", start, header);
                             const printHeader = (header !== curHeader);
                             let itemStatus = "not accepted";
@@ -238,22 +260,23 @@ function Agenda({ classes }) {
                             if (printHeader) { curHeader = header; }
                             const startTime = timeFormat(start, allDay, "All");
                             const endTime = timeFormat(end, allDay, "Day");
-                            const startDateShort = shortDateFormat(start, allDay);
-                            const endDateShort = shortDateFormat(end, allDay, -1);
-                            // const dateRange = startDateShort == endDateShort ? startDateShort : startDateShort + " - " + endDateShort;
-                            // const startOffset = moment(start).utcOffset();
+                            const startDateShort = shortDateFormat(start, startTZ, allDay);
+                            const endDateShort = shortDateFormat(end, endTZ, allDay, -1);
+                            const idDt = idDateFormat(start, startTZ, idDtFmt);
                             let timeRange = (allDay ? "All Day" : startTime + " - " + endTime);
                             if (startTime == endTime) { timeRange = startTime; }
                             let eventDetails = startDateShort == endDateShort ? startDateShort + " from " + timeRange : startDateShort + " to " + endDateShort + " from " + timeRange;
                             if (allDay) {
                                 eventDetails = startDateShort == endDateShort ? "All Day on " + startDateShort : "All Day from " + startDateShort + " to " + endDateShort;
                             }
+                            // console.log("TIME STUFF: ", allDay, eventDetails, start, end, startTime, endTime, startDateShort, endDateShort, timeRange);
+                            // console.log("TIME STUFF: allDay: "+allDay+", eventDetails: '"+eventDetails+"', start: '"+start+"', end: ', '"+end+"', startTime: '"+startTime+"', endTime: '"+endTime+"', startDateShort: '"+startDateShort+"', endDateShort: '"+endDateShort+"', timeRange: '"+timeRange+"'");
                             const itemLink = isUrl(location) ? location : calendarEventLink;
                             // console.log(location, calendarEventLink);
                             const avatarColor = pickAvatarColor(fromEmail, colorsContext);
                             return (<Fragment key={id}>
-                                {printHeader && (
-                                <ListItem divider key={`dateHeader_${moment(start).format('YYYYMMDD')}`} id={`dateHeader_${moment(start).format('YYYYMMDD')}`}>
+                                {start && printHeader && (
+                                <ListItem divider key={`dateHeader_${idDt}`} id={`dateHeader_${idDt}`}>
                                     <ListItemText>
                                         <Typography noWrap variant={'h5'} style={{textAlign: 'center'}}>{header}</Typography>
                                     </ListItemText>
@@ -301,6 +324,16 @@ function Agenda({ classes }) {
                             </Fragment>
                         )})}
                     </List>
+                    { defaultAllowCompose && (<div className={classes.logoutBox}>
+                        <Tooltip title={intl.formatMessage({id: 'outlookNewEventLinkTxt'})}>
+                            <Typography className={classes.row} component='div' variant={'body'}>
+                                <TextLink className={classes.unread} href={intl.formatMessage({id: 'outlookNewEventURL'})} target='_blank'>
+                                    <span className={classes.attachment}><Icon name='calendar-add' /> {intl.formatMessage({id: 'newEventLabel'})}</span>
+                                </TextLink>
+                            </Typography>
+                        </Tooltip>
+                    </div>
+                    )}
                     <div className={classes.logoutBox}>
                         <SignOutButton onClick={logout}/>
                     </div>

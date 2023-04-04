@@ -1,9 +1,9 @@
-// Copyright 2021-2022 Ellucian Company L.P. and its affiliates.
+// Copyright 2021-2023 Ellucian Company L.P. and its affiliates.
 
 import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 
-import { useUserInfo } from '@ellucian/experience-extension-hooks';
+import { useUserInfo } from '@ellucian/experience-extension-utils';
 
 import { useAuth } from '../../context-hooks/auth-context-hooks';
 import { Context } from '../../context-hooks/mail-context-hooks';
@@ -16,7 +16,7 @@ const refreshInterval = 60000;
 
 export function MailProvider({children}) {
     const { locale } = useUserInfo();
-    const { email, loggedIn, setLoggedIn } = useAuth();
+    const { user, loggedIn, setLoggedIn } = useAuth();
 
     const [error, setError] = useState(false);
     const [state, setState] = useState('init');
@@ -32,9 +32,9 @@ export function MailProvider({children}) {
 
     useEffect(() => {
         if (loggedIn && (state === 'load' || state === 'refresh')) {
-            refresh({dateFormater, email, setError, setLoggedIn, setMessages, setState, state, timeFormater });
+            refresh({dateFormater, user, setError, setLoggedIn, setMessages, setState, state, timeFormater });
         }
-    }, [dateFormater, loggedIn, state, timeFormater])
+    }, [dateFormater, user, loggedIn, state, timeFormater])
 
     useEffect(() => {
         let timerId;
@@ -98,7 +98,7 @@ export function MailProvider({children}) {
             error,
             messages,
             openMail: () => {
-                window.open(`https://mail.google.com?authuser=${email}`, '_blank');
+                window.open(`https://mail.google.com?authuser=${user?.authUser}`, '_blank');
             },
             refresh: () => { setState('refresh') },
             state

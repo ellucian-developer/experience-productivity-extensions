@@ -1,8 +1,6 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React from 'react';
 
-import { ExtensionProvider } from '@ellucian/experience-extension-hooks';
-
 import { withIntl } from '../../components/ReactIntlProviderWrapper';
 
 import { MicrosoftCardProvider } from '../context-providers/microsoft-card-context-provider';
@@ -16,15 +14,13 @@ initializeLogging('Microsoft');
 
 function OneDriveCard(props) {
     return (
-        <ExtensionProvider {...props}>
-            <MicrosoftCardProvider {...props}>
-                <MicrosoftAuthProvider>
-                    <MicrosoftDriveProvider>
-                        <Drive/>
-                    </MicrosoftDriveProvider>
-                </MicrosoftAuthProvider>
-            </MicrosoftCardProvider>
-        </ExtensionProvider>
+        <MicrosoftCardProvider {...props}>
+            <MicrosoftAuthProvider>
+                <MicrosoftDriveProvider>
+                    <Drive/>
+                </MicrosoftDriveProvider>
+            </MicrosoftAuthProvider>
+        </MicrosoftCardProvider>
     )
 }
 

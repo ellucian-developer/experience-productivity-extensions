@@ -7,14 +7,14 @@ import { Divider, Illustration, IMAGES, Popper, Typography, Tooltip, TextLink } 
 import { withStyles } from '@ellucian/react-design-system/core/styles';
 import { colorBrandNeutral250, colorBrandNeutral300, fontWeightBold, fontWeightNormal, spacing30, spacing40, spacing50 } from '@ellucian/react-design-system/core/styles/tokens';
 
-import { useExtensionControl, useUserInfo } from '@ellucian/experience-extension-hooks';
+import { useExtensionControl, useUserInfo } from '@ellucian/experience-extension-utils';
 import { useIntl } from '../context-hooks/card-context-hooks';
 import { useAuth } from '../context-hooks/auth-context-hooks';
 import { useDrive } from '../context-hooks/drive-context-hooks';
 
 import SignInButton from './SignInButton';
 import SignOutButton from './SignOutButton';
-import NoDriveFiles from './NoDriveFiles';
+import NoDriveFiles from './w75_NoDriveFiles';
 import { prepareFiles } from '../util/drive';
 
 const styles = () => ({

@@ -1,4 +1,4 @@
-// Copyright 2021-2022 Ellucian Company L.P. and its affiliates.
+// Copyright 2021-2023 Ellucian Company L.P. and its affiliates.
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
@@ -15,7 +15,7 @@ const logger = log.getLogger('Google');
 const refreshInterval = 60000;
 
 export function DriveProvider({children}) {
-    const { email, loggedIn, setLoggedIn } = useAuth();
+    const { user, loggedIn, setLoggedIn } = useAuth();
 
     const [error, setError] = useState(false);
     const [state, setState] = useState('load');
@@ -113,11 +113,11 @@ export function DriveProvider({children}) {
             error,
             files,
             openDrive: () => {
-                window.open(`https://drive.google.com?authuser=${email}`, '_blank');
+                window.open(`https://drive.google.com?authuser=${user?.authUser}`, '_blank');
             },
             refresh: () => { setState('refresh') }
         }
-    }, [ email, error, files, setState ]);
+    }, [ user, error, files, setState ]);
 
     useEffect(() => {
         logger.debug('GoogleDriveProvider mounted');

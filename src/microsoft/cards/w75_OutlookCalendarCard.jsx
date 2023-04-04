@@ -1,8 +1,6 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React from 'react';
 
-import { ExtensionProvider } from '@ellucian/experience-extension-hooks';
-
 import { withIntl } from '../../components/ReactIntlProviderWrapper';
 
 import { MicrosoftCardProvider } from '../context-providers/w75_microsoft-card-context-provider';
@@ -16,7 +14,6 @@ initializeLogging('Microsoft');
 
 function OutlookCalendarCard(props) {
     return (
-        <ExtensionProvider {...props}>
             <MicrosoftCardProvider {...props}>
                 <MicrosoftAuthProvider>
                     <MicrosoftCalendarProvider>
@@ -24,7 +21,6 @@ function OutlookCalendarCard(props) {
                     </MicrosoftCalendarProvider>
                 </MicrosoftAuthProvider>
             </MicrosoftCardProvider>
-        </ExtensionProvider>
     )
 }
 

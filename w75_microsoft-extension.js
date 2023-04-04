@@ -50,6 +50,6 @@ module.exports = {
         source: './src/microsoft/cards/w75_OutlookCalendarCard',
         title: 'NWC Outlook Calendar',
         displayCardType: 'NWC Outlook Calendar',
-        description: 'This card displays your next weeks Agenda from your Outlook Calendar.'
+        description: 'This card displays your Outlook Calendar.'
     }]
 };

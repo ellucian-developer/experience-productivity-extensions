@@ -1,4 +1,4 @@
-// Copyright 2021-2022 Ellucian Company L.P. and its affiliates.
+// Copyright 2021-2023 Ellucian Company L.P. and its affiliates.
 
 import React, { useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
@@ -23,6 +23,10 @@ export function CardProvider({children, intl}) {
                 noFiles: {
                     titleId: 'google.noFilesTitle',
                     messageId: 'google.noFilesMessage'
+                },
+                noEvents: {
+                    titleId: 'google.noEventsTitle',
+                    messageId: 'google.noEventsMessage'
                 }
             }
         }

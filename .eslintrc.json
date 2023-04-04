@@ -5,8 +5,7 @@
     "plugin:import/errors",
     "plugin:import/warnings",
     "plugin:jsx-a11y/recommended",
-    "plugin:react/recommended",
-    "plugin:jest/recommended"
+    "plugin:react/recommended"
   ],
   "parserOptions": {
     "babelOptions": {
@@ -34,15 +33,17 @@
         "version": "detect"
     },
     "linkComponents": [
-        "Hyperlink", {"name": "Link", "linkAttribute": "to"}
+        "Hyperlink", {
+          "name": "Link", 
+          "linkAttribute": "to"
+        }
     ]
   },
   "env": {
     "browser": true,
     "node": true,
     "es6": true,
-    "mocha": true,
-    "jest/globals": true
+    "mocha": true
   },
   "plugins": [
     "react",
@@ -257,16 +258,18 @@
     "padding-line-between-statements": "error",
     "prefer-arrow-callback": "error",
     "prefer-const": "error",
-    "prefer-destructuring": ["error", {
-      "array": false,
-      "object": true
-    }
-  ],
+    "prefer-destructuring": [
+      "error", 
+      {
+        "array": false,
+        "object": true
+      }
+    ],
     "prefer-numeric-literals": "error",
     "prefer-promise-reject-errors": "error",
     "prefer-reflect": "off",
     "prefer-rest-params": "error",
-    "prefer-spread": "error",
+    "prefer-spread": "warn",
     "prefer-template": "off",
     "quote-props": "off",
     "quotes": "off",
@@ -310,7 +313,11 @@
       "error",
       "never"
     ],
-    "valid-jsdoc": "error",
+    "valid-jsdoc": ["error", 
+      {
+        "requireReturn": false
+      }
+    ],
     "vars-on-top": "error",
     "wrap-iife": "error",
     "wrap-regex": "error",
@@ -319,14 +326,14 @@
       "error",
       "never"
     ],
-    "@calm/react-intl/missing-formatted-message": [1, { "noTrailingWhitespace": true, "ignoreLinks": true }],
-    "@calm/react-intl/missing-attribute": [1,
-        {
-            "noTrailingWhitespace": true,
-            "noSpreadOperator": true,
-            "requireDescription": false,
-            "formatDefineMessages": false
-        }
+    "@calm/react-intl/missing-attribute": [
+      1,
+      {
+          "noTrailingWhitespace": true,
+          "noSpreadOperator": true,
+          "requireDescription": false,
+          "formatDefineMessages": false
+      }
     ],
     "@calm/react-intl/missing-values": 1,
     "react/no-unused-prop-types": 1

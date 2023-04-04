@@ -1,186 +1,163 @@
-// Copyright 2021-2022 Ellucian Company L.P. and its affiliates.
-
+// Copyright 2021-2023 Ellucian Company L.P. and its affiliates.
 import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-// eslint-disable-next-line camelcase
-import { unstable_batchedUpdates } from 'react-dom';
 
-import { useCache, useCardInfo } from '@ellucian/experience-extension-hooks';
 import { Context } from '../../context-hooks/auth-context-hooks';
+import { subscribe, unsubscribe, dispatch } from '../util/events';
+import { useCache, useCardInfo } from '@ellucian/experience-extension-utils';
+import { getTokenClient, initialize } from '../util/google-scripts';
 
 import log from 'loglevel';
 const logger = log.getLogger('Google');
 
 const cacheScope = 'google-productivity';
-const lastUserIdCacheKey = 'last-user-id';
+const lastUserIdCacheKey = 'last-user-token';
 const cacheOptions = {
     scope: cacheScope,
     key: lastUserIdCacheKey
 }
 
-function loadGapiScript() {
-    return new Promise(resolve => {
-        const element = document.getElementsByTagName('script')[0];
-        const js = document.createElement('script');
-        js.id = 'google-platform';
-        js.src = '//apis.google.com/js/platform.js';
-        js.async = true;
-        js.defer = true;
-        element.parentNode.insertBefore(js, element);
-        js.onload = () => {
-            resolve(window.gapi);
-        }
-    });
-}
-
-function loadGapi(clientId, setApiState, setLoggedIn, setError, cacheGetItem) {
-    const { gapi } = window;
-    gapi.load('client:auth2', async () => {
-        const discoveryDocs = [
-            'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest',
-            'https://gmail.googleapis.com/$discovery/rest?version=v1'
-        ];
-        const scope = 'https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/gmail.readonly';
-
-        try {
-            await gapi.client.init({
-                clientId: clientId,
-                discoveryDocs,
-                scope
-            });
-
-            const googleAuth = gapi.auth2.getAuthInstance();
-
-            googleAuth.isSignedIn.listen(isSignedIn => {
-                logger.debug('Google isSignedIn changed:', isSignedIn);
-                setLoggedIn(isSignedIn)
-            });
-
-            // Handle the initial sign-in state.
-            const signedIn = googleAuth.isSignedIn.get();
-
-            if (signedIn) {
-                // if user is signed in,
-                // verify that the same user was stored in in cache
-                // if not do a logout
-                const {data: lastUserId} = cacheGetItem(cacheOptions);
-
-                const googleUserId = googleAuth.currentUser.get().getId();
-
-                if (lastUserId !== googleUserId) {
-                    unstable_batchedUpdates(() => {
-                        setLoggedIn(false);
-                        setApiState('do-logout');
-                    });
-                } else {
-                    unstable_batchedUpdates(() => {
-                        setLoggedIn(signedIn);
-                        setApiState('ready');
-                    });
-                }
-            } else {
-                unstable_batchedUpdates(() => {
-                    setLoggedIn(signedIn);
-                    setApiState('ready');
-                });
-            }
-        } catch (error) {
-            if (setError) {
-                setError(error);
-            }
-            logger.error('gapi failed', error);
-        }
-    });
-}
-
-export function AuthProvider({ children }) {
-    const { getItem: cacheGetItem, storeItem: cacheStoreItem } = useCache();
+export function AuthProvider({ children, id = 'default'}) {
     const { configuration: { googleOAuthClientId } } = useCardInfo();
+    const { getItem: cacheGetItem, storeItem: cacheStoreItem } = useCache();
 
-    const [email, setEmail] = useState();
+    const [user, setUser] = useState({});
+    const [cachedUser, setCachedUser] = useState({});
     const [error, setError] = useState(false);
     const [loggedIn, setLoggedIn] = useState();
-    const [state, setState] = useState('initializing');
 
-    const [apiState, setApiState] = useState('init');
+    const [state, setState] = useState('init');
 
-    function login(scope) {
+    function login() {
         const { gapi } = window;
-        if (gapi) {
-            const options = {
-                prompt: 'select_account',
-                'ux_mode': 'popup'
-            };
-            if (typeof scope === 'string') {
-                options.scope = scope;
-            }
-            // might be needing to login because of permission issues.
-            // in this case the user is actually logged in
-            // so logout out first so we get notified when they login again.
-            gapi.auth2.getAuthInstance().signOut();
+        const tokenClient = getTokenClient();
 
-            gapi.auth2.getAuthInstance().signIn(options);
+        if (gapi.client.getToken() === null) {
+            // Prompt the user to select a Google Account and ask for consent to share their data
+            // when establishing a new session.
+            tokenClient?.requestAccessToken({ prompt: 'consent' });
+        } else {
+            // Skip display of account chooser and consent dialog for an existing session.
+            tokenClient?.requestAccessToken({ prompt: '' });
         }
     }
 
     function logout() {
-        const { gapi } = window;
-        if (gapi) {
-            gapi.auth2.getAuthInstance().signOut();
+        dispatch('google-event', { reason: 'user-logout' });
+    }
+
+    /**
+     *
+     * Updates the user state with the authenticated Google API response
+     *
+     * @param {*} authUser    The user login id
+     * @param {*} accessToken The access token
+     * @param {*} expiresIn Seconds until the token expires
+     * @param {*} updateCache Whether to update the cache
+     *
+     * @returns {void}
+     */
+    function authenticateUser(
+        authUser,
+        accessToken,
+        expiresIn,
+        updateCache = false
+    ) {
+        setLoggedIn(true);
+        setUser({ authUser });
+
+        if (updateCache) {
+            cacheStoreItem({
+                ...cacheOptions,
+                data: {
+                    authUser,
+                    accessToken,
+                    expiresIn
+                }
+            });
         }
+
+        const { gapi } = window;
+        gapi?.client?.setToken({
+            'access_token': accessToken
+        });
+    }
+
+    /**
+     * Basically this function logs out the user from
+     * the google account and clears the cache.
+     *
+     * @returns {void}
+     */
+    function prepareForLogin() {
+        const { gapi, google } = window;
+        const { data = {} } = cacheGetItem(cacheOptions);
+        if (Object.keys(data).length) {
+            const { accessToken } = data;
+            google?.accounts?.oauth2?.revoke(accessToken);
+            cacheStoreItem({ ...cacheOptions, data: {} });
+        }
+
+        setLoggedIn(false);
+        setUser({});
+        gapi?.client?.setToken('');
     }
 
     useEffect(() => {
-        if (apiState === 'init') {
-            const { gapi } = window;
+        const { data: cachedUser } = cacheGetItem(cacheOptions);
+        setCachedUser(cachedUser);
 
-            if (!gapi) {
-                ( async() => {
-                    setApiState('script-loading');
-                    await loadGapiScript();
-                    setApiState('script-loaded');
-                })();
-            } else {
-                setApiState('script-loaded');
+        subscribe('google-event', event => {
+            const { detail: data } = event;
+            const { reason } = data;
+            logger.debug(`AuthProvider ${id} notification receieved reason: ${reason}`);
+            if (reason === 'ready') {
+                setState('ready');
+            } else if (reason === 'user-authenticated') {
+                const { accessToken, authUser, expiresIn } = data;
+                authenticateUser( authUser, accessToken, expiresIn, true);
+            } else if (reason === 'user-logout') {
+                prepareForLogin();
+            } else if (reason === 'error') {
+                setError(true);
             }
-        } else if (apiState === 'script-loaded') {
-            loadGapi(googleOAuthClientId, setApiState, setLoggedIn, setError, cacheGetItem);
+        });
+
+        return () => {
+            unsubscribe('google-event');
         }
-    }, [apiState, setLoggedIn, setError]);
+    }, []);
 
     useEffect(() => {
-        if (apiState === 'ready') {
-            setState('ready');
-        } else if (apiState === 'do-logout') {
-            logout();
-            setApiState('ready');
-        }
-    }, [apiState]);
+        const { google, gapi } = window;
+        logger.debug(`AuthProvider ${id}, apiState: ${state}, google: ${google}, gapi: ${gapi}`);
 
-    useEffect(() => {
-        if (loggedIn) {
-            const { gapi } = window;
-            const user = gapi.auth2.getAuthInstance().currentUser.get();
-            const email = user.getBasicProfile().getEmail();
-            setEmail(email);
-
-            // store user in cache to detect user changes
-            const googleUserId = gapi.auth2.getAuthInstance().currentUser.get().getId();
-            cacheStoreItem({...cacheOptions, data: googleUserId})
+        const now = new Date();
+        if (state === 'init') {
+            setState(initialize({ clientId: googleOAuthClientId, providerId: id }));
+        } else if (state === 'ready') {
+            logger.debug(`AuthProvider ${id} state: ready`);
+            if (cachedUser && cachedUser.authUser && cachedUser.expiresIn > now.getTime()) {
+                authenticateUser(cachedUser.authUser, cachedUser.accessToken, cachedUser.expiresIn);
+            } else {
+                prepareForLogin();
+            }
         }
-    }, [loggedIn]);
+    }, [state, cachedUser]);
 
     const contextValue = useMemo(() => {
-        return {
-            email,
+        const newContext = {
+            user,
             error,
             login,
             logout,
             loggedIn,
             setLoggedIn,
-            state
+            state: state === 'ready' ? 'ready' : 'initializing'
         }
-    }, [email, error, loggedIn, login, state]);
+        logger.debug(`AuthProvider ${id} context: ${JSON.stringify(newContext, null, 2)}`);
+        return newContext;
+    }, [state, error, loggedIn, login, user]);
 
     useEffect(() => {
         logger.debug('GoogleAuthProvider mounted');
@@ -198,5 +175,6 @@ export function AuthProvider({ children }) {
 }
 
 AuthProvider.propTypes = {
-    children: PropTypes.object.isRequired
+    children: PropTypes.object.isRequired,
+    id: PropTypes.string
 }

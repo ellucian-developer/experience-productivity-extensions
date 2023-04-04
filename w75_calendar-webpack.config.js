@@ -30,12 +30,5 @@ module.exports = async (env, options) => {
 
     webpackConfig.plugins.push(new Dotenv());
 
-    // this is needed for @ellucian/experience-extension-hooks
-    webpackConfig.module.rules.forEach( rule => {
-        if (rule.loader === 'babel-loader') {
-            rule.exclude = /node_modules\/(?!(@ellucian)\/)/
-        }
-    })
-
     return webpackConfig;
 };

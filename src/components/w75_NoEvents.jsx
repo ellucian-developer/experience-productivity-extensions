@@ -20,6 +20,10 @@ function NoEvents() {
             title={intl.formatMessage({id: noEvents.titleId})}
             message={intl.formatMessage({id: noEvents.messageId})}
             url={intl.formatMessage({id: 'outlookCalendarURL'})}
+            urlTooltip={intl.formatMessage({id: 'outlookCalendarLinkMsg'})}
+            composeUrl={intl.formatMessage({id: 'outlookNewEventURL'})}
+            composeUrlTooltip={intl.formatMessage({id: 'outlookNewEventLinkMsg'})}
+            composeLabel={intl.formatMessage({id: 'newEventLabel'})}
         />
     );
 }

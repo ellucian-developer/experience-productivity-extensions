@@ -17,7 +17,7 @@ import {
     spacing40
 } from '@ellucian/react-design-system/core/styles/tokens';
 
-import { useExtensionControl } from '@ellucian/experience-extension-hooks';
+import { useExtensionControl } from '@ellucian/experience-extension-utils';
 
 import { useIntl } from '../context-hooks/card-context-hooks.js';
 import { useAuth } from '../context-hooks/auth-context-hooks';
@@ -140,6 +140,8 @@ function Mail({ classes }) {
     const { intl } = useIntl();
     const { error: authError, login, loggedIn, logout, state: authState } = useAuth();
     const { error: mailError, fetchUnreadOnlyLabel, messageCount, unreadMessageCount, messages, state: mailState } = useMail();
+    // get Outlook Allow Compose setting from .env
+    const defaultAllowCompose  = (process.env.ALLOW_COMPOSE === "true" || process.env.ALLOW_COMPOSE === "True" || process.env.ALLOW_COMPOSE === "TRUE");
 
     const [colorsContext] = useState({ colorsUsed: [], colorsByUser: {}});
 
@@ -171,11 +173,29 @@ function Mail({ classes }) {
         if (messages && messages.length > 0) {
             return (
                 <div className={classes.content}>
-                    <Typography className='row' component='div' variant='body2'>
-                        <TextLink className='unread' href={intl.formatMessage({id: 'outlookURL'})} target='_blank'>
-                            {intl.formatMessage({id: fetchUnreadOnlyLabel}, {unread: unreadMessageCount, count: messageCount})}
-                        </TextLink>
-                    </Typography>
+                    <div className={classes.fromBox}>
+                        <Tooltip title={intl.formatMessage({id: 'outlookLinkMsg'})}>
+                            <Typography
+                                className={classnames(classes.messageFrom, classes.unread)}
+                                component='div'
+                                dir={'auto'}
+                                noWrap
+                                variant={'body2'}
+                            >
+                                <TextLink className={classnames(classes.messageFrom, classes.unread)} href={intl.formatMessage({id: 'outlookURL'})} target='_blank' noWrap>
+                                {intl.formatMessage({id: fetchUnreadOnlyLabel}, {unread: unreadMessageCount, count: messageCount})}
+                                </TextLink>
+                            </Typography>
+                        </Tooltip>
+                        {defaultAllowCompose && (<Tooltip title={intl.formatMessage({id: 'outlookComposeLinkMsg'})}>
+                            <Typography className={classes.date} component='div' variant={'body3'}>
+                                <TextLink className={classnames(classes.messageFrom, classes.unread)} href={intl.formatMessage({id: 'outlookComposeURL'})} target='_blank'>
+                                    <div className={classes.attachment} style={{ minWidth: '35px'}}><Icon name='add' /><Icon name="email"/></div>
+                                </TextLink>
+                            </Typography>
+                        </Tooltip>
+                        )}
+                    </div>
                     {messages.map((message) => {
                         const {
                             bodySnippet,
@@ -247,6 +267,16 @@ function Mail({ classes }) {
                             </Fragment>
                         );
                     })}
+                    {defaultAllowCompose && (<div className={classes.logoutBox}>
+                        <Tooltip title={intl.formatMessage({id: 'outlookComposeLinkMsg'})}>
+                            <Typography className={classes.row} component='div' variant={'body'}>
+                                <TextLink className={classes.unread} href={intl.formatMessage({id: 'outlookComposeURL'})} target='_blank'>
+                                    <span className={classes.attachment}><Icon name='add' /><Icon name='email'/> {intl.formatMessage({id: 'newMailLabel'})}</span>
+                                </TextLink>
+                            </Typography>
+                        </Tooltip>
+                    </div>
+                    )}
                     <div className={classes.logoutBox}>
                         <SignOutButton onClick={logout}/>
                     </div>

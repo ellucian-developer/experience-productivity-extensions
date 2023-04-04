@@ -1,9 +1,7 @@
-// Copyright 2021-2022 Ellucian Company L.P. and its affiliates.
+// Copyright 2021-2023 Ellucian Company L.P. and its affiliates.
 
 /* eslint-disable jsx-a11y/alt-text */
 import React from 'react';
-
-import { ExtensionProvider } from '@ellucian/experience-extension-hooks';
 
 import { withIntl } from '../../components/ReactIntlProviderWrapper';
 
@@ -18,15 +16,13 @@ initializeLogging('Google');
 
 function GmailCard(props) {
     return (
-        <ExtensionProvider {...props}>
             <CardProvider {...props}>
-                <AuthProvider>
+                <AuthProvider id="GMail">
                     <MailProvider>
                         <Mail/>
                     </MailProvider>
                 </AuthProvider>
             </CardProvider>
-        </ExtensionProvider>
     )
 }
 
