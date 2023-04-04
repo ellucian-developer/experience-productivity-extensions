@@ -25,7 +25,6 @@ import { pickAvatarColor } from '../util/mail.js';
 import { format, parseJSON, addMinutes, startOfDay } from 'date-fns';
 import { utcToZonedTime } from 'date-fns-tz';
 
-const parseUTC = (dateStr) => parseJSON(dateStr);
 const dateInTimeZone = (dateStr, tz) => utcToZonedTime(dateStr, tz);
 const headerFmt = "EEEE, MMMM do, uuuu";
 const timeFmt = "hh:mm a";
@@ -155,9 +154,6 @@ const headerDateFormat = (d, tz, allDay, allDayOffsetMinutes = 0) => {
     return allDay ? format(addMinutes(startOfDay(dateInTimeZone(d, tz)), allDayOffsetMinutes), headerFmt) : format(parseJSON(d), headerFmt);
 }
 const idDateFormat = (d, tz, allDay, allDayOffsetMinutes = 0) => {
-    const utcParsedDt = parseUTC(d);
-    const utcParseOffsetDt = addMinutes(startOfDay(parseUTC(d)), allDayOffsetMinutes);
-    const utcParseTZOffsetDt = addMinutes(startOfDay(dateInTimeZone(d, tz)), allDayOffsetMinutes);
     // return allDay ? format(utcParseOffsetDt, idDtFmt) : format(utcParsedDt, idDtFmt);
     return allDay ? format(addMinutes(startOfDay(dateInTimeZone(d, tz)), allDayOffsetMinutes), idDtFmt) : format(parseJSON(d));
 }
@@ -236,13 +232,10 @@ function Agenda({ classes }) {
                                     calendarEventLink,
                                     color,
                                     eventId: id,
-                                    bodySnippet,
                                     isAccepted,
                                     isTentative,
                                     fromEmail,
-                                    fromInitials,
                                     fromName,
-                                    hasAttachment,
                                     location,
                                     status
                             } = item;
@@ -324,7 +317,7 @@ function Agenda({ classes }) {
                             </Fragment>
                         )})}
                     </List>
-                    { defaultAllowCompose && (<div className={classes.logoutBox}>
+                    {defaultAllowCompose && (<div className={classes.logoutBox}>
                         <Tooltip title={intl.formatMessage({id: 'outlookNewEventLinkTxt'})}>
                             <Typography className={classes.row} component='div' variant={'body'}>
                                 <TextLink className={classes.unread} href={intl.formatMessage({id: 'outlookNewEventURL'})} target='_blank'>

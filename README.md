@@ -75,7 +75,7 @@ Use your favorite Git tool to clone this repository.
 1. Obtain an upload token from Experience Setup and add that token to .env, as described in [Build and upload an extension](https://resources.elluciancloud.com/bundle/ellucian_experience_acn_use/page/t_upload_extension.html).
 1. Update publisher in `google-extension.js`.
 1. Run 'npm install' to install all the dependencies.
-1. Run one of the deployment npm scripts, such as 'npm run google-start' (for development).
+1. Run one of the deployment npm scripts, such as 'npm run google-watch-and-upload' (for development).
 1. Enable the extension and add it to an environment(s) in Experience Setup -> Extensions, using the procedure in [Enable an extension in Experience environments](https://resources.elluciancloud.com/bundle/ellucian_experience_acn_use/page/t_enable_extension_experience_envs.html). 
 
 ## <a name="google-configuration"></a>Google Configuration
@@ -121,7 +121,7 @@ optional .env variables.</br>
 `OUTLOOK_USE_WEB_LINK` set to `'true'` can be used to use the deep link webLink URL as sent by the Microsoft Graph API with the message. Default is false.
 1. Update publisher in `microsoft-extension.js`.
 1. Run 'npm install' to install all the dependencies.
-1. Run one of the deployment npm scripts, such as 'npm run microsoft-start' (for development).
+1. Run one of the deployment npm scripts, such as 'npm run microsoft-watch-and-upload' (for development).
 1. Enable the extension and add it to an environment(s) in Experience Setup -> Extensions, using the procedure in [Enable an extension in Experience environments](https://resources.elluciancloud.com/bundle/ellucian_experience_acn_use/page/t_enable_extension_experience_envs.html). 
 
 ## <a name="microsoft-configuration"></a>Microsoft Configuration

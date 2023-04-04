@@ -81,8 +81,6 @@ export function MicrosoftCalendarProvider({children}) {
                 .header('Prefer', 'IdType="ImmutableId"')
                 .get();
 
-                // ToDo: implement getCalendarEventBaseColor() to get the settings cookie value associated with the Calendar Event Base Color
-                // const baseColor = getCalendarEventBaseColor();
                 const { value: events } = response;
                 // console.log("MSGraph Events: ", events);
                 const acceptedColor = getColor('accepted');
@@ -103,7 +101,6 @@ export function MicrosoftCalendarProvider({children}) {
                         },
                         id: eventId,
                         isRead,
-                        isDraft,
                         isCancelled,
                         recurrence,
                         hasAttachments: hasAttachment,

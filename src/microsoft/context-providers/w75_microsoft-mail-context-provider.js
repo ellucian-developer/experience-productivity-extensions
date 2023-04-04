@@ -32,7 +32,7 @@ export function MicrosoftMailProvider({children}) {
     const [messages, setMessages] = useState();
     const [userPhotos, setUserPhotos] = useState({});
     const [renderCount, setRenderCount] = useState(0);
-    const [maxMessageCount, setMaxMessageCount] = useState(defaultMaxMessageCount);
+    const [maxMessageCount] = useState(defaultMaxMessageCount);
     const [messageCount, setMessageCount] = useState(0);
     const [unreadMessageCount, setUnreadMessageCount] = useState(0);
     const [fetchUnreadOnly, setFetchUnreadOnly] = useState(defaultFetchUnreadOnlyMessageCount);

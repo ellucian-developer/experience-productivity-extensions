@@ -1,6 +1,6 @@
 {
   "name": "productivity-tools-extensions",
-  "version": "1.2.4",
+  "version": "1.3.2",
   "description": "Productivity Tools extensions",
   "main": "index.js",
   "license": "UNLICENSED",
@@ -75,26 +75,26 @@
     
   },
   "devDependencies": {
-    "@babel/eslint-parser": "7.17.0",
-    "@babel/plugin-transform-runtime": "7.12.1",
-    "@babel/preset-env": "7.12.1",
-    "@babel/preset-react": "7.12.1",
+    "@babel/eslint-parser": "7.18.2",
+    "@babel/plugin-transform-runtime": "7.18.6",
+    "@babel/preset-env": "7.18.6",
+    "@babel/preset-react": "7.18.6",
     "@calm/eslint-plugin-react-intl": "1.4.1",
     "@ellucian/experience-extension": "https://cdn.elluciancloud.com/assets/SDK/7.0.0/ellucian-experience-extension-7.0.0.tgz",    
     "babel-plugin-rewire": "1.2.0",
-    "cross-env": "7.0.2",
+    "cross-env": "7.0.3",
     "dotenv": "8.6.0",
     "dotenv-webpack": "7.1.1",
     "eslint": "8.32.0",
-    "eslint-plugin-import": "2.25.4",
-    "eslint-plugin-jsx-a11y": "6.5.1",
-    "eslint-plugin-react": "7.28.0",
-    "expect": "26.6.2",
-    "webpack": "5.75.0",
+    "eslint-plugin-import": "2.26.0",
+    "eslint-plugin-jsx-a11y": "6.6.0",
+    "eslint-plugin-react": "7.30.1",
+    "webpack": "5.76.1",
     "webpack-cli": "5.0.1",
     "webpack-dev-server": "4.11.1"
   },
   "overrides": {
-    "ua-parser-js": "0.7.33"
+    "ua-parser-js": "0.7.33",
+    "webpack": "5.76.1"
   }
 }

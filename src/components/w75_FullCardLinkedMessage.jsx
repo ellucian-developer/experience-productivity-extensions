@@ -70,8 +70,7 @@ function FullCardLinkedMessage({ classes, imageName, title, message, url, urlToo
                     </Typography>
                 </TextLink>
                 </Tooltip>
-                {defaultAllowCompose && composeUrl && composeUrlTooltip && composeLabel && (
-                    <div className={classes.compose}>
+                {defaultAllowCompose && composeUrl && composeUrlTooltip && composeLabel && (<div className={classes.compose}>
                     <Tooltip title={composeUrlTooltip}>
                     <TextLink href={composeUrl} target='_blank' >
                         <Typography component='div' align='center' variant={'body2'}>

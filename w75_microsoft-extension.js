@@ -1,6 +1,6 @@
 module.exports = {
-    name: 'NWC Microsoft Cards',
-    publisher: 'Northwest College',
+    name: 'NWC-Microsoft-Cards',
+    publisher: '',
     configuration: {
         client: [{
             key: 'aadRedirectUrl',
