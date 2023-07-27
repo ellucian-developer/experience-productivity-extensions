@@ -52,8 +52,7 @@ export function MicrosoftAuthProvider({ children }) {
 
     useEffect(() => {
         function mobileLogOut() {
-            setLoggedIn(false);
-            setState('ready');
+            setState('event-logout')
         }
         setInvokable('mobileLogout', mobileLogOut);
     }, [])
