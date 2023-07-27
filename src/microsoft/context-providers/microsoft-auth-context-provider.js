@@ -9,36 +9,66 @@ import { Context } from '../../context-hooks/auth-context-hooks';
 import { acquireToken, initializeAuthEvents, initializeMicrosoft, initializeGraphClient, login, logout } from '../util/auth';
 
 import log from 'loglevel';
+import { invokeNativeFunction, isInNativeApp, setInvokable } from '../../util/mobileAppUtils';
+import { Client } from '@microsoft/microsoft-graph-client';
 const logger = log.getLogger('Microsoft');
 
 export function MicrosoftAuthProvider({ children }) {
     const { getItem: cacheGetItem, storeItem: cacheStoreItem } = useCache();
-	const {
-		configuration: {
-			aadRedirectUrl,
-			aadClientId,
-			aadTenantId
-		}
-	} = useCardInfo();
+    const {
+        configuration: {
+            aadRedirectUrl,
+            aadClientId,
+            aadTenantId
+        }
+    } = useCardInfo();
 
-	const [msalClient, setMsalClient] = useState();
-	const [graphClient, setGraphClient] = useState();
-	const [error, setError] = useState(false);
-	const [loggedIn, setLoggedIn] = useState(false);
-	const [state, setState] = useState('initialize');
+    const [msalClient, setMsalClient] = useState();
+    const [graphClient, setGraphClient] = useState();
+    const [error, setError] = useState(false);
+    const [loggedIn, setLoggedIn] = useState(false);
+    const [state, setState] = useState('initialize');
 
-	// eslint-disable-next-line complexity
-	useEffect(() => {
-        switch( state ) {
+    useEffect(() => {
+        function mobileLogin(accessToken) {
+            const options = {
+                authProvider: {
+                    getAccessToken: () => (accessToken)
+                }
+            }
+            const graphClient = Client.initWithMiddleware(options);
+            if (graphClient) {
+                setGraphClient(() => graphClient);
+                setLoggedIn(true);
+                setState('ready');
+            }
+        }
+        setInvokable('mobileLogin', mobileLogin);
+    }, [])
+
+    useEffect(() => {
+        invokeNativeFunction('acquireMobileToken', Math.random(), false)
+    }, [])
+
+    useEffect(() => {
+        function mobileLogOut() {
+            setLoggedIn(false);
+            setState('ready');
+        }
+        setInvokable('mobileLogout', mobileLogOut);
+    }, [])
+    // eslint-disable-next-line complexity
+    useEffect(() => {
+        switch (state) {
             case 'initialize':
-                if (aadClientId && aadRedirectUrl && aadTenantId && !msalClient ) {
-                    const msalClient = initializeMicrosoft({aadClientId, aadRedirectUrl, aadTenantId, setMsalClient});
+                if (aadClientId && aadRedirectUrl && aadTenantId && !msalClient) {
+                    const msalClient = initializeMicrosoft({ aadClientId, aadRedirectUrl, aadTenantId, setMsalClient });
                     setMsalClient(() => msalClient);
-                    initializeAuthEvents({setState});
+                    initializeAuthEvents({ setState });
 
                     // check if already logged in
                     (async () => {
-                        if (await acquireToken({aadClientId, aadTenantId, cacheGetItem, cacheStoreItem, msalClient, trySsoSilent: true})) {
+                        if (await acquireToken({ aadClientId, aadTenantId, cacheGetItem, cacheStoreItem, msalClient, trySsoSilent: true })) {
                             setState('do-graph-initialize');
                         } else {
                             setState('ready');
@@ -49,7 +79,7 @@ export function MicrosoftAuthProvider({ children }) {
             case 'do-login':
                 if (aadClientId && aadRedirectUrl && aadTenantId && cacheGetItem && cacheStoreItem && msalClient) {
                     (async () => {
-                        if (await login({aadClientId, aadRedirectUrl, aadTenantId, cacheGetItem, cacheStoreItem, msalClient})) {
+                        if (await login({ aadClientId, aadRedirectUrl, aadTenantId, cacheGetItem, cacheStoreItem, msalClient })) {
                             setState('do-graph-initialize');
                         } else {
                             // user likely bailed
@@ -61,19 +91,21 @@ export function MicrosoftAuthProvider({ children }) {
             case 'do-logout':
                 if (aadClientId && aadRedirectUrl && aadTenantId && msalClient) {
                     (async () => {
-                        await logout({aadClientId, aadRedirectUrl, aadTenantId, msalClient});
+                        await logout({ aadClientId, aadRedirectUrl, aadTenantId, msalClient });
                         setLoggedIn(false);
                         setState('ready');
                     })();
                 }
                 break;
             case 'do-graph-initialize':
-                if (aadClientId && aadRedirectUrl && aadTenantId && msalClient) {
-                    const graphClient = initializeGraphClient({aadClientId, aadTenantId, msalClient, setError});
-                    if (graphClient) {
-                        setGraphClient(() => graphClient);
-                        setLoggedIn(true);
-                        setState('ready');
+                if (!isInNativeApp()) {
+                    if (aadClientId && aadRedirectUrl && aadTenantId && msalClient) {
+                        const graphClient = initializeGraphClient({ aadClientId, aadTenantId, msalClient, setError });
+                        if (graphClient) {
+                            setGraphClient(() => graphClient);
+                            setLoggedIn(true);
+                            setState('ready');
+                        }
                     }
                 }
                 break;
@@ -86,19 +118,19 @@ export function MicrosoftAuthProvider({ children }) {
                 break;
             default:
         }
-	}, [ aadClientId, aadRedirectUrl, aadTenantId, cacheGetItem, cacheStoreItem, msalClient, state ]);
+    }, [aadClientId, aadRedirectUrl, aadTenantId, cacheGetItem, cacheStoreItem, msalClient, state]);
 
-	const contextValue = useMemo(() => {
-		return {
-			client: graphClient,
-			error,
-			login: () => { setState('do-login')},
-			logout: () => { setState('do-logout')},
-			loggedIn,
-			setLoggedIn,
-			state: state === 'ready' || state === 'do-logout' ? 'ready' : 'not-ready'
-		}
-	}, [graphClient, error, loggedIn, login, state]);
+    const contextValue = useMemo(() => {
+        return {
+            client: graphClient,
+            error,
+            login: () => { setState('do-login') },
+            logout: () => { setState('do-logout') },
+            loggedIn,
+            setLoggedIn,
+            state: state === 'ready' || state === 'do-logout' ? 'ready' : 'not-ready'
+        }
+    }, [graphClient, error, loggedIn, login, state]);
 
     useEffect(() => {
         logger.debug('MicrosoftAuthProvider mounted');
@@ -107,13 +139,13 @@ export function MicrosoftAuthProvider({ children }) {
         }
     }, []);
 
-	return (
-		<Context.Provider value={contextValue}>
-			{children}
-		</Context.Provider>
-	)
+    return (
+        <Context.Provider value={contextValue}>
+            {children}
+        </Context.Provider>
+    )
 }
 
 MicrosoftAuthProvider.propTypes = {
-	children: PropTypes.object.isRequired
+    children: PropTypes.object.isRequired
 }

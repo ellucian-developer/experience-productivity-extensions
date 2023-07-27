@@ -11,6 +11,7 @@ import { withStyles } from '@ellucian/react-design-system/core/styles';
 import { spacing30 } from '@ellucian/react-design-system/core/styles/tokens';
 
 import { useComponents, useIntl } from '../context-hooks/card-context-hooks';
+import { invokeNativeFunction, isInNativeApp } from '../util/mobileAppUtils';
 
 const styles = () => ({
     button: {
@@ -27,9 +28,11 @@ function SignOutButton({classes, className = '', onClick}) {
 
 
     return (
-        <Button className={classnames(className, classes.button)} color='secondary' onClick={onClick}>
-            <img className={classes.image} src={buttonImage}/>
-            {intl.formatMessage({id: 'signOut'})}
+        <Button className={classnames(className, classes.button)} color='secondary' onClick={
+            isInNativeApp() ? () => invokeNativeFunction('userSignOut', Math.random(), false)
+                : onClick}>
+            <img className={classes.image} src={buttonImage} />
+            {intl.formatMessage({ id: 'signOut' })}
         </Button>
     );
 }

@@ -9,6 +9,8 @@ import { withStyles } from '@ellucian/react-design-system/core/styles';
 import { spacing30 } from '@ellucian/react-design-system/core/styles/tokens';
 
 import { useComponents, useIntl } from '../context-hooks/card-context-hooks';
+import { invokeNativeFunction, isInNativeApp } from '../util/mobileAppUtils';
+import { useCardInfo } from '@ellucian/experience-extension-utils';
 
 const styles = () => ({
     button: {
@@ -22,11 +24,19 @@ const styles = () => ({
 function SignInButton({ classes, onClick}) {
     const { intl } = useIntl();
     const { buttonImage } = useComponents();
+    const {
+        configuration: {
+            aadClientId,
+            aadTenantId
+        }
+    } = useCardInfo();
 
     return (
-        <Button className={classes.button} color='secondary' onClick={onClick}>
-            <img className={classes.image} src={buttonImage}/>
-            {intl.formatMessage({id: 'signIn'})}
+        <Button className={classes.button} color='secondary' onClick={
+            isInNativeApp() ? () => invokeNativeFunction('userSignIn', { aadClientId, aadTenantId }, false)
+                : onClick}>
+            <img className={classes.image} src={buttonImage} />
+            {intl.formatMessage({ id: 'signIn' })}
         </Button>
     );
 }
