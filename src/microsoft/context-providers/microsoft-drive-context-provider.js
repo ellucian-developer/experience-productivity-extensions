@@ -11,6 +11,7 @@ import { useAuth } from '../../context-hooks/auth-context-hooks';
 import { Context } from '../../context-hooks/drive-context-hooks';
 
 import log from 'loglevel';
+import { invokeNativeFunction, isInNativeApp } from '../../util/mobileAppUtils';
 const logger = log.getLogger('Microsoft');
 
 const refreshInterval = 60000;
@@ -81,15 +82,19 @@ export function MicrosoftDriveProvider({children}) {
                     setState('loaded');
                 })
             } catch (error) {
-                // did we get logged out or credentials were revoked?
-                if (error && error.status === 401) {
-                    setLoggedIn(false);
+                if (!isInNativeApp()) {
+                    // did we get logged out or credentials were revoked?
+                    if (error && error.status === 401) {
+                        setLoggedIn(false);
+                    } else {
+                        logger.error('OneDrive msal failed', error);
+                        unstable_batchedUpdates(() => {
+                            setState(() => ({ error: 'api' }));
+                            setError(error);
+                        })
+                    }
                 } else {
-                    logger.error('OneDrive msal failed', error);
-                    unstable_batchedUpdates(() => {
-                        setState(() => ({ error: 'api'}));
-                        setError(error);
-                    })
+                    invokeNativeFunction('acquireMobileToken', Math.random(), false)
                 }
             }
         }

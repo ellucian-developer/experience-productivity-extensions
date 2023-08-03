@@ -14,6 +14,7 @@ import { Context } from '../../context-hooks/mail-context-hooks';
 import { isToday, getInitials } from '../../util/mail';
 
 import log from 'loglevel';
+import { invokeNativeFunction, isInNativeApp } from '../../util/mobileAppUtils';
 const logger = log.getLogger('Microsoft');
 
 const refreshInterval = 60000;
@@ -161,15 +162,19 @@ export function MicrosoftMailProvider({children}) {
                     })();
                 }
             } catch (error) {
-                // did we get logged out or credentials were revoked?
-                if (error && error.status === 401) {
-                    setLoggedIn(false);
+                if (!isInNativeApp()) {
+                    // did we get logged out or credentials were revoked?
+                    if (error && error.status === 401) {
+                        setLoggedIn(false);
+                    } else {
+                        logger.error('Outlook mapi failed\n', error);
+                        unstable_batchedUpdates(() => {
+                            setState(() => ({ error: 'api' }));
+                            setError(error);
+                        });
+                    }
                 } else {
-                    logger.error('Outlook mapi failed\n', error);
-                    unstable_batchedUpdates(() => {
-                        setState(() => ({ error: 'api'}));
-                        setError(error);
-                    });
+                    invokeNativeFunction('acquireMobileToken', Math.random(), false)
                 }
             }
         }
