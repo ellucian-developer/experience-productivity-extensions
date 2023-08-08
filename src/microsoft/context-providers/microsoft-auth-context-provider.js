@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 
-import { useCache, useCardInfo } from '@ellucian/experience-extension-utils';
+import { useCache, useCardInfo, useExtensionControl } from '@ellucian/experience-extension-utils';
 import { Context } from '../../context-hooks/auth-context-hooks';
 
 import { acquireToken, initializeAuthEvents, initializeMicrosoft, initializeGraphClient, login, logout } from '../util/auth';
@@ -28,6 +28,7 @@ export function MicrosoftAuthProvider({ children }) {
     const [error, setError] = useState(false);
     const [loggedIn, setLoggedIn] = useState(false);
     const [state, setState] = useState('initialize');
+    const { setLoadingStatus } = useExtensionControl();
 
     useEffect(() => {
         function mobileLogin(accessToken) {
@@ -40,7 +41,6 @@ export function MicrosoftAuthProvider({ children }) {
             if (graphClient) {
                 setGraphClient(() => graphClient);
                 setLoggedIn(true);
-                setState('ready');
             }
         }
         setInvokable('mobileLogin', mobileLogin);
@@ -48,6 +48,18 @@ export function MicrosoftAuthProvider({ children }) {
 
     useEffect(() => {
         invokeNativeFunction('acquireMobileToken', Math.random(), false)
+    }, [])
+
+    useEffect(() => {
+        function setLoading(status) {
+            if (status === 'true') {
+                setLoadingStatus(true)
+            } else if (status === 'false') {
+                setState('ready');
+                setLoadingStatus(false)
+            }
+        }
+        setInvokable('setLoading', setLoading);
     }, [])
 
     useEffect(() => {
@@ -69,7 +81,7 @@ export function MicrosoftAuthProvider({ children }) {
                     (async () => {
                         if (await acquireToken({ aadClientId, aadTenantId, cacheGetItem, cacheStoreItem, msalClient, trySsoSilent: true })) {
                             setState('do-graph-initialize');
-                        } else {
+                        } else if (!isInNativeApp()) {
                             setState('ready');
                         }
                     })();
