@@ -14,7 +14,6 @@ import { Context } from '../../context-hooks/mail-context-hooks';
 import { isToday, getInitials } from '../../util/mail';
 
 import log from 'loglevel';
-import { invokeNativeFunction, isInNativeApp } from '../../util/mobileAppUtils';
 const logger = log.getLogger('Microsoft');
 
 const refreshInterval = 60000;
@@ -162,7 +161,7 @@ export function MicrosoftMailProvider({children}) {
                     })();
                 }
             } catch (error) {
-                if (!isInNativeApp()) {
+                if (!window.isInNativeApp()) {
                     // did we get logged out or credentials were revoked?
                     if (error && error.status === 401) {
                         setLoggedIn(false);
@@ -174,7 +173,7 @@ export function MicrosoftMailProvider({children}) {
                         });
                     }
                 } else {
-                    invokeNativeFunction('acquireMobileToken', Math.random(), false)
+                    window.invokeNativeFunction('acquireMobileToken', Math.random(), false)
                 }
             }
         }

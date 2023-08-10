@@ -11,7 +11,6 @@ import { useAuth } from '../../context-hooks/auth-context-hooks';
 import { Context } from '../../context-hooks/drive-context-hooks';
 
 import log from 'loglevel';
-import { invokeNativeFunction, isInNativeApp } from '../../util/mobileAppUtils';
 const logger = log.getLogger('Microsoft');
 
 const refreshInterval = 60000;
@@ -82,7 +81,7 @@ export function MicrosoftDriveProvider({children}) {
                     setState('loaded');
                 })
             } catch (error) {
-                if (!isInNativeApp()) {
+                if (!window.isInNativeApp()) {
                     // did we get logged out or credentials were revoked?
                     if (error && error.status === 401) {
                         setLoggedIn(false);
@@ -94,7 +93,7 @@ export function MicrosoftDriveProvider({children}) {
                         })
                     }
                 } else {
-                    invokeNativeFunction('acquireMobileToken', Math.random(), false)
+                    window.invokeNativeFunction('acquireMobileToken', Math.random(), false)
                 }
             }
         }

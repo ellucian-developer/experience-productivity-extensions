@@ -9,7 +9,6 @@ import { Context } from '../../context-hooks/auth-context-hooks';
 import { acquireToken, initializeAuthEvents, initializeMicrosoft, initializeGraphClient, login, logout } from '../util/auth';
 
 import log from 'loglevel';
-import { invokeNativeFunction, isInNativeApp, setInvokable } from '../../util/mobileAppUtils';
 import { Client } from '@microsoft/microsoft-graph-client';
 const logger = log.getLogger('Microsoft');
 
@@ -43,11 +42,11 @@ export function MicrosoftAuthProvider({ children }) {
                 setLoggedIn(true);
             }
         }
-        setInvokable('mobileLogin', mobileLogin);
+        window.setInvokable('mobileLogin', mobileLogin);
     }, [])
 
     useEffect(() => {
-        invokeNativeFunction('acquireMobileToken', Math.random(), false)
+        window.invokeNativeFunction('acquireMobileToken', Math.random(), false)
     }, [])
 
     useEffect(() => {
@@ -59,14 +58,14 @@ export function MicrosoftAuthProvider({ children }) {
                 setLoadingStatus(false)
             }
         }
-        setInvokable('setLoading', setLoading);
+        window.setInvokable('setLoading', setLoading);
     }, [])
 
     useEffect(() => {
         function mobileLogOut() {
             setState('event-logout')
         }
-        setInvokable('mobileLogout', mobileLogOut);
+        window.setInvokable('mobileLogout', mobileLogOut);
     }, [])
     // eslint-disable-next-line complexity
     useEffect(() => {
@@ -81,7 +80,7 @@ export function MicrosoftAuthProvider({ children }) {
                     (async () => {
                         if (await acquireToken({ aadClientId, aadTenantId, cacheGetItem, cacheStoreItem, msalClient, trySsoSilent: true })) {
                             setState('do-graph-initialize');
-                        } else if (!isInNativeApp()) {
+                        } else if (!window.isInNativeApp()) {
                             setState('ready');
                         }
                     })();
@@ -109,7 +108,7 @@ export function MicrosoftAuthProvider({ children }) {
                 }
                 break;
             case 'do-graph-initialize':
-                if (!isInNativeApp()) {
+                if (!window.isInNativeApp()) {
                     if (aadClientId && aadRedirectUrl && aadTenantId && msalClient) {
                         const graphClient = initializeGraphClient({ aadClientId, aadTenantId, msalClient, setError });
                         if (graphClient) {
