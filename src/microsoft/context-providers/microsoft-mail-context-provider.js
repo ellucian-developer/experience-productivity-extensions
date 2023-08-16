@@ -161,7 +161,8 @@ export function MicrosoftMailProvider({children}) {
                     })();
                 }
             } catch (error) {
-                if (!window.isInNativeApp()) {
+                // check whether we are in the native app
+                if (window?.isInNativeApp ? !window.isInNativeApp() : true) {
                     // did we get logged out or credentials were revoked?
                     if (error && error.status === 401) {
                         setLoggedIn(false);
@@ -172,7 +173,7 @@ export function MicrosoftMailProvider({children}) {
                             setError(error);
                         });
                     }
-                } else {
+                } else if (window?.invokeNativeFunction) {
                     window.invokeNativeFunction('acquireMobileToken', Math.random(), false)
                 }
             }

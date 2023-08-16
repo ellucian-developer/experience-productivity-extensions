@@ -42,11 +42,15 @@ export function MicrosoftAuthProvider({ children }) {
                 setLoggedIn(true);
             }
         }
-        window.setInvokable('mobileLogin', mobileLogin);
+        if (window?.setInvokable) {
+            window.setInvokable('mobileLogin', mobileLogin);
+        }
     }, [])
 
     useEffect(() => {
-        window.invokeNativeFunction('acquireMobileToken', Math.random(), false)
+        if (window?.invokeNativeFunction) {
+            window.invokeNativeFunction('acquireMobileToken', Math.random(), false)
+        }
     }, [])
 
     useEffect(() => {
@@ -58,14 +62,18 @@ export function MicrosoftAuthProvider({ children }) {
                 setLoadingStatus(false)
             }
         }
-        window.setInvokable('setLoading', setLoading);
+        if (window?.setInvokable) {
+            window.setInvokable('setLoading', setLoading);
+        }
     }, [])
 
     useEffect(() => {
         function mobileLogOut() {
             setState('event-logout')
         }
-        window.setInvokable('mobileLogout', mobileLogOut);
+        if (window?.setInvokable) {
+            window.setInvokable('mobileLogout', mobileLogOut);
+        }
     }, [])
     // eslint-disable-next-line complexity
     useEffect(() => {
@@ -80,7 +88,9 @@ export function MicrosoftAuthProvider({ children }) {
                     (async () => {
                         if (await acquireToken({ aadClientId, aadTenantId, cacheGetItem, cacheStoreItem, msalClient, trySsoSilent: true })) {
                             setState('do-graph-initialize');
-                        } else if (!window.isInNativeApp()) {
+                        }
+                        // check whether we are in the native app
+                        else if (window?.isInNativeApp ? !window.isInNativeApp() : true) {
                             setState('ready');
                         }
                     })();
@@ -108,7 +118,8 @@ export function MicrosoftAuthProvider({ children }) {
                 }
                 break;
             case 'do-graph-initialize':
-                if (!window.isInNativeApp()) {
+                // check whether we are in the native app
+                if (window?.isInNativeApp ? !window.isInNativeApp() : true) {
                     if (aadClientId && aadRedirectUrl && aadTenantId && msalClient) {
                         const graphClient = initializeGraphClient({ aadClientId, aadTenantId, msalClient, setError });
                         if (graphClient) {

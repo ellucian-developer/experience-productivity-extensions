@@ -32,7 +32,7 @@ function SignInButton({ classes, onClick}) {
 
     return (
         <Button className={classes.button} color='secondary' onClick={
-            window.isInNativeApp() ? () => window.invokeNativeFunction('userSignIn', { aadClientId, aadTenantId }, false)
+            window?.isInNativeApp && window.isInNativeApp() ? () => window?.invokeNativeFunction('userSignIn', { aadClientId, aadTenantId }, false)
                 : onClick}>
             <img className={classes.image} src={buttonImage} />
             {intl.formatMessage({ id: 'signIn' })}
