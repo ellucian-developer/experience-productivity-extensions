@@ -135,6 +135,9 @@ The Microsoft Azure Redirect URL, Application ID, and Tenant ID will be configur
 1. Click the "App Registrations" and create a new application in the tenant of your choice.
 1. Provide the name of your choice, eg. "Experience".
 1. Set the Redirect URI for the Single Page Application. Set this to the Ellucian Experience Dashboard URL from the About tab in Experience Setup.
+1. Set the Redirect URI for the Mobile and Desktop Application using Bundle identifier(IOS) and Application ID(Android) mentioned in the the Mobile Application tab in Experience Setup.
+<br/> Redirect URI Format: `<Bundle identifier>//oauth/redirect/` <br/> Example: `com.test.eee//oauth/redirect/`
+1. If you have used different Bundle identifier for IOS and Application ID for Android then add both Redirect URIs in the above said format.
 1. Click the application link you just created, and navigate to the Redirect URIs ‘spa’ link.
 1. Make sure it shows the Grant Type ‘Your Redirect URI is eligible for the Authorization Code Flow with PKCE’.
 1. The application has been created successfully.
