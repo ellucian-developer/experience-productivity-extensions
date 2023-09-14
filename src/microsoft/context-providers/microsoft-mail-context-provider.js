@@ -161,15 +161,20 @@ export function MicrosoftMailProvider({children}) {
                     })();
                 }
             } catch (error) {
-                // did we get logged out or credentials were revoked?
-                if (error && error.status === 401) {
-                    setLoggedIn(false);
-                } else {
-                    logger.error('Outlook mapi failed\n', error);
-                    unstable_batchedUpdates(() => {
-                        setState(() => ({ error: 'api'}));
-                        setError(error);
-                    });
+                // check whether we are in the native app
+                if (window?.isInNativeApp ? !window.isInNativeApp() : true) {
+                    // did we get logged out or credentials were revoked?
+                    if (error && error.status === 401) {
+                        setLoggedIn(false);
+                    } else {
+                        logger.error('Outlook mapi failed\n', error);
+                        unstable_batchedUpdates(() => {
+                            setState(() => ({ error: 'api' }));
+                            setError(error);
+                        });
+                    }
+                } else if (window?.invokeNativeFunction) {
+                    window.invokeNativeFunction('acquireMobileToken', Math.random(), false)
                 }
             }
         }

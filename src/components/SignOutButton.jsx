@@ -27,9 +27,11 @@ function SignOutButton({classes, className = '', onClick}) {
 
 
     return (
-        <Button className={classnames(className, classes.button)} color='secondary' onClick={onClick}>
-            <img className={classes.image} src={buttonImage}/>
-            {intl.formatMessage({id: 'signOut'})}
+        <Button className={classnames(className, classes.button)} color='secondary' onClick={
+            window?.isInNativeApp && window.isInNativeApp() ? () => window?.invokeNativeFunction('userSignOut', Math.random(), false)
+                : onClick}>
+            <img className={classes.image} src={buttonImage} />
+            {intl.formatMessage({ id: 'signOut' })}
         </Button>
     );
 }
