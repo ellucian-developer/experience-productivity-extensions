@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import log from 'loglevel';
 const logger = log.getLogger('Microsoft');
 
-const microsoftScopes = [
+ export const microsoftScopes = [
     'files.read',
     'files.read.all',
     'mail.read',
