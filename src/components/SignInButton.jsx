@@ -10,6 +10,8 @@ import { spacing30 } from '@ellucian/react-design-system/core/styles/tokens';
 
 import { useComponents, useIntl } from '../context-hooks/card-context-hooks';
 import { useCardInfo } from '@ellucian/experience-extension-utils';
+import { microsoftScopes }  from '../microsoft/util/auth'
+import { expMobileExtensionId } from '../../microsoft-extension'
 
 const styles = () => ({
     button: {
@@ -29,10 +31,9 @@ function SignInButton({ classes, onClick}) {
             aadTenantId
         }
     } = useCardInfo();
-
     return (
         <Button className={classes.button} color='secondary' onClick={
-            window?.isInNativeApp && window.isInNativeApp() ? () => window?.invokeNativeFunction('userSignIn', { aadClientId, aadTenantId }, false)
+            window?.isInNativeApp && window.isInNativeApp() ? () => window?.invokeNativeFunction('userSignIn', { aadClientId, aadTenantId, microsoftScopes, expMobileExtensionId }, false)
                 : onClick}>
             <img className={classes.image} src={buttonImage} />
             {intl.formatMessage({ id: 'signIn' })}

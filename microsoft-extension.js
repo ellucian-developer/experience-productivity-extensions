@@ -1,6 +1,7 @@
 // Copyright 2021-2023 Ellucian Company L.P. and its affiliates.
 
 module.exports = {
+    expMobileExtensionId: '2ert245hgrt53rgrtfdsl',
     name: 'microsoft-productivity-tools',
     publisher: '',
     configuration: {

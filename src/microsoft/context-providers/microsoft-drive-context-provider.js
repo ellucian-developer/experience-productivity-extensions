@@ -9,7 +9,7 @@ import { getFileTypeIconUriByExtension } from '@microsoft/mgt-components/dist/es
 
 import { useAuth } from '../../context-hooks/auth-context-hooks';
 import { Context } from '../../context-hooks/drive-context-hooks';
-
+import { expMobileExtensionId } from '../../../microsoft-extension'
 import log from 'loglevel';
 const logger = log.getLogger('Microsoft');
 
@@ -94,7 +94,7 @@ export function MicrosoftDriveProvider({children}) {
                         })
                     }
                 } else if (window?.invokeNativeFunction) {
-                    window.invokeNativeFunction('acquireMobileToken', Math.random(), false)
+                    window.invokeNativeFunction('acquireMobileToken', {randomVal: Math.random(), expMobileExtensionId}, false)
                 }
             }
         }
