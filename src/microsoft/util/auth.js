@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import log from 'loglevel';
 const logger = log.getLogger('Microsoft');
 
-// offline_access is required for EXP mobile refresh token
+// "offline_access" scope is necessary for obtaining refresh token in EXP mobile .
 export const microsoftScopes = [
     'files.read',
     'files.read.all',

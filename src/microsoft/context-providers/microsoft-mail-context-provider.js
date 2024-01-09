@@ -12,7 +12,7 @@ import { useUserInfo } from '@ellucian/experience-extension-utils';
 import { useAuth } from '../../context-hooks/auth-context-hooks';
 import { Context } from '../../context-hooks/mail-context-hooks';
 import { isToday, getInitials } from '../../util/mail';
-import { expMobileExtensionId } from '../../../microsoft-extension'
+import { name, publisher } from '../../../microsoft-extension'
 import log from 'loglevel';
 const logger = log.getLogger('Microsoft');
 
@@ -174,7 +174,7 @@ export function MicrosoftMailProvider({children}) {
                         });
                     }
                 } else if (window?.invokeNativeFunction) {
-                    window.invokeNativeFunction('acquireMobileToken', {randomVal: Math.random(), expMobileExtensionId}, false)
+                    window.invokeNativeFunction('acquireMobileToken', {randomVal: Math.random(), extName:`${name.replace(/ /g, '')}+${publisher.replace(/ /g, '')}`}, false)
                 }
             }
         }
