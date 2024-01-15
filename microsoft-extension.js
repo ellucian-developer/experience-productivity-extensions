@@ -22,17 +22,17 @@ module.exports = {
         }]
 	},
     cards: [{
-        type: 'OutlookCard Test2',
+        type: 'OutlookCard',
         source: './src/microsoft/cards/OutlookMailCard',
-        title: 'Outlook Beta Test2',
-        displayCardType: 'Outlook Test 1',
+        title: 'Outlook',
+        displayCardType: 'Outlook',
         description: 'This card displays Office 365 Mail'
     },
     {
-        type: 'OneDriveCard Test2',
+        type: 'OneDriveCard',
         source: './src/microsoft/cards/OneDriveCard',
-        title: 'OneDrive Beta Test2',
-        displayCardType: 'OneDrive Test 1',
+        title: 'OneDrive',
+        displayCardType: 'OneDrive',
         description: 'This card displays OneDrive'
     }]
 }
