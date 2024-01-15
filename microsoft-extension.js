@@ -1,9 +1,8 @@
 // Copyright 2021-2023 Ellucian Company L.P. and its affiliates.
 
 module.exports = {
-    expMobileExtensionId: '2ert245hgrt53rgrtfdsl',
     name: 'microsoft-productivity-tools',
-    publisher: '',
+    publisher: 'Rahul Kumar',
     configuration: {
         client: [{
             key: 'aadRedirectUrl',
@@ -23,17 +22,17 @@ module.exports = {
         }]
 	},
     cards: [{
-        type: 'OutlookCard',
+        type: 'OutlookCard Test2',
         source: './src/microsoft/cards/OutlookMailCard',
-        title: 'Outlook',
-        displayCardType: 'Outlook',
+        title: 'Outlook Beta Test2',
+        displayCardType: 'Outlook Test 1',
         description: 'This card displays Office 365 Mail'
     },
     {
-        type: 'OneDriveCard',
+        type: 'OneDriveCard Test2',
         source: './src/microsoft/cards/OneDriveCard',
-        title: 'OneDrive',
-        displayCardType: 'OneDrive',
+        title: 'OneDrive Beta Test2',
+        displayCardType: 'OneDrive Test 1',
         description: 'This card displays OneDrive'
     }]
 }
