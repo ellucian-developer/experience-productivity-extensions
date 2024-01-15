@@ -2,7 +2,7 @@
 
 module.exports = {
     name: 'microsoft-productivity-tools',
-    publisher: 'Rahul Kumar',
+    publisher: '',
     configuration: {
         client: [{
             key: 'aadRedirectUrl',
