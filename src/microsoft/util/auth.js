@@ -8,13 +8,15 @@ import { v4 as uuidv4 } from 'uuid';
 import log from 'loglevel';
 const logger = log.getLogger('Microsoft');
 
-const microsoftScopes = [
+// "offline_access" scope is necessary for obtaining refresh token in EXP mobile .
+export const microsoftScopes = [
     'files.read',
     'files.read.all',
     'mail.read',
     'mail.read.shared',
     'user.read',
-    'user.readbasic.all'
+    'user.readbasic.all',
+    "offline_access"
 ];
 
 export function authorityUrl(tenantId) {
