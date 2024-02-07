@@ -10,6 +10,8 @@ import { acquireToken, initializeAuthEvents, initializeMicrosoft, initializeGrap
 
 import log from 'loglevel';
 import { Client } from '@microsoft/microsoft-graph-client';
+import { name, publisher } from '../../../microsoft-extension'
+
 const logger = log.getLogger('Microsoft');
 
 export function MicrosoftAuthProvider({ children }) {
@@ -49,7 +51,7 @@ export function MicrosoftAuthProvider({ children }) {
 
     useEffect(() => {
         if (window?.invokeNativeFunction) {
-            window.invokeNativeFunction('acquireMobileToken', Math.random(), false)
+            window.invokeNativeFunction('acquireMobileToken', {randomVal: Math.random(), extName:`${name.replace(/ /g, '')}+${publisher.replace(/ /g, '')}`}, false)
         }
     }, [])
 

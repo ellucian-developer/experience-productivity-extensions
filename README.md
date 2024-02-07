@@ -152,6 +152,9 @@ The Microsoft Azure Redirect URL, Application ID, and Tenant ID will be configur
     - Mail.Read.Shared
     - Files.Read
     - Files.Read.All
+    - offline_access
+
+     Note: offline_access permissions is mandatory for Experience mobile app.
 1. Copy the ClientId and TenantId for the application, and configure them in the Experience OneDrive card configuration.
 
     After setting the API permissions, here is how it will look:
