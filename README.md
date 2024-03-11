@@ -72,11 +72,11 @@ Use your favorite Git tool to clone this repository.
 
 # <a name="google"></a>Google Extension
 ## <a name="google-build"></a>Google Extension - build and upload
-1. Obtain an upload token from Experience Setup and add that token to .env, as described in [Build and upload an extension](https://resources.elluciancloud.com/bundle/ellucian_experience_acn_use/page/t_upload_extension.html).
+1. Obtain an upload token from Experience Setup and add that token to .env, as described in [Build and upload an extension](https://resources.elluciancloud.com/bundle/ellucian_experience/page/t_upload_extension.html).
 1. Update publisher in `google-extension.js`.
 1. Run 'npm install' to install all the dependencies.
 1. Run one of the deployment npm scripts, such as 'npm run google-watch-and-upload' (for development).
-1. Enable the extension and add it to an environment(s) in Experience Setup -> Extensions, using the procedure in [Enable an extension in Experience environments](https://resources.elluciancloud.com/bundle/ellucian_experience_acn_use/page/t_enable_extension_experience_envs.html). 
+1. Enable the extension and add it to an environment(s) in Experience Setup -> Extensions, using the procedure in [Enable an extension in Experience environments](https://resources.elluciancloud.com/bundle/ellucian_experience/page/t_enable_extension_experience_envs.html). 
 
 ## <a name="google-configuration"></a>Google Configuration
 The Google cards use a Google OAuth client ID to initiate an OAuth Authorization Code flow with PKCE. This is done using Google Identity's Google Sign-In for Websites [see reference](https://developers.google.com/identity/sign-in/web/reference)
@@ -109,20 +109,20 @@ The Google Client ID will be configured in Experience later.
 1. Click "CREATE". You can copy the Client ID from here. Client Secret is not needed.
 
 ## <a name="configure-google-cards"></a>Configure Google Cards
-Configure the Google cards using the procedure in [Set up an extension card in an environment](https://resources.elluciancloud.com/bundle/ellucian_experience_acn_use/page/t_set_up_extension_card.html). In the Configure step of the wizard, enter the Google OAuth client ID that you created in Google. A valid Google OAuth client ID will end with '.apps.googleusercontent.com'.
+Configure the Google cards using the procedure in [Set up an extension card in an environment](https://resources.elluciancloud.com/bundle/ellucian_experience/page/t_set_up_extension_card.html). In the Configure step of the wizard, enter the Google OAuth client ID that you created in Google. A valid Google OAuth client ID will end with '.apps.googleusercontent.com'.
 
 The Configure step values are shared by both Google Cards because it is an extension-level setting.
 
 # <a name="microsoft"></a>Microsoft Extension
 ## <a name="microsoft-build"></a>Microsoft Extension - build and upload
-1. Obtain an upload token from Experience Setup and add that token to .env, as described in [Build and upload an extension](https://resources.elluciancloud.com/bundle/ellucian_experience_acn_use/page/t_upload_extension.html).</br>
+1. Obtain an upload token from Experience Setup and add that token to .env, as described in [Build and upload an extension](https://resources.elluciancloud.com/bundle/ellucian_experience/page/t_upload_extension.html).</br>
 optional .env variables.</br>
 `OUTLOOK_MESSAGE_TEMPLATE_URL` can be used to customize the URL opened when you click on a mail message. Default is `'https://outlook.office.com/mail/inbox/id/{id}'`</br>
 `OUTLOOK_USE_WEB_LINK` set to `'true'` can be used to use the deep link webLink URL as sent by the Microsoft Graph API with the message. Default is false.
 1. Update publisher in `microsoft-extension.js`.
 1. Run 'npm install' to install all the dependencies.
 1. Run one of the deployment npm scripts, such as 'npm run microsoft-watch-and-upload' (for development).
-1. Enable the extension and add it to an environment(s) in Experience Setup -> Extensions, using the procedure in [Enable an extension in Experience environments](https://resources.elluciancloud.com/bundle/ellucian_experience_acn_use/page/t_enable_extension_experience_envs.html). 
+1. Enable the extension and add it to an environment(s) in Experience Setup -> Extensions, using the procedure in [Enable an extension in Experience environments](https://resources.elluciancloud.com/bundle/ellucian_experience/page/t_enable_extension_experience_envs.html). 
 
 ## <a name="microsoft-configuration"></a>Microsoft Configuration
 The Microsoft cards use an Azure AD Application ID to initiate an OAuth Authorization Code flow with PKCE. This is done using the Microsoft Authentication Library for JavaScript [see reference](https://github.com/AzureAD/microsoft-authentication-library-for-js#readme).
@@ -163,7 +163,7 @@ The Microsoft Azure Redirect URL, Application ID, and Tenant ID will be configur
     </p>
 
 ## <a name="configure-microsoft-cards"></a>Configure Microsoft Cards
-Configure the Microsoft cards using the procedure in [Set up an extension card in an environment](https://resources.elluciancloud.com/bundle/ellucian_experience_acn_use/page/t_set_up_extension_card.html). In the Configure step of the wizard, enter the Redirect URL exactly as it was entered in the Azure AD Application; the Azure AD Application ID; and Tenant ID.
+Configure the Microsoft cards using the procedure in [Set up an extension card in an environment](https://resources.elluciancloud.com/bundle/ellucian_experience/page/t_set_up_extension_card.html). In the Configure step of the wizard, enter the Redirect URL exactly as it was entered in the Azure AD Application; the Azure AD Application ID; and Tenant ID.
 
 The Configure step values are shared by both Microsoft Cards because it is an extension-level setting.
 
