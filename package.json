@@ -16,13 +16,13 @@
     "google-deploy-dev": "webpack --config google-webpack.config.js --progress --mode development --env verbose --env upload",
     "google-deploy-prod": "webpack --config google-webpack.config.js --progress --mode production --env verbose --env upload",
     "google-watch-and-upload": "webpack --config google-webpack.config.js --hot --watch --mode development --env verbose --env upload --env forceUpload",
-    "google-start": "webpack --config google-webpack.config.js serve --mode development --env verbose --env liveReload",
+    "google-start": "webpack serve --config google-webpack.config.js --mode development --env verbose --env liveReload",
     "microsoft-build-dev": "webpack --config microsoft-webpack.config.js --progress --mode development --env verbose",
     "microsoft-build-prod": "webpack --config microsoft-webpack.config.js --progress --mode production --env verbose",
     "microsoft-deploy-dev": "webpack --config microsoft-webpack.config.js --progress --mode development --env verbose --env upload",
     "microsoft-deploy-prod": "webpack --config microsoft-webpack.config.js --progress --mode production --env verbose --env upload",
     "microsoft-watch-and-upload": "webpack --config microsoft-webpack.config.js --hot --watch --mode development --env verbose --env upload --env forceUpload",
-    "microsoft-start": "webpack --config microsoft-webpack.config.js serve --mode development --env verbose --env liveReload"
+    "microsoft-start": "webpack serve --config microsoft-webpack.config.js --mode development --env verbose --env liveReload"
   },
   "dependencies": {
     "@azure/msal-browser": "2.14.2",
